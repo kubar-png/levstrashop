@@ -16,8 +16,11 @@ import {
   productsByCategoryQuery,
   categoriesQuery,
   colorSiblingsQuery,
+  allPostsQuery,
+  postBySlugQuery,
+  recentPostsQuery,
 } from '@/sanity/queries';
-import type { Product, ProductSummary, Category } from '@/sanity/types';
+import type { Product, ProductSummary, Category, Post, PostSummary } from '@/sanity/types';
 import { mockProducts, mockSummaries, mockCategories } from './mock-data';
 
 export type PlaceholderSpec = {
@@ -213,5 +216,69 @@ export async function getCategories(): Promise<CategoryView[]> {
     return rows.length ? rows : mockCategories;
   } catch {
     return mockCategories;
+  }
+}
+
+/* ── Blog ─────────────────────────────────────────────────────────── */
+
+export type PostSummaryView = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImageUrl: string | null;
+  publishedAt: string;
+  readingMinutes?: number;
+};
+
+export type PostView = PostSummaryView & {
+  body?: Post['body'];
+};
+
+function toPostSummary(p: PostSummary): PostSummaryView {
+  return {
+    _id: p._id,
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt,
+    coverImageUrl: p.coverImage?.asset?._ref
+      ? urlFor(p.coverImage).width(1200).fit('max').url()
+      : null,
+    publishedAt: p.publishedAt,
+    readingMinutes: p.readingMinutes,
+  };
+}
+
+export async function getAllPosts(): Promise<PostSummaryView[]> {
+  if (!isSanityConfigured()) return [];
+  try {
+    const rows = await sanityClient.fetch<PostSummary[]>(allPostsQuery);
+    return rows.map(toPostSummary);
+  } catch {
+    return [];
+  }
+}
+
+export async function getPostBySlug(slug: string): Promise<PostView | null> {
+  if (!isSanityConfigured()) return null;
+  try {
+    const row = await sanityClient.fetch<Post | null>(postBySlugQuery, { slug });
+    if (!row) return null;
+    return {
+      ...toPostSummary(row),
+      body: row.body,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function getRecentPosts(excludeSlug: string): Promise<PostSummaryView[]> {
+  if (!isSanityConfigured()) return [];
+  try {
+    const rows = await sanityClient.fetch<PostSummary[]>(recentPostsQuery, { excludeSlug });
+    return rows.map(toPostSummary);
+  } catch {
+    return [];
   }
 }

@@ -55,3 +55,17 @@ export type Product = {
   colorGroup?: string;
   colorHex?: string;
 };
+
+export type PostSummary = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  coverImage?: SanityImage;
+  publishedAt: string;
+  readingMinutes?: number;
+};
+
+export type Post = PostSummary & {
+  body?: PortableTextBlock[];
+};

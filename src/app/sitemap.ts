@@ -5,6 +5,7 @@ import { sanityClient } from '@/sanity/client';
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://levstra.cz';
 
 const productSlugsQuery = groq`*[_type=="product" && active==true].slug.current`;
+const postSlugsQuery = groq`*[_type=="post" && published==true].slug.current`;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
@@ -28,8 +29,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   let productSlugs: string[] = [];
+  let postSlugs: string[] = [];
   try {
-    productSlugs = await sanityClient.fetch<string[]>(productSlugsQuery);
+    [productSlugs, postSlugs] = await Promise.all([
+      sanityClient.fetch<string[]>(productSlugsQuery),
+      sanityClient.fetch<string[]>(postSlugsQuery),
+    ]);
   } catch {}
 
   const productRoutes = productSlugs.map((slug) => ({
@@ -39,5 +44,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...productRoutes];
+  const postRoutes = postSlugs.map((slug) => ({
+    url: `${BASE}/blog/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...productRoutes, ...postRoutes];
 }
