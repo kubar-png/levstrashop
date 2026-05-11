@@ -22,7 +22,10 @@ export default async function HomePage() {
     <>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="-mt-[76px] px-4 pt-4 md:-mt-[88px] md:px-6 md:pt-5">
-        <div className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.25rem] aspect-[3/4] sm:aspect-[16/10] md:aspect-[16/8]">
+        <div
+          className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[16/10] md:aspect-[16/8]"
+          style={{ borderRadius: 'var(--radius-2xl)' }}
+        >
           <Image
             src={IMG.hero}
             alt="Cestujte se stylem — Levstra"
@@ -33,23 +36,31 @@ export default async function HomePage() {
             <div className="w-full px-4 md:px-6">
               <div className="max-w-5xl">
                 <h1
-                  className="font-poppins-semibold leading-[1.0] text-white"
-                  style={{ fontSize: 'clamp(2rem, 7.5vw, 8rem)', letterSpacing: '-0.035em', color: '#fff' }}
+                  className="font-poppins-semibold leading-[1.0]"
+                  style={{
+                    fontSize: 'var(--text-display)',
+                    letterSpacing: '-0.035em',
+                    color: '#fff',
+                  }}
                 >
                   Cestujte se<br />stylem.
                 </h1>
                 <p
-                  className="font-serif mt-4 text-white"
-                  style={{ fontSize: 'clamp(1rem, 2.4vw, 2.8rem)', lineHeight: 1.35, color: '#fff' }}
+                  className="font-serif mt-4"
+                  style={{
+                    fontSize: 'var(--text-lead)',
+                    lineHeight: 1.35,
+                    color: '#fff',
+                  }}
                 >
                   Kufry a kabelky, které zvládnou letiště i&nbsp;večerní rande
                 </p>
                 <Link
                   href="/shop"
-                  className="marina-btn mt-6 inline-flex items-center rounded-xl border-2 border-white px-9 py-3.5 font-poppins-semibold"
-                  style={{ fontSize: '20px' }}
+                  className="btn-primary mt-6"
+                  data-on-dark="true"
                 >
-                  <span className="marina-btn-text text-white">Nakupovat</span>
+                  Nakupovat
                 </Link>
               </div>
             </div>
@@ -63,7 +74,8 @@ export default async function HomePage() {
       {/* ── MARINA GALANTI BANNER ─────────────────────────────────────── */}
       <section className="px-4 pt-4 md:px-6 md:pt-5">
         <div
-          className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.25rem] aspect-[4/3] sm:aspect-[16/9] md:aspect-[16/6]"
+          className="relative w-full overflow-hidden aspect-[4/3] sm:aspect-[16/9] md:aspect-[16/6]"
+          style={{ borderRadius: 'var(--radius-2xl)' }}
         >
           <Image
             src={IMG.marinaModel}
@@ -83,23 +95,31 @@ export default async function HomePage() {
             <div className="w-full px-4 md:px-6">
               <div className="max-w-lg">
                 <h2
-                  className="font-poppins-semibold leading-[1.05] text-white"
-                  style={{ color: '#fff', fontSize: 'clamp(1.75rem, 4vw, 3rem)', letterSpacing: '-0.03em' }}
+                  className="font-poppins-semibold leading-[1.05]"
+                  style={{
+                    color: '#fff',
+                    fontSize: 'var(--text-h1)',
+                    letterSpacing: '-0.03em',
+                  }}
                 >
                   Lehkost, styl,<br />nadčasovost.
                 </h2>
                 <p
-                  className="font-serif mt-3 text-white"
-                  style={{ color: '#fff', fontSize: 'clamp(0.9rem, 1.5vw, 1.3rem)', lineHeight: 1.35 }}
+                  className="font-serif mt-3"
+                  style={{
+                    color: '#fff',
+                    fontSize: 'var(--text-lead)',
+                    lineHeight: 1.35,
+                  }}
                 >
                   Nové kousky Marina Galanti už jsou skladem.
                 </p>
                 <Link
                   href="/shop/kabelky"
-                  className="marina-btn mt-5 inline-flex items-center rounded-xl border-2 border-white px-7 py-3 font-poppins-semibold"
-                  style={{ fontSize: '16px' }}
+                  className="btn-secondary mt-5"
+                  data-on-dark="true"
                 >
-                  <span className="marina-btn-text text-white">Prohlédnout kolekci</span>
+                  Prohlédnout kolekci
                 </Link>
               </div>
             </div>
@@ -111,20 +131,23 @@ export default async function HomePage() {
       </section>
 
       {/* ── CATEGORY GRID ────────────────────────────────────────────── */}
-      <section className="px-4 py-12 md:px-6 md:py-16">
+      <section
+        className="px-4 md:px-6"
+        style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}
+      >
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
           <div className="flex flex-col items-start gap-6 md:w-[30%] md:pt-1">
             <h2
-              className="font-poppins-semibold leading-[1.1] tracking-tight"
-              style={{ color: '#2B312F', fontSize: 'clamp(1.5rem, 2.5vw, 2.25rem)' }}
+              className="font-poppins-semibold leading-[1.1]"
+              style={{
+                color: 'var(--color-ink)',
+                fontSize: 'var(--text-h2)',
+                letterSpacing: '-0.025em',
+              }}
             >
               Nakupujte podle kategorie
             </h2>
-            <Link
-              href="/shop"
-              className="inline-flex items-center rounded-xl border-2 px-5 py-2 text-sm font-semibold transition hover:opacity-70"
-              style={{ borderColor: '#2D5143', color: '#2D5143' }}
-            >
+            <Link href="/shop" className="btn-secondary">
               Zobrazit vše
             </Link>
           </div>
@@ -136,26 +159,44 @@ export default async function HomePage() {
       </section>
 
       {/* ── BRAND STORY ──────────────────────────────────────────────── */}
-      <section className="px-4 py-12 md:px-6 md:py-16">
+      <section
+        className="px-4 md:px-6"
+        style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}
+      >
         <div
-          className="reveal-on-scroll rounded-3xl px-8 py-12 text-center md:px-20 md:py-16"
-          style={{ background: '#A0C8FF' }}
+          className="reveal-on-scroll px-8 py-12 text-center md:px-20 md:py-16"
+          style={{
+            background: 'var(--color-sky)',
+            borderRadius: 'var(--radius-xl)',
+          }}
         >
           <h2
             className="font-poppins-semibold leading-[1.1]"
-            style={{ color: '#2D5143', fontSize: 'clamp(1.5rem, 3vw, 2.5rem)' }}
+            style={{
+              color: 'var(--color-forest)',
+              fontSize: 'var(--text-h1)',
+              letterSpacing: '-0.025em',
+            }}
           >
             Náš příběh
           </h2>
           <p
-            className="font-serif mx-auto mt-6 max-w-4xl leading-[1.25]"
-            style={{ color: '#2D5143', fontSize: 'clamp(1.5rem, 3.5vw, 3rem)' }}
+            className="font-serif mx-auto mt-6 max-w-3xl"
+            style={{
+              color: 'var(--color-forest)',
+              fontSize: 'var(--text-lead)',
+              lineHeight: 1.5,
+            }}
           >
             Módu dovážíme už přes dvě desetiletí. Za tu dobu nám rukama prošly stovky kolekcí – a my dnes víme přesně, co má smysl nabízet dál.
           </p>
           <p
             className="font-poppins-light mt-8"
-            style={{ color: '#2D5143', fontSize: '13px' }}
+            style={{
+              color: 'var(--color-forest)',
+              fontSize: 'var(--text-small)',
+              letterSpacing: '0.04em',
+            }}
           >
             Protože každý si zaslouží kvalitní módu.
           </p>
@@ -172,9 +213,17 @@ function CategoryCard({ href, label, image }: { href: string; label: string; ima
   return (
     <Link
       href={href}
-      className="group block rounded-2xl p-3 transition-colors duration-500 bg-[#F2F0EB] hover:bg-[#C7DFFF]"
+      className="group block p-3 transition-colors duration-500 bg-[var(--color-cream)] hover:bg-[var(--color-sky-light)]"
+      style={{ borderRadius: 'var(--radius-lg)' }}
     >
-      <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: '3/4', maxHeight: '42vh' }}>
+      <div
+        className="relative w-full overflow-hidden"
+        style={{
+          aspectRatio: '3/4',
+          maxHeight: '42vh',
+          borderRadius: 'var(--radius-md)',
+        }}
+      >
         <Image
           src={image} alt={label} fill
           sizes="(min-width: 768px) 34vw, 50vw"
@@ -183,13 +232,16 @@ function CategoryCard({ href, label, image }: { href: string; label: string; ima
       </div>
       <div className="mt-3">
         <div
-          className="cat-label w-full rounded-xl border-2 py-3 md:py-3.5"
-          style={{ borderColor: '#2B312F' }}
+          className="cat-label w-full border-2 py-3 md:py-3.5"
+          style={{
+            borderColor: 'var(--color-ink)',
+            borderRadius: 'var(--radius-md)',
+          }}
         >
           <div className="cat-label-inner">
             <span
               className="cat-label-word font-poppins-semibold lowercase tracking-wide"
-              style={{ fontSize: 'clamp(1.05rem, 1.6vw, 1.3rem)' }}
+              style={{ fontSize: 'var(--text-lead)' }}
             >
               {label}
             </span>
