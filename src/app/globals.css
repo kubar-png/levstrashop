@@ -130,14 +130,23 @@ h1 { letter-spacing: -0.035em; }
 
 /* Page transition — triggered by key change in PageTransition component. */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(9px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 .page-transition {
-  animation: page-enter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: page-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .page-transition { animation: none; }
+}
+
+/* Smooth-scroll companion: enables snap-to-anchor for in-page links
+   when Lenis isn't running (reduced motion). */
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
 
 /* Scroll-triggered reveal — slides up + fades in as element enters viewport. */

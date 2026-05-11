@@ -4,16 +4,24 @@ import { getFeaturedProducts } from '@/lib/data';
 import { PromoTicker } from '@/components/PromoTicker';
 import { InstagramSection } from '@/components/InstagramSection';
 import { ProductCarousel } from '@/components/ProductCarousel';
+import { HeroGallery } from '@/components/HeroGallery';
 
 export const revalidate = 60;
 
 const WIX = 'https://static.wixstatic.com/media';
 const IMG = {
-  hero:        `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`,
   marinaModel: `${WIX}/f0cf6b_0fb65fabc4d54b149a2b6213e5153e9e~mv2.jpg`,
   catKabelky:  `${WIX}/f0cf6b_8a21028ccb924868a7824d820313a55c~mv2.jpg`,
   catKufry:    `${WIX}/f0cf6b_3ce5a12e7ebe4524a196ef34a03d1e59~mv2.jpg`,
 };
+
+// Hero rotation images — swap freely from Sanity / your CDN.
+const HERO_IMAGES = [
+  `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`,
+  `${WIX}/f0cf6b_29b8ee8366484656828782c7267140df~mv2.jpg`,
+  `${WIX}/f0cf6b_447c2054b701497e93bbfa703008a619~mv2.jpg`,
+  `${WIX}/f0cf6b_59b0236fe6ae4dd39ea9700a093c14e4~mv2.jpg`,
+];
 
 export default async function HomePage() {
   const featured = await getFeaturedProducts();
@@ -26,13 +34,12 @@ export default async function HomePage() {
           className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[16/10] md:aspect-[16/8]"
           style={{ borderRadius: 'var(--radius-2xl)' }}
         >
-          <Image
-            src={IMG.hero}
-            alt="Cestujte se stylem — Levstra"
-            fill priority sizes="100vw"
-            className="object-cover object-[50%_20%]"
+          <HeroGallery images={HERO_IMAGES} alt="Cestujte se stylem — Levstra" />
+          <div
+            className="absolute inset-0 z-[5] pointer-events-none"
+            style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.45) 100%)' }}
           />
-          <div className="absolute inset-0 flex items-end pb-8 md:pb-12">
+          <div className="absolute inset-0 z-[6] flex items-end pb-8 md:pb-12 pointer-events-none">
             <div className="w-full px-4 md:px-6">
               <div className="max-w-5xl">
                 <h1
@@ -57,7 +64,7 @@ export default async function HomePage() {
                 </p>
                 <Link
                   href="/shop"
-                  className="btn-primary mt-6"
+                  className="btn-primary mt-6 pointer-events-auto"
                   data-on-dark="true"
                 >
                   Nakupovat
