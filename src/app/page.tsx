@@ -24,7 +24,7 @@ export default async function HomePage() {
     <>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="relative">
-        <div className="relative h-[78vh] min-h-[520px] w-full overflow-hidden md:h-[88vh]">
+        <div className="relative h-[58vh] min-h-[440px] w-full overflow-hidden md:h-[72vh]">
           <Image
             src={IMG.hero}
             alt="Cestujte se stylem — Levstra"
@@ -105,7 +105,7 @@ export default async function HomePage() {
               alt="Modelka s kabelkou Marina Galanti"
               fill
               sizes="(min-width: 768px) 50vw, 100vw"
-              className="object-cover"
+              className="object-cover object-[55%_75%] scale-[1.15]"
             />
           </div>
         </div>
