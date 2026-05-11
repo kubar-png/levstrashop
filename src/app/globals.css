@@ -140,15 +140,6 @@ h1 { letter-spacing: -0.035em; }
   .page-transition { animation: none; }
 }
 
-/* Native smooth scroll for anchor links and window.scrollTo —
-   does NOT smooth the mouse wheel, so it never feels laggy. */
-html {
-  scroll-behavior: smooth;
-}
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-}
-
 /* Scroll-triggered reveal — slides up + fades in as element enters viewport. */
 @keyframes reveal-up {
   from { opacity: 0; transform: translateY(56px); }
