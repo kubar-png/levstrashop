@@ -34,24 +34,50 @@ export function ProductCarousel({ products }: { products: ProductSummaryView[] }
   };
 
   return (
-    <section className="reveal-on-scroll px-4 py-16 md:px-6 md:py-20">
+    <section
+      className="reveal-on-scroll px-4 md:px-6"
+      style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}
+    >
       {/* ── Header row ── */}
       <div className="mb-10 flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-extrabold tracking-tight md:text-4xl">
+        <h2
+          className="font-poppins-semibold leading-[1.1]"
+          style={{
+            fontSize: 'var(--text-h2)',
+            color: 'var(--color-forest)',
+            letterSpacing: '-0.025em',
+          }}
+        >
           Nejoblíbenější kousky
         </h2>
 
         <div className="flex items-center gap-2.5">
-          {/* Left arrow — fades in after scrolling */}
-          <NavArrow dir="left" visible={canLeft} onClick={() => scroll('left')} />
-          {/* Right arrow — always shown initially */}
-          <NavArrow dir="right" visible={canRight} onClick={() => scroll('right')} />
-
-          <Link
-            href="/shop"
-            className="ml-2 inline-flex items-center rounded-xl border-2 px-5 py-2 text-sm font-semibold transition hover:opacity-70"
-            style={{ borderColor: '#2D5143', color: '#2D5143' }}
+          <button
+            type="button"
+            className="btn-icon"
+            aria-label="Posunout doleva"
+            onClick={() => scroll('left')}
+            aria-disabled={!canLeft}
+            disabled={!canLeft}
           >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="btn-icon"
+            aria-label="Posunout doprava"
+            onClick={() => scroll('right')}
+            aria-disabled={!canRight}
+            disabled={!canRight}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+
+          <Link href="/shop" className="btn-secondary ml-2 hidden sm:inline-flex">
             Zobrazit vše
           </Link>
         </div>
@@ -64,7 +90,6 @@ export function ProductCarousel({ products }: { products: ProductSummaryView[] }
         style={{ scrollSnapType: 'x mandatory' }}
       >
         {products.map((p) => {
-          // Build colorGroup swatches from inline siblings (this product + its siblings)
           const swatches =
             p.colorGroup && p.colorHex && p.colorSiblings?.length
               ? [
@@ -88,40 +113,13 @@ export function ProductCarousel({ products }: { products: ProductSummaryView[] }
           );
         })}
       </div>
-    </section>
-  );
-}
 
-function NavArrow({
-  dir,
-  visible,
-  onClick,
-}: {
-  dir: 'left' | 'right';
-  visible: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={dir === 'left' ? 'Posunout doleva' : 'Posunout doprava'}
-      className={[
-        'flex h-9 w-9 items-center justify-center rounded-full',
-        'transition-all duration-300',
-        'hover:brightness-110 active:scale-90',
-        visible
-          ? 'opacity-100 scale-100 pointer-events-auto'
-          : 'opacity-0 scale-75 pointer-events-none',
-      ].join(' ')}
-      style={{ background: '#2D5143' }}
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        {dir === 'left' ? (
-          <path d="M15 18l-6-6 6-6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-        ) : (
-          <path d="M9 18l6-6-6-6" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-        )}
-      </svg>
-    </button>
+      {/* Mobile "Zobrazit vše" CTA below the row */}
+      <div className="mt-6 flex justify-center sm:hidden">
+        <Link href="/shop" className="btn-secondary">
+          Zobrazit vše
+        </Link>
+      </div>
+    </section>
   );
 }

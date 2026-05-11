@@ -21,10 +21,23 @@ export function ProductCard({
         sizes="(min-width: 1024px) 25vw, 50vw"
       />
       <div className="mt-3 flex flex-col gap-1.5 px-1">
-        <h3 className="text-base font-semibold leading-snug text-neutral-900 transition group-hover:text-[#2D5143] md:text-lg">
+        <h3
+          className="font-poppins-semibold leading-snug transition-colors group-hover:text-[var(--color-forest)]"
+          style={{
+            fontSize: 'var(--text-body)',
+            color: 'var(--color-ink)',
+          }}
+        >
           {product.title}
         </h3>
-        <p className="text-sm text-neutral-600 md:text-base">{formatPrice(product.minPriceCents)}</p>
+        <p
+          style={{
+            fontSize: 'var(--text-small)',
+            color: 'var(--color-text-muted)',
+          }}
+        >
+          {formatPrice(product.minPriceCents)}
+        </p>
 
         {/* Color group swatches (Riga-type siblings: clickable links) */}
         {colorSwatches && colorSwatches.length > 1 && (
@@ -47,7 +60,7 @@ export function ProductCard({
                   className="h-4 w-4 rounded-full transition hover:scale-110"
                   style={{
                     background: sw.colorHex,
-                    boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
+                    boxShadow: '0 0 0 1px var(--color-border-strong)',
                     display: 'block',
                   }}
                   title={sw.slug}
@@ -66,7 +79,10 @@ export function ProductCard({
                 <span
                   key={i}
                   className="h-4 w-4 rounded-full"
-                  style={{ background: hex, boxShadow: '0 0 0 1px rgba(0,0,0,0.15)' }}
+                  style={{
+                    background: hex,
+                    boxShadow: '0 0 0 1px var(--color-border-strong)',
+                  }}
                 />
               ))}
             </div>

@@ -47,66 +47,30 @@ export function ProductScrollRow({ products }: { products: ProductSummaryView[] 
         ))}
       </div>
 
-      {/* Left arrow — visible only after user has scrolled */}
-      <ArrowButton
-        visible={canScrollLeft}
-        dir="left"
+      <button
+        type="button"
+        className="btn-icon absolute top-[38%] z-10 -translate-y-1/2 -left-3 md:-left-5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.22)]"
         onClick={() => scroll('left')}
-        label="Posunout doleva"
-      />
-
-      {/* Right arrow — always visible initially */}
-      <ArrowButton
-        visible={canScrollRight}
-        dir="right"
+        aria-label="Posunout doleva"
+        aria-disabled={!canScrollLeft}
+        disabled={!canScrollLeft}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className="btn-icon absolute top-[38%] z-10 -translate-y-1/2 -right-3 md:-right-5 shadow-[0_4px_18px_-6px_rgba(0,0,0,0.22)]"
         onClick={() => scroll('right')}
-        label="Posunout doprava"
-      />
+        aria-label="Posunout doprava"
+        aria-disabled={!canScrollRight}
+        disabled={!canScrollRight}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
     </div>
-  );
-}
-
-function ArrowButton({
-  visible,
-  dir,
-  onClick,
-  label,
-}: {
-  visible: boolean;
-  dir: 'left' | 'right';
-  onClick: () => void;
-  label: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      className={[
-        'absolute top-[38%] z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full',
-        'shadow-[0_4px_18px_-6px_rgba(0,0,0,0.22)] ring-1 ring-black/8',
-        'transition-all duration-300 hover:scale-105 active:scale-95',
-        dir === 'left' ? '-left-3 md:-left-5' : '-right-3 md:-right-5',
-        visible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
-      ].join(' ')}
-      style={{ background: 'var(--color-pill-bg)' }}
-    >
-      {dir === 'left' ? <ChevronLeft /> : <ChevronRight />}
-    </button>
-  );
-}
-
-function ChevronLeft() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M15 18l-6-6 6-6" stroke="#2B312F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function ChevronRight() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M9 18l6-6-6-6" stroke="#2B312F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }
