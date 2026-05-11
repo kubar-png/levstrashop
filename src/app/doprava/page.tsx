@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
 export const metadata = { title: 'Doprava — Levstra' };
@@ -64,6 +65,15 @@ export default function ShippingPage() {
           Po odeslání obdržíte e-mail s číslem zásilky a odkazem na sledování. Zásilky odesíláme
           v pracovní dny do 14:00.
         </p>
+      </div>
+
+      <div className="mt-10 flex flex-wrap items-center gap-4">
+        <Link href="/vraceni" className="btn-secondary">
+          Vrácení a reklamace
+        </Link>
+        <Link href="/kontakt" className="btn-tertiary">
+          Máte dotaz? Napište nám →
+        </Link>
       </div>
     </div>
   );

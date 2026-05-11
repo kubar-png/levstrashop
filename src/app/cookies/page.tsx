@@ -1,4 +1,4 @@
-import { Eyebrow, Card } from '@/components/ui';
+import { Eyebrow, Card, Banner } from '@/components/ui';
 
 export const metadata = { title: 'Cookies — Levstra' };
 
@@ -38,9 +38,22 @@ export default function CookiesPage() {
       >
         Cookies
       </h1>
+      <p
+        className="mt-3"
+        style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
+      >
+        Naposledy aktualizováno: 11. 5. 2026
+      </p>
+
+      <div className="mt-6">
+        <Banner title="VZOR — čeká na právní kontrolu">
+          Tento dokument je pracovní šablona. Před spuštěním e-shopu jej nechte
+          zkontrolovat právníkem.
+        </Banner>
+      </div>
 
       <div
-        className="mt-10 space-y-6"
+        className="mt-8 space-y-6"
         style={{ color: 'var(--color-ink)', fontSize: 'var(--text-body)', lineHeight: 1.7 }}
       >
         <p>

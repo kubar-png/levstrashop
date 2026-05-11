@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
 export const metadata = { title: 'Vrácení zboží — Levstra' };
@@ -47,6 +48,15 @@ export default function ReturnsPage() {
           U reklamace vadného zboží se postupuje podle zákona o ochraně spotřebitele. Reklamaci
           vyřídíme do 30 dnů.
         </p>
+      </div>
+
+      <div className="mt-10 flex flex-wrap items-center gap-4">
+        <Link href="/doprava" className="btn-secondary">
+          Informace o dopravě
+        </Link>
+        <Link href="/kontakt" className="btn-tertiary">
+          Máte dotaz? Napište nám →
+        </Link>
       </div>
     </div>
   );

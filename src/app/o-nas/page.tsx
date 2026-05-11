@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
 export const metadata = { title: 'O nás — Levstra' };
@@ -48,6 +49,12 @@ export default function AboutPage() {
           </a>
           .
         </p>
+      </div>
+
+      <div className="mt-10">
+        <Link href="/shop" className="btn-secondary">
+          Prohlédnout kolekci
+        </Link>
       </div>
     </div>
   );

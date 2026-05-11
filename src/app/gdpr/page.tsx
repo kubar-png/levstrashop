@@ -1,4 +1,4 @@
-import { Eyebrow } from '@/components/ui';
+import { Eyebrow, Banner } from '@/components/ui';
 
 export const metadata = { title: 'Ochrana osobních údajů — Levstra' };
 
@@ -29,8 +29,15 @@ export default function GdprPage() {
         className="mt-3"
         style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
       >
-        <strong>VZOR — před spuštěním nechte zkontrolovat právníkem.</strong>
+        Naposledy aktualizováno: 11. 5. 2026
       </p>
+
+      <div className="mt-6">
+        <Banner title="VZOR — čeká na právní kontrolu">
+          Tento dokument je pracovní šablona. Před spuštěním e-shopu jej nechte
+          zkontrolovat právníkem.
+        </Banner>
+      </div>
 
       <article
         className="mt-10 space-y-8"
