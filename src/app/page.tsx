@@ -22,9 +22,9 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* ── HERO — inset rounded photo, floating pill header above ─────── */}
-      <section className="-mt-[72px] px-3 pt-3 md:-mt-[88px] md:px-5 md:pt-5">
-        <div className="relative aspect-[16/9] min-h-[520px] w-full overflow-hidden rounded-[2rem] md:aspect-[16/8] md:min-h-0 md:rounded-[2.5rem]">
+      {/* ── HERO — pill header floats above inset rounded photo ─────────── */}
+      <section className="-mt-[72px] px-3 pt-[68px] md:-mt-[92px] md:px-6 md:pt-[88px]">
+        <div className="relative aspect-[16/10] min-h-[520px] w-full overflow-hidden rounded-[2rem] md:aspect-[16/8] md:min-h-0 md:rounded-[2.25rem]">
           <Image
             src={IMG.hero}
             alt="Cestujte se stylem — Levstra"
@@ -33,30 +33,42 @@ export default async function HomePage() {
             sizes="100vw"
             className="object-cover object-[65%_center]"
           />
-          {/* Subtle left-side darkening for text legibility */}
+          {/* Soft left wash for legibility */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.18) 38%, rgba(0,0,0,0) 60%)',
+                'linear-gradient(90deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.18) 40%, rgba(0,0,0,0) 62%)',
             }}
           />
-          {/* Text overlay — anchored bottom-left on mobile, center-left on desktop */}
+          {/* Text overlay — bottom-left on mobile, center-left on desktop */}
           <div className="absolute inset-0 flex items-end pb-12 md:items-center md:pb-0">
-            <div className="w-full max-w-7xl px-8 md:mx-auto md:px-14">
-              <div className="max-w-xl text-white">
+            <div className="w-full max-w-7xl px-7 md:mx-auto md:px-16">
+              <div className="max-w-xl">
                 <h1
-                  className="font-extrabold leading-[0.95] tracking-[-0.025em] text-white"
-                  style={{ color: '#fff', fontSize: 'clamp(3rem, 8vw, 6rem)' }}
+                  className="font-poppins-semibold leading-[0.95] text-white"
+                  style={{
+                    color: '#ffffff',
+                    fontSize: 'clamp(3.25rem, 7.8vw, 6.5rem)',
+                    letterSpacing: '-0.035em',
+                  }}
                 >
                   Cestujte se<br />stylem.
                 </h1>
-                <p className="mt-5 max-w-md text-base text-white/95 md:text-lg">
+                <p
+                  className="font-serif mt-5 max-w-md text-white"
+                  style={{
+                    color: '#ffffff',
+                    fontSize: 'clamp(1.05rem, 1.5vw, 1.5rem)',
+                    lineHeight: 1.35,
+                  }}
+                >
                   Kufry a kabelky, které zvládnou letiště i&nbsp;večerní rande
                 </p>
                 <Link
                   href="/shop"
-                  className="mt-7 inline-flex items-center rounded-full bg-[#2b312f] px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-black"
+                  className="mt-7 inline-flex items-center rounded-full px-7 py-3 text-sm font-poppins-semibold text-white shadow-lg transition hover:opacity-90"
+                  style={{ background: 'var(--color-pill-ink)' }}
                 >
                   Nakupovat
                 </Link>

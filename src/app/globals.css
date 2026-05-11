@@ -1,46 +1,63 @@
 @import "tailwindcss";
 
 /**
- * Palette extracted directly from the rendered Wix HTML.
- *   --color-forest     #2d5143  brand green (headings + footer)
- *   --color-lime       #e1f861  promo ticker background
+ * Type system — exactly as the brand specifies:
+ *   --font-sans   Poppins (200 ExtraLight body / 600 SemiBold headlines)
+ *   --font-serif  Forum (subheads, the elegant accent face)
+ *
+ * Palette taken from the live Wix theme variables.
  *   --color-bg         #eeeeee  page background
  *   --color-ink        #2b312f  body text
- *   --color-sky        #c5d6e8  pastel-blue accent (Marina Galanti / Náš příběh)
+ *   --color-forest     #2d5143  brand green (h2 + footer)
+ *   --color-lime       #e1f861  promo ticker
+ *   --color-sky        #a0c8ff  Náš příběh section
+ *   --color-red        #b43e2e  active nav state
+ *   --color-pill-bg    #f4f1ea  header pill cream
  */
 :root {
   --color-bg: #eeeeee;
   --color-ink: #2b312f;
-  --color-ink-soft: #5a5a5a;
   --color-forest: #2d5143;
-  --color-forest-deep: #1f3528;
+  --color-forest-deep: #1f4537;
   --color-lime: #e1f861;
-  --color-sky: #c5d6e8;
-  --color-sky-deep: #b4c8df;
-  --color-promo-text: #2d5143;
+  --color-sky: #a0c8ff;
+  --color-red: #b43e2e;
+  --color-pill-bg: #f4f1ea;
+  --color-pill-ink: #1a1a1a;
 }
 
 @theme inline {
   --color-background: var(--color-bg);
   --color-foreground: var(--color-ink);
   --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 200; /* ExtraLight body */
   -webkit-font-smoothing: antialiased;
 }
 
-/* Brand headings use the deep green. */
-h1, h2 {
-  color: var(--color-forest);
+/* Headings — Poppins SemiBold in brand green by default. */
+h1, h2, h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
   letter-spacing: -0.02em;
+  color: var(--color-forest);
 }
-h3 { letter-spacing: -0.015em; }
+h1 { letter-spacing: -0.035em; }
 
-/* Ticker marquee. */
+/* Convenience utility for serif subheads. */
+.font-serif { font-family: var(--font-serif), Georgia, serif; }
+.font-poppins-light { font-family: var(--font-sans); font-weight: 200; }
+.font-poppins-regular { font-family: var(--font-sans); font-weight: 400; }
+.font-poppins-medium { font-family: var(--font-sans); font-weight: 500; }
+.font-poppins-semibold { font-family: var(--font-sans); font-weight: 600; }
+
+/* Lime ticker marquee. */
 @keyframes ticker-scroll {
   0% { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(-50%, 0, 0); }
