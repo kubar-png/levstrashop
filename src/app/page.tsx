@@ -95,7 +95,7 @@ export default async function HomePage() {
                   Nové kousky Marina Galanti už jsou skladem.
                 </p>
                 <Link
-                  href="/shop"
+                  href="/shop/kabelky"
                   className="marina-btn mt-5 inline-flex items-center rounded-xl border-2 border-white px-7 py-3 font-poppins-semibold"
                   style={{ fontSize: '16px' }}
                 >
