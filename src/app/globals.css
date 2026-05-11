@@ -32,6 +32,44 @@
   --color-red: #b43e2e;
   --color-pill-bg: #f4f1ea;
   --color-pill-ink: #1a1a1a;
+
+  /* ─── Semantic colors (layer on top of palette) ─────────────── */
+  --color-success: var(--color-olive);
+  --color-warning: #b06820;                       /* darker than --color-orange, passes AA on cream */
+  --color-danger: var(--color-red);
+  --color-text-muted: #6b6f6e;                    /* replaces ad-hoc neutral-500/600/700 */
+  --color-border-subtle: rgba(43, 49, 47, 0.12);  /* replaces border-neutral-200 */
+  --color-border-strong: rgba(43, 49, 47, 0.24);
+
+  /* ─── Type scale (fluid, responsive) ────────────────────────── */
+  --text-display: clamp(2.5rem, 6.5vw, 5.5rem);   /* hero h1 only */
+  --text-h1:      clamp(2rem, 4vw, 3rem);         /* page titles */
+  --text-h2:      clamp(1.5rem, 2.8vw, 2.25rem);  /* section headings */
+  --text-h3:      clamp(1.15rem, 1.8vw, 1.4rem);  /* subsection headings */
+  --text-lead:    clamp(1.05rem, 1.4vw, 1.25rem); /* hero subtitles, lead copy */
+  --text-body:    clamp(0.95rem, 1.05vw, 1.05rem);/* normal body */
+  --text-small:   clamp(0.8rem, 0.9vw, 0.875rem); /* meta, labels */
+  --text-micro:   0.75rem;                        /* eyebrows, fixed */
+
+  /* ─── Spacing scale (section-level) ─────────────────────────── */
+  --section-py:    clamp(3rem, 7vw, 6rem);
+  --section-px:    clamp(1rem, 4vw, 2rem);
+  --container-max: 80rem;
+  --prose-max:     48rem;
+
+  /* ─── Radius scale ──────────────────────────────────────────── */
+  --radius-sm:  0.5rem;
+  --radius-md:  0.75rem;
+  --radius-lg:  1rem;
+  --radius-xl:  1.5rem;
+  --radius-2xl: 2rem;
+
+  /* ─── Motion tokens ─────────────────────────────────────────── */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast:    180ms;
+  --dur-med:     280ms;
+  --dur-slow:    420ms;
 }
 
 @theme inline {
@@ -230,4 +268,243 @@ h1 { letter-spacing: -0.035em; }
 @media (prefers-reduced-motion: reduce) {
   .cat-label::before { transition: none; }
   .cat-label-word, .cat-label-arrow { transition: none; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BUTTON SYSTEM
+   .btn-primary   — lime sweep, the conversion CTA
+   .btn-secondary — forest-deep sweep, supporting / navigational
+   .btn-tertiary  — text-only with underline reveal
+   .btn-icon      — circular icon button, 44px tap target
+   .btn-destructive — muted text, danger color on hover
+   ──────────────────────────────────────────────────────────────── */
+
+/* Shared base for sweep buttons (primary + secondary). */
+.btn-primary,
+.btn-secondary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--btn-border, currentColor);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-body);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  color: var(--btn-text, var(--color-ink));
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: border-color var(--dur-med) var(--ease-out),
+              color var(--dur-med) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+  text-decoration: none;
+}
+.btn-primary::before,
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--btn-sweep);
+  transform: translateX(-102%);
+  transition: transform var(--dur-slow) var(--ease-out);
+  z-index: -1;
+}
+.btn-primary:hover::before,
+.btn-secondary:hover::before,
+.btn-primary:focus-visible::before,
+.btn-secondary:focus-visible::before {
+  transform: translateX(0);
+}
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  color: var(--btn-hover-text);
+  border-color: var(--btn-sweep);
+}
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(1px);
+}
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 3px;
+}
+.btn-primary[aria-disabled='true'],
+.btn-primary:disabled,
+.btn-secondary[aria-disabled='true'],
+.btn-secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primary — lime sweep, ink text reveals. Use white border on dark
+   backgrounds (hero, Marina banner) via `--btn-border: #fff`. */
+.btn-primary {
+  --btn-sweep: var(--color-lime);
+  --btn-text: var(--color-ink);
+  --btn-hover-text: var(--color-ink);
+  --btn-border: var(--color-ink);
+}
+
+/* Secondary — forest-deep sweep, text inverts to white. */
+.btn-secondary {
+  --btn-sweep: var(--color-forest-deep);
+  --btn-text: var(--color-ink);
+  --btn-hover-text: #fff;
+  --btn-border: var(--color-ink);
+}
+
+/* Variant: secondary on dark surfaces (footer, hero, Marina banner). */
+.btn-secondary[data-on-dark],
+.btn-primary[data-on-dark] {
+  --btn-text: #fff;
+  --btn-border: #fff;
+}
+.btn-primary[data-on-dark]:hover,
+.btn-primary[data-on-dark]:focus-visible {
+  color: var(--color-ink);
+}
+
+/* Tertiary — text-only with animated underline. */
+.btn-tertiary {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.5rem 0.25rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-body);
+  color: var(--color-ink);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.btn-tertiary::after {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  bottom: 0.35rem;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+.btn-tertiary:hover,
+.btn-tertiary:focus-visible {
+  color: var(--color-forest);
+}
+.btn-tertiary:hover::after,
+.btn-tertiary:focus-visible::after {
+  transform: scaleX(1);
+}
+.btn-tertiary:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Icon — circular, used for gallery/carousel nav. */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(43, 49, 47, 0.08);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+}
+.btn-icon:hover,
+.btn-icon:focus-visible {
+  background: var(--color-forest);
+  color: #fff;
+}
+.btn-icon:active {
+  transform: scale(0.94);
+}
+.btn-icon:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 3px;
+}
+.btn-icon[aria-disabled='true'],
+.btn-icon:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+/* Variant: icon button on dark / image surfaces (gallery overlay). */
+.btn-icon[data-on-image] {
+  background: rgba(43, 49, 47, 0.55);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+.btn-icon[data-on-image]:hover,
+.btn-icon[data-on-image]:focus-visible {
+  background: rgba(43, 49, 47, 0.78);
+  color: #fff;
+}
+
+/* Destructive — quiet by default, danger color on hover. */
+.btn-destructive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0.5rem 0.25rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.btn-destructive:hover,
+.btn-destructive:focus-visible {
+  color: var(--color-danger);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.btn-destructive:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Reduced motion — disable sweeps and underline animations. */
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary::before,
+  .btn-secondary::before,
+  .btn-tertiary::after {
+    transition: none;
+  }
+  .btn-primary,
+  .btn-secondary,
+  .btn-icon,
+  .btn-tertiary,
+  .btn-destructive {
+    transition: none;
+  }
 }
