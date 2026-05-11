@@ -1,17 +1,43 @@
+import { Eyebrow } from '@/components/ui';
+
 export const metadata = { title: 'Ochrana osobních údajů — Levstra' };
 
 export default function GdprPage() {
+  const h2Style = {
+    fontSize: 'var(--text-h3)',
+    color: 'var(--color-forest)',
+    letterSpacing: '-0.02em',
+  } as const;
+
   return (
-    <div className="mx-auto max-w-3xl px-6 py-20">
-      <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Právní</p>
-      <h1 className="mt-2 text-5xl font-medium">Ochrana osobních údajů</h1>
-      <p className="mt-3 text-sm text-neutral-500">
+    <div
+      className="mx-auto max-w-3xl px-6"
+      style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}
+    >
+      <Eyebrow>Právní</Eyebrow>
+      <h1
+        className="mt-2 font-poppins-semibold leading-[1.05]"
+        style={{
+          fontSize: 'var(--text-h1)',
+          color: 'var(--color-forest)',
+          letterSpacing: '-0.03em',
+        }}
+      >
+        Ochrana osobních údajů
+      </h1>
+      <p
+        className="mt-3"
+        style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
+      >
         <strong>VZOR — před spuštěním nechte zkontrolovat právníkem.</strong>
       </p>
 
-      <article className="mt-10 space-y-8 text-neutral-800">
+      <article
+        className="mt-10 space-y-8"
+        style={{ color: 'var(--color-ink)', fontSize: 'var(--text-body)', lineHeight: 1.7 }}
+      >
         <section>
-          <h2 className="text-2xl font-medium">1. Správce údajů</h2>
+          <h2 className="font-poppins-semibold" style={h2Style}>1. Správce údajů</h2>
           <p className="mt-2">
             Správcem osobních údajů je Levstra s.r.o., IČO: 27686281, se sídlem Hněvkovského 587/39a, Komárov, 617 00 Brno,
             e-mail: info@levstra.cz. Při zpracování postupujeme v souladu s nařízením (EU)
@@ -20,7 +46,7 @@ export default function GdprPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium">2. Jaké údaje zpracováváme</h2>
+          <h2 className="font-poppins-semibold" style={h2Style}>2. Jaké údaje zpracováváme</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>Identifikační údaje (jméno, e-mail, telefon, adresa)</li>
             <li>Platební údaje (zpracovává poskytovatel platební brány Stripe — my je nevidíme)</li>
@@ -30,7 +56,7 @@ export default function GdprPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium">3. Účel zpracování</h2>
+          <h2 className="font-poppins-semibold" style={h2Style}>3. Účel zpracování</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>Plnění kupní smlouvy a doručení zboží (právní základ: smlouva)</li>
             <li>Vystavení daňového dokladu (právní základ: zákonná povinnost)</li>
@@ -40,7 +66,7 @@ export default function GdprPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium">4. Komu údaje předáváme</h2>
+          <h2 className="font-poppins-semibold" style={h2Style}>4. Komu údaje předáváme</h2>
           <ul className="mt-2 list-disc space-y-1 pl-5">
             <li>PPL — pro doručení zásilky</li>
             <li>Stripe — pro zpracování platby</li>
@@ -50,7 +76,7 @@ export default function GdprPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium">5. Doba uchování</h2>
+          <h2 className="font-poppins-semibold" style={h2Style}>5. Doba uchování</h2>
           <p className="mt-2">
             Údaje o objednávkách uchováváme po dobu 10 let (daňová povinnost). Provozní logy 6
             měsíců. Souhlasy do jejich odvolání.
@@ -58,11 +84,14 @@ export default function GdprPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-medium">6. Vaše práva</h2>
+          <h2 className="font-poppins-semibold" style={h2Style}>6. Vaše práva</h2>
           <p className="mt-2">
             Máte právo na přístup, opravu, výmaz, omezení zpracování, přenositelnost údajů a
-            právo vznést námitku. Žádosti zasílejte na <a className="underline" href="mailto:info@levstra.cz">info@levstra.cz</a>.
-            Stížnost můžete podat u Úřadu pro ochranu osobních údajů (www.uoou.cz).
+            právo vznést námitku. Žádosti zasílejte na{' '}
+            <a className="underline" href="mailto:info@levstra.cz" style={{ color: 'var(--color-forest)' }}>
+              info@levstra.cz
+            </a>
+            . Stížnost můžete podat u Úřadu pro ochranu osobních údajů (www.uoou.cz).
           </p>
         </section>
       </article>
