@@ -105,11 +105,14 @@ export function ShopClient({
       </div>
 
       <aside
+        data-open={filtersOpen || undefined}
         className={[
-          'shrink-0 md:w-56',
-          'md:block',
-          'md:sticky md:self-start',
-          filtersOpen ? 'block mb-6' : 'hidden',
+          'shrink-0 md:w-56 md:sticky md:self-start',
+          // Mobile: collapse with smooth max-height + opacity transition.
+          'max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-out',
+          'data-[open]:max-h-[1600px] data-[open]:opacity-100 data-[open]:mb-6',
+          // Desktop: always visible regardless of mobile-toggle state.
+          'md:!max-h-none md:!overflow-visible md:!opacity-100 md:!mb-0',
         ].join(' ')}
         style={{ top: 'calc(88px + 1.5rem)' }}
       >

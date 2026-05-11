@@ -252,6 +252,43 @@ export function ProductBuyBox({
         </p>
       </div>
 
+      {/* ── Mobile sticky mini buy bar (hidden on md+) ─────────────── */}
+      <div
+        className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 px-4 md:hidden"
+        style={{
+          padding: '0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom)) 1rem',
+          background: 'rgba(255,255,255,0.92)',
+          backdropFilter: 'blur(10px)',
+          borderTop: '1px solid var(--color-border-subtle)',
+          boxShadow: '0 -4px 18px -8px rgba(0,0,0,0.15)',
+        }}
+      >
+        <div className="flex flex-col leading-tight">
+          <span
+            className="font-poppins-regular"
+            style={{ fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)' }}
+          >
+            Cena
+          </span>
+          <span
+            className="font-serif"
+            style={{ fontSize: 'var(--text-h3)', color: 'var(--color-forest)', lineHeight: 1 }}
+          >
+            {formatPrice(selectedVariant.priceCents)}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={outOfStock || added}
+          aria-disabled={outOfStock || added}
+          className="btn-primary flex-1"
+          style={{ borderRadius: 'var(--radius-md)' }}
+        >
+          {outOfStock ? 'Vyprodáno' : added ? '✓ Přidáno' : 'Přidat do košíku'}
+        </button>
+      </div>
+
     </div>
   );
 }

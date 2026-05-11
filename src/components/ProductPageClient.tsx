@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ProductImage } from './ProductImage';
 import { ProductBuyBox } from './ProductBuyBox';
 import { Eyebrow } from './ui';
@@ -19,15 +19,40 @@ function ProductGallery({
   const canPrev = idx > 0;
   const canNext = idx < images.length - 1;
 
+  // Touch-swipe state for mobile gallery navigation.
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
+    const t = e.touches[0];
+    touchStartX.current = t.clientX;
+    touchStartY.current = t.clientY;
+  }
+
+  function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
+    if (touchStartX.current == null || touchStartY.current == null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX.current;
+    const dy = t.clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+    // Only treat as swipe if horizontal movement dominates and exceeds threshold.
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0 && canNext) setIdx((i) => Math.min(images.length - 1, i + 1));
+    else if (dx > 0 && canPrev) setIdx((i) => Math.max(0, i - 1));
+  }
+
   return (
     <div>
       {/* Main image with nav arrows */}
       <div
-        className="relative overflow-hidden"
+        className="relative overflow-hidden touch-pan-y"
         style={{
           background: 'var(--color-cream)',
           borderRadius: 'var(--radius-xl)',
         }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
         <ProductImage
           src={images[idx]}
