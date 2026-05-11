@@ -45,8 +45,12 @@ export default async function ShopPage({
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         {/* ── HERO ───────────────────────────────────────────────────── */}
         <div
-          className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.25rem] mt-4 md:mt-5"
-          style={{ aspectRatio: '21/5', minHeight: '140px' }}
+          className="relative w-full overflow-hidden mt-4 md:mt-5"
+          style={{
+            aspectRatio: '21/5',
+            minHeight: '140px',
+            borderRadius: 'var(--radius-2xl)',
+          }}
         >
           <Image
             src={heroSrc}
@@ -63,13 +67,20 @@ export default async function ShopPage({
             <div>
               <h1
                 className="font-poppins-semibold leading-[1.0]"
-                style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', letterSpacing: '-0.03em', color: '#F2F0EB' }}
+                style={{
+                  fontSize: 'var(--text-h1)',
+                  letterSpacing: '-0.03em',
+                  color: 'var(--color-cream)',
+                }}
               >
                 {title}
               </h1>
               <p
                 className="font-serif mt-1"
-                style={{ fontSize: 'clamp(0.8rem, 1.1vw, 1rem)', color: 'rgba(242,240,235,0.8)' }}
+                style={{
+                  fontSize: 'var(--text-lead)',
+                  color: 'rgba(242,240,235,0.85)',
+                }}
               >
                 {sub}
               </p>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
+import { Chip } from './ui';
 import type { ProductView, VariantView } from '@/lib/data';
 
 export function ProductBuyBox({
@@ -61,13 +62,34 @@ export function ProductBuyBox({
     return s;
   };
 
+  const variantLabelStyle = {
+    fontSize: 'var(--text-micro)',
+    letterSpacing: '0.18em',
+    color: 'var(--color-text-muted)',
+    textTransform: 'uppercase' as const,
+  };
+
+  // Swatch wrapper: gives a 44×44 invisible tap target around the visible 32px circle.
+  const swatchWrapper: React.CSSProperties = {
+    width: 44,
+    height: 44,
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    background: 'transparent',
+    border: 0,
+    padding: 0,
+    borderRadius: 999,
+  };
+
   return (
     <div className="mt-6 space-y-6">
 
       {/* ── Price ── */}
       <p
         className="font-serif leading-none"
-        style={{ fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', color: 'var(--color-forest)' }}
+        style={{ fontSize: 'var(--text-h1)', color: 'var(--color-forest)' }}
       >
         {formatPrice(selectedVariant.priceCents)}
       </p>
@@ -75,32 +97,34 @@ export function ProductBuyBox({
       {/* ── Sibling color navigation (separate product per color) ── */}
       {hasSiblings && (
         <div>
-          <p
-            className="font-poppins-semibold mb-3"
-            style={{ fontSize: '11px', letterSpacing: '0.07em', color: 'var(--color-gray-warm)', textTransform: 'uppercase' }}
-          >
-            Barva — <span className="font-poppins-regular normal-case">{product.variants[0]?.color}</span>
+          <p className="font-poppins-semibold mb-3" style={variantLabelStyle}>
+            Barva — <span className="font-poppins-regular normal-case" style={{ letterSpacing: 0 }}>{product.variants[0]?.color}</span>
           </p>
-          <div className="flex flex-wrap gap-2.5">
-            <span
-              title={product.variants[0]?.color}
-              className="h-8 w-8 rounded-full"
-              style={{
-                background: product.colorHex ?? '#ccc',
-                boxShadow: `0 0 0 2.5px white, 0 0 0 4px ${product.colorHex ?? '#ccc'}`,
-              }}
-            />
+          <div className="flex flex-wrap gap-1">
+            <span style={swatchWrapper} title={product.variants[0]?.color}>
+              <span
+                className="h-8 w-8 rounded-full block"
+                style={{
+                  background: product.colorHex ?? '#ccc',
+                  boxShadow: `0 0 0 2.5px white, 0 0 0 4px ${product.colorHex ?? '#ccc'}`,
+                }}
+              />
+            </span>
             {product.colorSiblings!.map((sib) => (
               <Link
                 key={sib.slug}
                 href={`/shop/p/${sib.slug}`}
                 title={sib.title}
-                className="block h-8 w-8 rounded-full transition-transform hover:scale-110"
-                style={{
-                  background: sib.colorHex,
-                  boxShadow: '0 0 0 1px rgba(0,0,0,0.12)',
-                }}
+                style={swatchWrapper}
+                className="transition-transform hover:scale-110"
               >
+                <span
+                  className="h-8 w-8 rounded-full block"
+                  style={{
+                    background: sib.colorHex,
+                    boxShadow: '0 0 0 1px var(--color-border-strong)',
+                  }}
+                />
                 <span className="sr-only">{sib.title}</span>
               </Link>
             ))}
@@ -111,13 +135,10 @@ export function ProductBuyBox({
       {/* ── Within-product color swatches ── */}
       {!hasSiblings && colors.length > 1 && (
         <div>
-          <p
-            className="font-poppins-semibold mb-3"
-            style={{ fontSize: '11px', letterSpacing: '0.07em', color: 'var(--color-gray-warm)', textTransform: 'uppercase' }}
-          >
-            Barva — <span className="font-poppins-regular normal-case">{selectedVariant.color}</span>
+          <p className="font-poppins-semibold mb-3" style={variantLabelStyle}>
+            Barva — <span className="font-poppins-regular normal-case" style={{ letterSpacing: 0 }}>{selectedVariant.color}</span>
           </p>
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap gap-1">
             {colors.map((color) => {
               const variant = product.variants.find((v) => v.color === color);
               const hex = variant?.colorHex ?? '#ccc';
@@ -125,17 +146,23 @@ export function ProductBuyBox({
               return (
                 <button
                   key={color}
+                  type="button"
                   onClick={() => pickVariant(selectedVariant.size, color)}
                   title={color}
-                  className="h-8 w-8 rounded-full transition-transform hover:scale-110"
-                  style={{
-                    background: hex,
-                    boxShadow: isSelected
-                      ? `0 0 0 2.5px white, 0 0 0 4px ${hex}`
-                      : '0 0 0 1px rgba(0,0,0,0.15)',
-                  }}
+                  aria-label={color}
+                  aria-pressed={isSelected}
+                  style={swatchWrapper}
+                  className="transition-transform hover:scale-110"
                 >
-                  <span className="sr-only">{color}</span>
+                  <span
+                    className="h-8 w-8 rounded-full block"
+                    style={{
+                      background: hex,
+                      boxShadow: isSelected
+                        ? `0 0 0 2.5px white, 0 0 0 4px ${hex}`
+                        : '0 0 0 1px var(--color-border-strong)',
+                    }}
+                  />
                 </button>
               );
             })}
@@ -146,31 +173,20 @@ export function ProductBuyBox({
       {/* ── Size picker ── */}
       {sizes.length > 0 && (
         <div>
-          <p
-            className="font-poppins-semibold mb-3"
-            style={{ fontSize: '11px', letterSpacing: '0.07em', color: 'var(--color-gray-warm)', textTransform: 'uppercase' }}
-          >
+          <p className="font-poppins-semibold mb-3" style={variantLabelStyle}>
             Velikost
           </p>
           <div className="flex flex-wrap gap-2">
-            {sizes.map((size) => {
-              const active = selectedVariant.size === size;
-              return (
-                <button
-                  key={size}
-                  onClick={() => pickVariant(size, selectedVariant.color)}
-                  className="rounded-xl border-2 px-4 py-2 font-poppins-semibold transition-all duration-200"
-                  style={{
-                    fontSize: '12px',
-                    borderColor: active ? 'var(--color-forest)' : 'rgba(43,49,47,0.15)',
-                    background: active ? 'var(--color-forest)' : 'transparent',
-                    color: active ? '#fff' : 'var(--color-ink)',
-                  }}
-                >
-                  {sizeLabel(size)}
-                </button>
-              );
-            })}
+            {sizes.map((size) => (
+              <Chip
+                key={size}
+                kind="size"
+                selected={selectedVariant.size === size}
+                onClick={() => pickVariant(size, selectedVariant.color)}
+              >
+                {sizeLabel(size)}
+              </Chip>
+            ))}
           </div>
         </div>
       )}
@@ -178,52 +194,43 @@ export function ProductBuyBox({
       {/* ── CTA ── */}
       <div className="space-y-3 pt-2">
         <button
+          type="button"
           onClick={handleAdd}
           disabled={outOfStock || added}
-          className="marina-btn w-full rounded-2xl border-2 py-4 font-poppins-semibold disabled:opacity-50"
-          style={{
-            borderColor: outOfStock ? 'rgba(43,49,47,0.2)' : 'var(--color-ink)',
-            fontSize: '15px',
-            letterSpacing: '-0.01em',
-          }}
+          aria-disabled={outOfStock || added}
+          className="btn-primary w-full"
+          style={{ borderRadius: 'var(--radius-lg)' }}
         >
-          <span
-            className="marina-btn-text"
-            style={{ color: outOfStock ? 'var(--color-gray-warm)' : 'var(--color-ink)' }}
-          >
-            {outOfStock ? 'Vyprodáno' : added ? '✓ Přidáno do košíku' : 'Přidat do košíku'}
-          </span>
+          {outOfStock ? 'Vyprodáno' : added ? '✓ Přidáno do košíku' : 'Přidat do košíku'}
         </button>
 
-        {/* Stock nudge */}
+        {/* Stock nudge — warning color + icon (passes WCAG AA) */}
         {!outOfStock && selectedVariant.stock <= 5 && (
           <p
-            className="font-poppins-regular text-center"
-            style={{ fontSize: '12px', color: 'var(--color-orange)' }}
+            className="font-poppins-medium flex items-center justify-center gap-1.5"
+            style={{ fontSize: 'var(--text-small)', color: 'var(--color-warning)' }}
           >
-            Zbývá již jen {selectedVariant.stock} {selectedVariant.stock === 1 ? 'kus' : 'kusy'}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+              <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            Posledních {selectedVariant.stock} {selectedVariant.stock === 1 ? 'kus' : 'kusů'} skladem
           </p>
         )}
       </div>
 
       {/* ── Meta ── */}
       <div
-        className="rounded-2xl px-5 py-4 space-y-1.5"
-        style={{ background: 'var(--color-cream)' }}
+        className="px-5 py-4 space-y-1.5"
+        style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-md)' }}
       >
-        <div className="flex justify-between">
-          <span className="font-poppins-regular" style={{ fontSize: '12px', color: 'var(--color-gray-warm)' }}>SKU</span>
-          <span className="font-poppins-semibold tabular-nums" style={{ fontSize: '12px', color: 'var(--color-ink)' }}>{selectedVariant.sku}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-poppins-regular" style={{ fontSize: '12px', color: 'var(--color-gray-warm)' }}>Skladem</span>
-          <span className="font-poppins-semibold tabular-nums" style={{ fontSize: '12px', color: 'var(--color-ink)' }}>{selectedVariant.stock} ks</span>
-        </div>
+        <MetaRow label="SKU" value={selectedVariant.sku} />
+        <MetaRow label="Skladem" value={`${selectedVariant.stock} ks`} />
         {selectedVariant.weightGrams && (
-          <div className="flex justify-between">
-            <span className="font-poppins-regular" style={{ fontSize: '12px', color: 'var(--color-gray-warm)' }}>Hmotnost</span>
-            <span className="font-poppins-semibold tabular-nums" style={{ fontSize: '12px', color: 'var(--color-ink)' }}>{(selectedVariant.weightGrams / 1000).toFixed(2)} kg</span>
-          </div>
+          <MetaRow
+            label="Hmotnost"
+            value={`${(selectedVariant.weightGrams / 1000).toFixed(2)} kg`}
+          />
         )}
       </div>
 
@@ -237,11 +244,33 @@ export function ProductBuyBox({
             <path d="M5 13l4 4L19 7" stroke="var(--color-ink)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <p className="font-poppins-regular" style={{ fontSize: '13px', color: 'var(--color-gray-warm)' }}>
+        <p
+          className="font-poppins-regular"
+          style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
+        >
           Doprava zdarma při objednávce nad 1 500 Kč
         </p>
       </div>
 
+    </div>
+  );
+}
+
+function MetaRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between">
+      <span
+        className="font-poppins-regular"
+        style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
+      >
+        {label}
+      </span>
+      <span
+        className="font-poppins-semibold tabular-nums"
+        style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
+      >
+        {value}
+      </span>
     </div>
   );
 }

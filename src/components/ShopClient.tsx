@@ -54,7 +54,6 @@ export function ShopClient({
     return list;
   }, [products, maxPrice, subcat, sort]);
 
-  // Build a map of colorGroup -> all swatches for that group (from ALL products, not just displayed)
   const colorGroupMap = useMemo(() => {
     const map = new Map<string, { slug: string; colorHex: string }[]>();
     products.forEach((p) => {
@@ -76,26 +75,31 @@ export function ShopClient({
   const count = displayed.length;
   const countLabel = count === 1 ? 'produkt' : count < 5 ? 'produkty' : 'produktů';
 
+  const filterLabelStyle = {
+    fontSize: 'var(--text-micro)',
+    color: 'var(--color-text-muted)',
+    letterSpacing: '0.18em',
+  } as const;
+
   return (
     <div className="mt-8 pb-16 md:flex md:gap-10">
 
       {/* ══ SIDEBAR ═══════════════════════════════════════════════════ */}
-      {/* Mobile toggle */}
       <div className="mb-4 md:hidden">
         <button
+          type="button"
           onClick={() => setFiltersOpen((v) => !v)}
-          className="flex cursor-pointer items-center gap-2 rounded-full border-2 px-5 py-2 text-sm font-poppins-semibold transition-colors duration-200"
-          style={{ borderColor: '#2D5143', color: '#2D5143' }}
+          className="btn-secondary"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 6h16M7 12h10M10 18h4" stroke="#2D5143" strokeWidth="2" strokeLinecap="round" />
+            <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
           Filtry
           <svg
             width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"
             style={{ transform: filtersOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
           >
-            <path d="M6 9l6 6 6-6" stroke="#2D5143" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       </div>
@@ -111,7 +115,7 @@ export function ShopClient({
       >
         {/* Category */}
         <div className="mb-8">
-          <p className="mb-3 text-xs font-poppins-semibold uppercase tracking-[0.18em]" style={{ color: '#9ca3af' }}>
+          <p className="mb-3 font-poppins-semibold uppercase" style={filterLabelStyle}>
             Kategorie
           </p>
           <nav className="flex flex-col gap-1">
@@ -122,14 +126,20 @@ export function ShopClient({
                   key={c.value}
                   href={c.href}
                   onClick={() => setSubcat(null)}
-                  className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-poppins-semibold transition-colors duration-150"
+                  className="flex cursor-pointer items-center gap-2.5 font-poppins-semibold transition-colors duration-150"
                   style={{
-                    background: active ? '#2D5143' : 'transparent',
-                    color: active ? '#fff' : '#2B312F',
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--text-small)',
+                    background: active ? 'var(--color-forest)' : 'transparent',
+                    color: active ? '#fff' : 'var(--color-ink)',
                   }}
                 >
                   {active && (
-                    <span className="block h-1.5 w-1.5 rounded-full bg-[#E1F861] shrink-0" />
+                    <span
+                      className="block h-1.5 w-1.5 rounded-full shrink-0"
+                      style={{ background: 'var(--color-lime)' }}
+                    />
                   )}
                   {c.label}
                 </Link>
@@ -141,16 +151,20 @@ export function ShopClient({
         {/* Subcategory */}
         {subcatOptions.length > 0 && (
           <div className="mb-8">
-            <p className="mb-3 text-xs font-poppins-semibold uppercase tracking-[0.18em]" style={{ color: '#9ca3af' }}>
-              Typ
+            <p className="mb-3 font-poppins-semibold uppercase" style={filterLabelStyle}>
+              Typ produktu
             </p>
             <div className="flex flex-col gap-1">
               <button
+                type="button"
                 onClick={() => setSubcat(null)}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-poppins-semibold transition-colors duration-150 text-left"
+                className="flex cursor-pointer items-center gap-2.5 font-poppins-semibold transition-colors duration-150 text-left"
                 style={{
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--text-small)',
                   background: subcat === null ? 'rgba(45,81,67,0.10)' : 'transparent',
-                  color: '#2B312F',
+                  color: 'var(--color-ink)',
                 }}
               >
                 Vše
@@ -158,11 +172,15 @@ export function ShopClient({
               {subcatOptions.map((opt) => (
                 <button
                   key={opt.value}
+                  type="button"
                   onClick={() => setSubcat(subcat === opt.value ? null : opt.value)}
-                  className="flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-poppins-semibold transition-colors duration-150 text-left"
+                  className="flex cursor-pointer items-center gap-2.5 font-poppins-semibold transition-colors duration-150 text-left"
                   style={{
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--text-small)',
                     background: subcat === opt.value ? 'rgba(45,81,67,0.10)' : 'transparent',
-                    color: subcat === opt.value ? '#2D5143' : '#2B312F',
+                    color: subcat === opt.value ? 'var(--color-forest)' : 'var(--color-ink)',
                   }}
                 >
                   {opt.label}
@@ -174,10 +192,13 @@ export function ShopClient({
 
         {/* Price */}
         <div>
-          <p className="mb-3 text-xs font-poppins-semibold uppercase tracking-[0.18em]" style={{ color: '#9ca3af' }}>
+          <p className="mb-3 font-poppins-semibold uppercase" style={filterLabelStyle}>
             Cena
           </p>
-          <p className="mb-2 text-sm font-poppins-semibold" style={{ color: '#2D5143' }}>
+          <p
+            className="mb-2 font-poppins-semibold"
+            style={{ color: 'var(--color-forest)', fontSize: 'var(--text-small)' }}
+          >
             do {formatPrice(maxPrice)}
           </p>
           <input
@@ -191,7 +212,10 @@ export function ShopClient({
             style={{ '--slider-pct': `${sliderPct}%` } as React.CSSProperties}
             aria-label="Maximální cena"
           />
-          <div className="mt-1 flex justify-between text-xs" style={{ color: '#9ca3af' }}>
+          <div
+            className="mt-1 flex justify-between"
+            style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-micro)' }}
+          >
             <span>{formatPrice(globalMin)}</span>
             <span>{formatPrice(globalMax)}</span>
           </div>
@@ -203,25 +227,35 @@ export function ShopClient({
 
         {/* Sort bar */}
         <div className="mb-6 flex items-center justify-between gap-4">
-          <span className="text-sm" style={{ color: '#9ca3af' }}>
+          <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-small)' }}>
             {count} {countLabel}
           </span>
           <div className="relative">
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as Sort)}
-              className="appearance-none cursor-pointer rounded-full border-2 bg-transparent pl-4 pr-8 py-1.5 text-sm font-poppins-semibold outline-none transition-colors duration-200"
-              style={{ borderColor: '#2D5143', color: '#2D5143' }}
+              className="appearance-none cursor-pointer bg-transparent font-poppins-semibold outline-none transition-colors duration-200"
+              style={{
+                paddingLeft: '1rem',
+                paddingRight: '2rem',
+                paddingTop: '0.5rem',
+                paddingBottom: '0.5rem',
+                borderRadius: '999px',
+                border: '1.5px solid var(--color-forest)',
+                color: 'var(--color-forest)',
+                fontSize: 'var(--text-small)',
+                minHeight: 40,
+              }}
             >
               <option value="default">Řazení</option>
-              <option value="price-asc">Cena: nejlevnější</option>
-              <option value="price-desc">Cena: nejdražší</option>
+              <option value="price-asc">Cena: od nejnižší</option>
+              <option value="price-desc">Cena: od nejvyšší</option>
             </select>
             <svg
               className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
               width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"
             >
-              <path d="M6 9l6 6 6-6" stroke="#2D5143" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M6 9l6 6 6-6" stroke="var(--color-forest)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
         </div>
@@ -229,13 +263,16 @@ export function ShopClient({
         {/* Grid */}
         {displayed.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="font-poppins-semibold text-base" style={{ color: '#2D5143' }}>
-              Žádné produkty neodpovídají filtru.
+            <p
+              className="font-poppins-semibold"
+              style={{ color: 'var(--color-forest)', fontSize: 'var(--text-lead)' }}
+            >
+              Pro zvolené filtry jsme nenašli žádné produkty.
             </p>
             <button
+              type="button"
               onClick={() => { setMaxPrice(globalMax); setSubcat(null); setSort('default'); }}
-              className="mt-3 cursor-pointer text-sm underline"
-              style={{ color: '#2D5143' }}
+              className="btn-tertiary mt-3"
             >
               Zrušit filtry
             </button>
