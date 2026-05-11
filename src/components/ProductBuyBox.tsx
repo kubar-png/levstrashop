@@ -224,7 +224,6 @@ export function ProductBuyBox({
         className="px-5 py-4 space-y-1.5"
         style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-md)' }}
       >
-        <MetaRow label="SKU" value={selectedVariant.sku} />
         <MetaRow label="Skladem" value={`${selectedVariant.stock} ks`} />
         {selectedVariant.weightGrams && (
           <MetaRow
