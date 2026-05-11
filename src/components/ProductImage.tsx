@@ -9,7 +9,7 @@ export function ProductImage({
   sizes,
   priority,
   className,
-  aspect = '4/5',
+  aspect = '1/1',
 }: {
   src: string | null | undefined;
   alt: string;

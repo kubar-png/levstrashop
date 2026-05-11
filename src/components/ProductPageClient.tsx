@@ -28,7 +28,7 @@ function ProductGallery({
           placeholder={placeholder}
           sizes="(min-width: 768px) 50vw, 100vw"
           priority
-          aspect="3/4"
+          aspect="1/1"
           className="!rounded-none"
         />
 
