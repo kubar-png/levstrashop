@@ -140,8 +140,8 @@ h1 { letter-spacing: -0.035em; }
   .page-transition { animation: none; }
 }
 
-/* Smooth-scroll companion: enables snap-to-anchor for in-page links
-   when Lenis isn't running (reduced motion). */
+/* Native smooth scroll for anchor links and window.scrollTo —
+   does NOT smooth the mouse wheel, so it never feels laggy. */
 html {
   scroll-behavior: smooth;
 }

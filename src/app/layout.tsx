@@ -5,7 +5,6 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { CookieBanner } from '@/components/CookieBanner';
 import { PageTransition } from '@/components/PageTransition';
-import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
 
 const poppins = Poppins({
   variable: '--font-sans',
@@ -44,7 +43,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="cs" className={`${poppins.variable} ${forum.variable} h-full`}>
       <body className="min-h-full flex flex-col">
-        <SmoothScrollProvider />
         <SiteHeader />
         <main className="flex-1 pt-[76px] md:pt-[88px]">
           <PageTransition>{children}</PageTransition>
