@@ -25,7 +25,7 @@ export function ProductImage({
   if (src) {
     return (
       <div
-        className={`relative ${aspectClass} overflow-hidden rounded-3xl bg-neutral-100 ${className ?? ''}`}
+        className={`relative ${aspectClass} overflow-hidden rounded-md bg-neutral-100 ${className ?? ''}`}
       >
         <Image
           src={src}
@@ -42,7 +42,7 @@ export function ProductImage({
   const spec = placeholder ?? { kind: 'suitcase' as const, color: '#c46a3d', accent: '#3d2418' };
   return (
     <div
-      className={`relative ${aspectClass} overflow-hidden rounded-3xl ${className ?? ''}`}
+      className={`relative ${aspectClass} overflow-hidden rounded-md ${className ?? ''}`}
       style={{
         background: `linear-gradient(135deg, ${shade(spec.color, 0.35)} 0%, ${spec.color} 60%, ${shade(spec.color, -0.15)} 100%)`,
       }}

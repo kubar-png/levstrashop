@@ -43,7 +43,7 @@ export function InstagramSection() {
               href="https://instagram.com/levstra"
               target="_blank"
               rel="noreferrer"
-              className="relative block aspect-square overflow-hidden rounded-2xl bg-white/5"
+              className="relative block aspect-square overflow-hidden rounded-md bg-white/5"
             >
               <Image
                 src={src}

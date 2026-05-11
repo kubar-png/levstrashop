@@ -99,7 +99,7 @@ export default async function HomePage() {
               Prohlédnout kolekci
             </Link>
           </div>
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] shadow-xl md:aspect-[5/6]">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg shadow-xl md:aspect-[5/6]">
             <Image
               src={IMG.marinaModel}
               alt="Modelka s kabelkou Marina Galanti"
@@ -152,7 +152,7 @@ export default async function HomePage() {
               Náš příběh
             </Link>
           </div>
-          <div className="relative aspect-[3/4] w-full max-w-md justify-self-end overflow-hidden rounded-[2rem] shadow-xl">
+          <div className="relative aspect-[3/4] w-full max-w-md justify-self-end overflow-hidden rounded-lg shadow-xl">
             <Image
               src={IMG.storyYellow}
               alt="Žlutý kufr Levstra"
@@ -182,7 +182,7 @@ function CategoryCard({
   return (
     <Link
       href={href}
-      className="group relative block aspect-[3/4] overflow-hidden rounded-[2rem] bg-neutral-200 md:aspect-[4/5]"
+      className="group relative block aspect-[3/4] overflow-hidden rounded-lg bg-neutral-200 md:aspect-[4/5]"
     >
       <Image
         src={image}
