@@ -118,7 +118,7 @@ export default function CartPage() {
                     style={{ width: '84px', height: '104px', background: '#e5e1d8' }}
                   >
                     {item.image && (
-                      <Image src={item.image} alt={item.title} fill className="object-cover" sizes="84px" />
+                      <Image src={item.image} alt={item.title} fill className="object-contain" sizes="84px" />
                     )}
                   </div>
 

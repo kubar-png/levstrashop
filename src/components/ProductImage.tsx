@@ -33,7 +33,7 @@ export function ProductImage({
           fill
           sizes={sizes}
           priority={priority}
-          className="object-cover transition duration-700 group-hover:scale-[1.04]"
+          className="object-contain transition duration-700 group-hover:scale-[1.04]"
         />
       </div>
     );
