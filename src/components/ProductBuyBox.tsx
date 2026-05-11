@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import { useCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
-import { urlFor } from '@/sanity/client';
-import type { Product, Variant } from '@/sanity/types';
+import type { ProductView, VariantView } from '@/lib/data';
 
-export function ProductBuyBox({ product }: { product: Product }) {
-  const [selected, setSelected] = useState<Variant>(product.variants[0]);
+export function ProductBuyBox({ product }: { product: ProductView }) {
+  const [selected, setSelected] = useState<VariantView>(product.variants[0]);
   const [added, setAdded] = useState(false);
   const add = useCart((s) => s.add);
 
@@ -32,7 +31,7 @@ export function ProductBuyBox({ product }: { product: Product }) {
       productId: product._id,
       variantSku: selected.sku,
       title: product.title,
-      image: product.images[0] ? urlFor(product.images[0]).width(200).url() : undefined,
+      image: product.imageUrls[0],
       size: selected.size,
       color: selected.color,
       priceCents: selected.priceCents,
@@ -44,12 +43,19 @@ export function ProductBuyBox({ product }: { product: Product }) {
   }
 
   const outOfStock = selected.stock <= 0;
+  const sizeLabel = (s: string) => {
+    if (s.startsWith('cabin-')) return `Kabinový (${s.split('-')[1]} cm)`;
+    if (s.startsWith('medium-')) return `Střední (${s.split('-')[1]} cm)`;
+    if (s.startsWith('large-')) return `Velký (${s.split('-')[1]} cm)`;
+    if (s === 'one-size') return 'Univerzální';
+    return s;
+  };
 
   return (
     <div className="mt-6">
       <p className="text-2xl font-semibold">{formatPrice(selected.priceCents)}</p>
 
-      {sizes.length > 0 && (
+      {sizes.length > 1 && (
         <div className="mt-6">
           <div className="mb-2 text-sm font-medium">Velikost</div>
           <div className="flex flex-wrap gap-2">
@@ -63,14 +69,14 @@ export function ProductBuyBox({ product }: { product: Product }) {
                     : 'border-neutral-300 hover:border-neutral-900'
                 }`}
               >
-                {size}
+                {sizeLabel(size)}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {colors.length > 0 && (
+      {colors.length > 1 && (
         <div className="mt-5">
           <div className="mb-2 text-sm font-medium">Barva</div>
           <div className="flex flex-wrap gap-2">
@@ -78,7 +84,7 @@ export function ProductBuyBox({ product }: { product: Product }) {
               <button
                 key={color}
                 onClick={() => pickVariant(selected.size, color)}
-                className={`rounded-full border px-4 py-1.5 text-sm transition ${
+                className={`rounded-full border px-4 py-1.5 text-sm capitalize transition ${
                   selected.color === color
                     ? 'border-neutral-900 bg-neutral-900 text-white'
                     : 'border-neutral-300 hover:border-neutral-900'
@@ -94,14 +100,17 @@ export function ProductBuyBox({ product }: { product: Product }) {
       <button
         onClick={handleAdd}
         disabled={outOfStock}
-        className="mt-8 w-full rounded-full bg-neutral-900 py-3 text-sm font-medium text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
+        className="mt-8 w-full rounded-full bg-neutral-900 py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
       >
         {outOfStock ? 'Vyprodáno' : added ? 'Přidáno ✓' : 'Přidat do košíku'}
       </button>
 
-      <p className="mt-3 text-xs text-neutral-500">
-SKU: {selected.sku} · skladem {selected.stock} ks
-      </p>
+      <div className="mt-4 space-y-1 text-xs text-neutral-500">
+        <p>SKU: {selected.sku} · skladem {selected.stock} ks</p>
+        {selected.weightGrams && (
+          <p>Hmotnost: {(selected.weightGrams / 1000).toFixed(2)} kg</p>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,18 +1,12 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { sanityClient, urlFor } from '@/sanity/client';
-import { featuredProductsQuery } from '@/sanity/queries';
-import { formatPrice } from '@/lib/format';
-import type { ProductSummary } from '@/sanity/types';
+import { getFeaturedProducts } from '@/lib/data';
+import { ProductCard } from '@/components/ProductCard';
 import { HeroIllustration, HandbagIllustration } from '@/components/HeroIllustration';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  let featured: ProductSummary[] = [];
-  try {
-    featured = await sanityClient.fetch<ProductSummary[]>(featuredProductsQuery);
-  } catch {}
+  const featured = await getFeaturedProducts();
 
   return (
     <>
@@ -71,21 +65,11 @@ export default async function HomePage() {
             Zobrazit vše →
           </Link>
         </div>
-        {featured.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-12 text-center text-neutral-500">
-            Zatím žádné produkty. Přidejte je v{' '}
-            <Link href="/studio" className="font-medium text-neutral-900 underline">
-              Sanity Studio
-            </Link>
-            .
-          </div>
-        ) : (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((p) => (
-              <BestSellerCard key={p._id} product={p} />
-            ))}
-          </div>
-        )}
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {featured.map((p) => (
+            <ProductCard key={p._id} product={p} />
+          ))}
+        </div>
       </section>
 
       {/* Marina Galanti collection */}
@@ -172,28 +156,6 @@ export default async function HomePage() {
         </a>
       </section>
     </>
-  );
-}
-
-function BestSellerCard({ product }: { product: ProductSummary }) {
-  return (
-    <Link href={`/shop/p/${product.slug}`} className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#f6efe5]">
-        {product.image && (
-          <Image
-            src={urlFor(product.image).width(800).height(1000).url()}
-            alt={product.image.alt || product.title}
-            fill
-            sizes="(min-width: 1024px) 25vw, 50vw"
-            className="object-cover transition duration-500 group-hover:scale-[1.03]"
-          />
-        )}
-      </div>
-      <div className="mt-4 flex items-baseline justify-between">
-        <h3 className="text-sm font-medium">{product.title}</h3>
-        <p className="text-sm text-neutral-600">{formatPrice(product.minPriceCents)}</p>
-      </div>
-    </Link>
   );
 }
 

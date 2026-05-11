@@ -1,10 +1,7 @@
-import { sanityClient, urlFor } from '@/sanity/client';
-import { productBySlugQuery } from '@/sanity/queries';
-import { PortableText } from 'next-sanity';
-import Image from 'next/image';
+import { getProductBySlug } from '@/lib/data';
+import { ProductImage } from '@/components/ProductImage';
 import { notFound } from 'next/navigation';
 import { ProductBuyBox } from '@/components/ProductBuyBox';
-import type { Product } from '@/sanity/types';
 import type { Metadata } from 'next';
 
 export const revalidate = 60;
@@ -15,23 +12,17 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  try {
-    const product = await sanityClient.fetch<Product | null>(productBySlugQuery, { slug });
-    if (!product) return {};
-    return {
+  const product = await getProductBySlug(slug);
+  if (!product) return {};
+  return {
+    title: product.title,
+    description: product.shortDescription,
+    openGraph: {
       title: product.title,
       description: product.shortDescription,
-      openGraph: {
-        title: product.title,
-        description: product.shortDescription,
-        images: product.images[0]
-          ? [urlFor(product.images[0]).width(1200).height(630).url()]
-          : undefined,
-      },
-    };
-  } catch {
-    return {};
-  }
+      images: product.imageUrls[0] ? [product.imageUrls[0]] : undefined,
+    },
+  };
 }
 
 export default async function ProductPage({
@@ -40,12 +31,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  let product: Product | null = null;
-  try {
-    product = await sanityClient.fetch<Product | null>(productBySlugQuery, { slug });
-  } catch {
-    notFound();
-  }
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
   const minPrice = Math.min(...product.variants.map((v) => v.priceCents));
@@ -55,7 +41,7 @@ export default async function ProductPage({
     '@type': 'Product',
     name: product.title,
     description: product.shortDescription,
-    image: product.images.map((img) => urlFor(img).width(1200).url()),
+    image: product.imageUrls,
     category: product.category?.title,
     offers: {
       '@type': 'AggregateOffer',
@@ -67,32 +53,30 @@ export default async function ProductPage({
     },
   };
 
+  const images = product.imageUrls.length > 0 ? product.imageUrls : [null];
+
   return (
     <div className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:grid-cols-2">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
       />
+
       <div className="grid gap-4">
-        {product.images.map((img, i) => (
-          <div
-            key={img._key ?? i}
-            className="relative aspect-[4/5] overflow-hidden rounded-lg bg-neutral-100"
-          >
-            <Image
-              src={urlFor(img).width(1200).height(1500).url()}
-              alt={img.alt || product!.title}
-              fill
-              sizes="(min-width: 768px) 50vw, 100vw"
-              className="object-cover"
-              priority={i === 0}
-            />
-          </div>
+        {images.map((src, i) => (
+          <ProductImage
+            key={i}
+            src={src}
+            alt={product.title}
+            placeholder={product.placeholder}
+            sizes="(min-width: 768px) 50vw, 100vw"
+            priority={i === 0}
+          />
         ))}
       </div>
 
       <div className="md:sticky md:top-24 md:self-start">
-        <p className="text-sm uppercase tracking-wide text-neutral-500">
+        <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
           {product.category?.title}
         </p>
         <h1 className="font-display mt-2 text-4xl font-medium md:text-5xl">{product.title}</h1>
@@ -102,10 +86,10 @@ export default async function ProductPage({
 
         <ProductBuyBox product={product} />
 
-        {product.description && (
-          <div className="prose prose-neutral mt-10 max-w-none text-sm">
-            <PortableText value={product.description} />
-          </div>
+        {product.descriptionText && (
+          <p className="mt-10 text-sm leading-relaxed text-neutral-700">
+            {product.descriptionText}
+          </p>
         )}
       </div>
     </div>

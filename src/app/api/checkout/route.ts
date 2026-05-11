@@ -2,12 +2,18 @@ import { NextResponse } from 'next/server';
 import { groq } from 'next-sanity';
 import { sanityClient } from '@/sanity/client';
 import { stripe, STRIPE_CURRENCY } from '@/lib/stripe';
+import { mockProducts } from '@/lib/mock-data';
 import type { CartItem } from '@/lib/cart';
 import type { SelectedParcelShop } from '@/components/ParcelShopPicker';
 
 export const runtime = 'nodejs';
 
 const FREE_SHIPPING_THRESHOLD_CENTS = 150000; // 1 500 Kč
+
+function isSanityConfigured() {
+  const id = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+  return !!id && id !== 'placeholder';
+}
 
 const variantLookupQuery = groq`
   *[_type == "product" && _id == $productId][0] {
@@ -18,6 +24,14 @@ const variantLookupQuery = groq`
     }
   }
 `;
+
+function lookupMock(productId: string, sku: string) {
+  const p = mockProducts.find((x) => x._id === productId);
+  if (!p) return null;
+  const v = p.variants.find((x) => x.sku === sku);
+  if (!v) return null;
+  return { title: p.title, slug: p.slug, variant: v };
+}
 
 type CheckoutBody = {
   items: CartItem[];
@@ -34,11 +48,21 @@ export async function POST(req: Request) {
 
     const verifiedItems = await Promise.all(
       items.map(async (item) => {
-        const data = await sanityClient.fetch<{
+        let data: {
           title: string;
           slug: string;
           variant: { sku: string; priceCents: number; stock: number; size?: string; color?: string } | null;
-        } | null>(variantLookupQuery, { productId: item.productId, sku: item.variantSku });
+        } | null = null;
+
+        if (isSanityConfigured()) {
+          try {
+            data = await sanityClient.fetch(variantLookupQuery, {
+              productId: item.productId,
+              sku: item.variantSku,
+            });
+          } catch {}
+        }
+        if (!data || !data.variant) data = lookupMock(item.productId, item.variantSku);
 
         if (!data || !data.variant) throw new Error(`Variant nenalezena: ${item.variantSku}`);
         if (data.variant.stock < item.qty) {
