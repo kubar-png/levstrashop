@@ -91,7 +91,7 @@ function toSummary(p: ProductSummary): ProductSummaryView {
     title: p.title,
     slug: p.slug,
     shortDescription: p.shortDescription,
-    imageUrl: p.image ? urlFor(p.image).width(800).height(1000).url() : null,
+    imageUrl: p.image ? urlFor(p.image).width(1000).fit('max').url() : null,
     category: p.category,
     subcategory: p.subcategory,
     minPriceCents: p.minPriceCents,
@@ -113,7 +113,7 @@ function toFull(p: Product): ProductView {
     descriptionText: undefined, // Portable Text rendered separately when source is Sanity
     imageUrls: p.images
       .filter((img) => img?.asset?._ref)
-      .map((img) => urlFor(img).width(1200).height(1500).url()),
+      .map((img) => urlFor(img).width(1600).fit('max').url()),
     category: p.category,
     variants: p.variants.map((v) => ({
       sku: v.sku,
@@ -126,7 +126,7 @@ function toFull(p: Product): ProductView {
       imageUrls: v.images?.length
         ? v.images
             .filter((img) => img?.asset?._ref)
-            .map((img) => urlFor(img).width(1200).height(1500).url())
+            .map((img) => urlFor(img).width(1600).fit('max').url())
         : undefined,
     })),
     colorGroup: p.colorGroup,
