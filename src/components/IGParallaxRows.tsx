@@ -67,9 +67,10 @@ export function IGParallaxRows() {
             href="https://instagram.com/levstra"
             target="_blank"
             rel="noreferrer"
-            className="relative block aspect-[4/3] flex-1 overflow-hidden rounded-xl bg-neutral-200"
+            className="relative block aspect-[4/3] flex-1 overflow-hidden"
+            style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-md)' }}
           >
-            <Image src={src} alt="" fill sizes="25vw" className="object-cover" />
+            <Image src={src} alt="Foto z Instagramu @levstra" fill sizes="25vw" className="object-cover" />
           </a>
         ))}
       </div>
@@ -85,9 +86,10 @@ export function IGParallaxRows() {
             href="https://instagram.com/levstra"
             target="_blank"
             rel="noreferrer"
-            className="relative block aspect-[4/3] flex-1 overflow-hidden rounded-xl bg-neutral-200"
+            className="relative block aspect-[4/3] flex-1 overflow-hidden"
+            style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-md)' }}
           >
-            <Image src={src} alt="" fill sizes="25vw" className="object-cover" />
+            <Image src={src} alt="Foto z Instagramu @levstra" fill sizes="25vw" className="object-cover" />
           </a>
         ))}
       </div>

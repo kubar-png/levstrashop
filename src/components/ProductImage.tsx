@@ -25,7 +25,8 @@ export function ProductImage({
   if (src) {
     return (
       <div
-        className={`relative ${aspectClass} overflow-hidden rounded-md bg-neutral-100 ${className ?? ''}`}
+        className={`relative ${aspectClass} overflow-hidden ${className ?? ''}`}
+        style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-md)' }}
       >
         <Image
           src={src}
