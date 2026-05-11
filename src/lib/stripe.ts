@@ -1,11 +1,31 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  /* don't throw at import — only when actually used, so build doesn't crash */
+export const STRIPE_CURRENCY = (process.env.NEXT_PUBLIC_CURRENCY || 'CZK').toLowerCase();
+
+let _stripe: Stripe | null = null;
+
+/**
+ * Lazy Stripe client. Only instantiates on first use, so the build doesn't
+ * crash when STRIPE_SECRET_KEY is missing in the build environment.
+ */
+export function getStripe(): Stripe {
+  if (_stripe) return _stripe;
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error(
+      'STRIPE_SECRET_KEY is not set. Add it to environment variables before using Stripe.',
+    );
+  }
+  _stripe = new Stripe(key, { apiVersion: '2026-04-22.dahlia' });
+  return _stripe;
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
-  apiVersion: '2026-04-22.dahlia',
+/**
+ * Proxy that forwards property access to the real Stripe client.
+ * Lets existing call sites stay as `stripe.checkout.sessions.create(...)`.
+ */
+export const stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    return getStripe()[prop as keyof Stripe];
+  },
 });
-
-export const STRIPE_CURRENCY = (process.env.NEXT_PUBLIC_CURRENCY || 'CZK').toLowerCase();
