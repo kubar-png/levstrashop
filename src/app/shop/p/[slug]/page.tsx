@@ -5,8 +5,34 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ProductBuyBox } from '@/components/ProductBuyBox';
 import type { Product } from '@/sanity/types';
+import type { Metadata } from 'next';
 
 export const revalidate = 60;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const product = await sanityClient.fetch<Product | null>(productBySlugQuery, { slug });
+    if (!product) return {};
+    return {
+      title: product.title,
+      description: product.shortDescription,
+      openGraph: {
+        title: product.title,
+        description: product.shortDescription,
+        images: product.images[0]
+          ? [urlFor(product.images[0]).width(1200).height(630).url()]
+          : undefined,
+      },
+    };
+  } catch {
+    return {};
+  }
+}
 
 export default async function ProductPage({
   params,
@@ -22,8 +48,31 @@ export default async function ProductPage({
   }
   if (!product) notFound();
 
+  const minPrice = Math.min(...product.variants.map((v) => v.priceCents));
+  const totalStock = product.variants.reduce((s, v) => s + v.stock, 0);
+  const ldJson = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.shortDescription,
+    image: product.images.map((img) => urlFor(img).width(1200).url()),
+    category: product.category?.title,
+    offers: {
+      '@type': 'AggregateOffer',
+      priceCurrency: 'CZK',
+      lowPrice: (minPrice / 100).toFixed(0),
+      offerCount: product.variants.length,
+      availability:
+        totalStock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    },
+  };
+
   return (
     <div className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:grid-cols-2">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
+      />
       <div className="grid gap-4">
         {product.images.map((img, i) => (
           <div
@@ -46,7 +95,7 @@ export default async function ProductPage({
         <p className="text-sm uppercase tracking-wide text-neutral-500">
           {product.category?.title}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight">{product.title}</h1>
+        <h1 className="font-display mt-2 text-4xl font-medium md:text-5xl">{product.title}</h1>
         {product.shortDescription && (
           <p className="mt-3 text-neutral-600">{product.shortDescription}</p>
         )}

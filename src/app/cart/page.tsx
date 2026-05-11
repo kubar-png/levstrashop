@@ -5,20 +5,33 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
+import { ParcelShopPicker, type SelectedParcelShop } from '@/components/ParcelShopPicker';
+
+type ShippingMode = 'home' | 'parcelshop';
 
 export default function CartPage() {
   const { items, setQty, remove, totalCents, clear } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<ShippingMode>('home');
+  const [shop, setShop] = useState<SelectedParcelShop | null>(null);
+
+  const FREE_SHIPPING_THRESHOLD = 150000; // 1500 Kč
+  const subtotal = totalCents();
+  const freeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
 
   async function checkout() {
+    if (mode === 'parcelshop' && !shop) {
+      setError('Vyberte prosím výdejnu PPL ParcelShop.');
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, shippingMode: mode, parcelShop: shop }),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Chyba při platbě');
       const { url } = await res.json();
@@ -31,7 +44,8 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
-      <h1 className="text-4xl font-semibold tracking-tight">Košík</h1>
+      <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Nákup</p>
+      <h1 className="font-display mt-2 text-5xl font-medium md:text-6xl">Košík</h1>
 
       {items.length === 0 ? (
         <div className="mt-12 text-neutral-600">
@@ -89,14 +103,52 @@ export default function CartPage() {
             ))}
           </ul>
 
+          {/* Shipping mode picker */}
+          <div className="mt-10">
+            <h2 className="font-display text-2xl font-medium">Doprava</h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <ShippingOption
+                active={mode === 'home'}
+                onClick={() => setMode('home')}
+                title="PPL na adresu"
+                price={freeShipping ? 'Zdarma' : '199 Kč'}
+                eta="1–2 prac. dny"
+              />
+              <ShippingOption
+                active={mode === 'parcelshop'}
+                onClick={() => setMode('parcelshop')}
+                title="PPL ParcelShop"
+                price={freeShipping ? 'Zdarma' : '129 Kč'}
+                eta="1–3 prac. dny"
+              />
+            </div>
+
+            {mode === 'parcelshop' && (
+              <div className="mt-5">
+                <ParcelShopPicker onSelect={setShop} />
+                {shop && (
+                  <p className="mt-3 text-sm text-neutral-700">
+                    Vybráno: <strong>{shop.name}</strong>, {shop.street}, {shop.city}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="mt-10 border-t border-neutral-200 pt-6">
             <div className="flex justify-between text-lg font-medium">
               <span>Mezisoučet</span>
-              <span>{formatPrice(totalCents())}</span>
+              <span>{formatPrice(subtotal)}</span>
             </div>
-            <p className="mt-1 text-sm text-neutral-500">
-              Doprava se vypočítá při platbě (PPL). Nad 1 500 Kč doprava zdarma.
-            </p>
+            {!freeShipping && (
+              <p className="mt-2 text-sm text-neutral-500">
+                Do dopravy zdarma vám chybí{' '}
+                <strong>{formatPrice(FREE_SHIPPING_THRESHOLD - subtotal)}</strong>.
+              </p>
+            )}
+            {freeShipping && (
+              <p className="mt-2 text-sm text-emerald-700">✓ Doprava zdarma</p>
+            )}
 
             {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
@@ -119,5 +171,35 @@ export default function CartPage() {
         </>
       )}
     </div>
+  );
+}
+
+function ShippingOption({
+  active,
+  onClick,
+  title,
+  price,
+  eta,
+}: {
+  active: boolean;
+  onClick: () => void;
+  title: string;
+  price: string;
+  eta: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center justify-between rounded-xl border p-4 text-left transition ${
+        active ? 'border-neutral-900 bg-neutral-900 text-white' : 'border-neutral-300 hover:border-neutral-900'
+      }`}
+    >
+      <div>
+        <div className="font-medium">{title}</div>
+        <div className={`text-sm ${active ? 'text-neutral-300' : 'text-neutral-500'}`}>{eta}</div>
+      </div>
+      <div className="font-medium">{price}</div>
+    </button>
   );
 }

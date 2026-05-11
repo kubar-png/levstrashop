@@ -3,8 +3,11 @@ import { groq } from 'next-sanity';
 import { sanityClient } from '@/sanity/client';
 import { stripe, STRIPE_CURRENCY } from '@/lib/stripe';
 import type { CartItem } from '@/lib/cart';
+import type { SelectedParcelShop } from '@/components/ParcelShopPicker';
 
 export const runtime = 'nodejs';
+
+const FREE_SHIPPING_THRESHOLD_CENTS = 150000; // 1 500 Kč
 
 const variantLookupQuery = groq`
   *[_type == "product" && _id == $productId][0] {
@@ -16,14 +19,19 @@ const variantLookupQuery = groq`
   }
 `;
 
+type CheckoutBody = {
+  items: CartItem[];
+  shippingMode?: 'home' | 'parcelshop';
+  parcelShop?: SelectedParcelShop | null;
+};
+
 export async function POST(req: Request) {
   try {
-    const { items }: { items: CartItem[] } = await req.json();
+    const { items, shippingMode = 'home', parcelShop }: CheckoutBody = await req.json();
     if (!Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
+      return NextResponse.json({ error: 'Košík je prázdný' }, { status: 400 });
     }
 
-    /* Re-validate every line item against Sanity — never trust client prices. */
     const verifiedItems = await Promise.all(
       items.map(async (item) => {
         const data = await sanityClient.fetch<{
@@ -32,9 +40,9 @@ export async function POST(req: Request) {
           variant: { sku: string; priceCents: number; stock: number; size?: string; color?: string } | null;
         } | null>(variantLookupQuery, { productId: item.productId, sku: item.variantSku });
 
-        if (!data || !data.variant) throw new Error(`Variant not found: ${item.variantSku}`);
+        if (!data || !data.variant) throw new Error(`Variant nenalezena: ${item.variantSku}`);
         if (data.variant.stock < item.qty) {
-          throw new Error(`Insufficient stock for ${data.title} (${item.variantSku})`);
+          throw new Error(`Skladem už není dostatek kusů: ${data.title} (${item.variantSku})`);
         }
         return {
           title: data.title,
@@ -48,6 +56,22 @@ export async function POST(req: Request) {
         };
       }),
     );
+
+    const subtotal = verifiedItems.reduce((s, i) => s + i.priceCents * i.qty, 0);
+    const freeShipping = subtotal >= FREE_SHIPPING_THRESHOLD_CENTS;
+
+    const shippingPriceCents = freeShipping
+      ? 0
+      : shippingMode === 'parcelshop'
+        ? 12900
+        : 19900;
+
+    const shippingLabel =
+      shippingMode === 'parcelshop'
+        ? parcelShop
+          ? `PPL ParcelShop · ${parcelShop.name}, ${parcelShop.city}`
+          : 'PPL ParcelShop'
+        : 'PPL na adresu';
 
     const origin =
       req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -68,29 +92,23 @@ export async function POST(req: Request) {
         },
         quantity: i.qty,
       })),
-      shipping_address_collection: { allowed_countries: ['CZ', 'SK', 'DE', 'AT', 'PL'] },
+      shipping_address_collection:
+        shippingMode === 'home'
+          ? { allowed_countries: ['CZ', 'SK'] }
+          : undefined,
       phone_number_collection: { enabled: true },
-      /* Free shipping placeholder — replace once PPL pricing is wired up. */
       shipping_options: [
         {
           shipping_rate_data: {
             type: 'fixed_amount',
-            fixed_amount: { amount: 12900, currency: STRIPE_CURRENCY },
-            display_name: 'PPL ParcelShop (CZ)',
+            fixed_amount: { amount: shippingPriceCents, currency: STRIPE_CURRENCY },
+            display_name: shippingLabel,
             delivery_estimate: {
               minimum: { unit: 'business_day', value: 1 },
-              maximum: { unit: 'business_day', value: 3 },
-            },
-          },
-        },
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: { amount: 19900, currency: STRIPE_CURRENCY },
-            display_name: 'PPL Home Delivery (CZ)',
-            delivery_estimate: {
-              minimum: { unit: 'business_day', value: 1 },
-              maximum: { unit: 'business_day', value: 2 },
+              maximum: {
+                unit: 'business_day',
+                value: shippingMode === 'parcelshop' ? 3 : 2,
+              },
             },
           },
         },
@@ -101,12 +119,15 @@ export async function POST(req: Request) {
         items: JSON.stringify(
           verifiedItems.map((i) => ({ sku: i.sku, qty: i.qty, priceCents: i.priceCents })),
         ),
+        shippingMode,
+        parcelShopId: parcelShop?.id ?? '',
+        parcelShopName: parcelShop?.name ?? '',
       },
     });
 
     return NextResponse.json({ url: session.url, id: session.id });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Checkout error';
+    const message = err instanceof Error ? err.message : 'Chyba při platbě';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

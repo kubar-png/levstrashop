@@ -39,8 +39,13 @@ export function SiteFooter() {
             </ul>
           </div>
         </div>
-        <div className="mt-10 border-t border-neutral-200 pt-6 text-xs">
-          © {new Date().getFullYear()} Levstra. Všechna práva vyhrazena.
+        <div className="mt-10 flex flex-col gap-3 border-t border-neutral-200 pt-6 text-xs md:flex-row md:items-center md:justify-between">
+          <div>© {new Date().getFullYear()} Levstra. Všechna práva vyhrazena.</div>
+          <div className="flex gap-4">
+            <Link href="/obchodni-podminky">Obchodní podmínky</Link>
+            <Link href="/gdpr">GDPR</Link>
+            <Link href="/cookies">Cookies</Link>
+          </div>
         </div>
       </div>
     </footer>

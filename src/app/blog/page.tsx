@@ -3,7 +3,8 @@ export const metadata = { title: 'Blog — Levstra' };
 export default function BlogPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
-      <h1 className="text-4xl font-semibold tracking-tight">Blog</h1>
+      <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Čtení</p>
+      <h1 className="font-display mt-2 text-5xl font-medium md:text-6xl">Blog</h1>
       <p className="mt-3 text-neutral-600">
         Tipy na cestování, péče o kůži, novinky z dílny Marina Galanti.
       </p>

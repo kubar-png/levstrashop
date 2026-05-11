@@ -82,7 +82,10 @@ export async function POST(req: Request) {
         totalCents: session.amount_total ?? 0,
         currency: session.currency ?? 'czk',
         items,
-        shipping: extractShipping(session),
+        shipping: {
+          ...extractShipping(session),
+          pplParcelShopId: session.metadata?.parcelShopId || undefined,
+        },
         createdAt: new Date().toISOString(),
       });
     } catch (err) {

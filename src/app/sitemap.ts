@@ -1,0 +1,43 @@
+import type { MetadataRoute } from 'next';
+import { groq } from 'next-sanity';
+import { sanityClient } from '@/sanity/client';
+
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://levstra.cz';
+
+const productSlugsQuery = groq`*[_type=="product" && active==true].slug.current`;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const staticRoutes = [
+    '',
+    '/shop',
+    '/shop/kabelky',
+    '/shop/kufry',
+    '/o-nas',
+    '/blog',
+    '/doprava',
+    '/vraceni',
+    '/kontakt',
+    '/obchodni-podminky',
+    '/gdpr',
+    '/cookies',
+  ].map((path) => ({
+    url: `${BASE}${path}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: path === '' ? 1.0 : 0.7,
+  }));
+
+  let productSlugs: string[] = [];
+  try {
+    productSlugs = await sanityClient.fetch<string[]>(productSlugsQuery);
+  } catch {}
+
+  const productRoutes = productSlugs.map((slug) => ({
+    url: `${BASE}/shop/p/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
+  return [...staticRoutes, ...productRoutes];
+}
