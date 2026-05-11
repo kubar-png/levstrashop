@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="cs" className={`${poppins.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pt-[72px] md:pt-[88px]">{children}</main>
         <SiteFooter />
         <CookieBanner />
       </body>

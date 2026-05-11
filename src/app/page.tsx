@@ -22,37 +22,41 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* ── HERO ─────────────────────────────────────────────────────── */}
-      <section className="relative">
-        <div className="relative h-[58vh] min-h-[440px] w-full overflow-hidden md:h-[72vh]">
+      {/* ── HERO — inset rounded photo, floating pill header above ─────── */}
+      <section className="-mt-[72px] px-3 pt-3 md:-mt-[88px] md:px-5 md:pt-5">
+        <div className="relative aspect-[16/9] min-h-[520px] w-full overflow-hidden rounded-[2rem] md:aspect-[16/8] md:min-h-0 md:rounded-[2.5rem]">
           <Image
             src={IMG.hero}
             alt="Cestujte se stylem — Levstra"
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[60%_center]"
+            className="object-cover object-[65%_center]"
           />
-          {/* Left dim wash for legibility */}
+          {/* Subtle left-side darkening for text legibility */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0) 65%)',
+                'linear-gradient(90deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.18) 38%, rgba(0,0,0,0) 60%)',
             }}
           />
-          <div className="absolute inset-0 flex items-end pb-14 md:items-center md:pb-0">
-            <div className="mx-auto w-full max-w-7xl px-6">
-              <div className="max-w-2xl text-white">
-                <h1 className="text-[clamp(3rem,9vw,7.5rem)] font-extrabold leading-[0.95] tracking-[-0.03em]">
-                  Cestujte<br />se stylem.
+          {/* Text overlay — anchored bottom-left on mobile, center-left on desktop */}
+          <div className="absolute inset-0 flex items-end pb-12 md:items-center md:pb-0">
+            <div className="w-full max-w-7xl px-8 md:mx-auto md:px-14">
+              <div className="max-w-xl text-white">
+                <h1
+                  className="font-extrabold leading-[0.95] tracking-[-0.025em] text-white"
+                  style={{ color: '#fff', fontSize: 'clamp(3rem, 8vw, 6rem)' }}
+                >
+                  Cestujte se<br />stylem.
                 </h1>
-                <p className="mt-6 max-w-md text-base text-white/90 md:text-lg">
-                  Kufry a kabelky, které zvládnou letiště i&nbsp;večerní rande.
+                <p className="mt-5 max-w-md text-base text-white/95 md:text-lg">
+                  Kufry a kabelky, které zvládnou letiště i&nbsp;večerní rande
                 </p>
                 <Link
                   href="/shop"
-                  className="mt-7 inline-flex items-center rounded-full bg-black px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-neutral-900"
+                  className="mt-7 inline-flex items-center rounded-full bg-[#2b312f] px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-black"
                 >
                   Nakupovat
                 </Link>
