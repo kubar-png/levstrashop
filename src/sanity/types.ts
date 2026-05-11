@@ -5,9 +5,11 @@ export type Variant = {
   sku: string;
   size?: string;
   color?: string;
+  colorHex?: string;
   priceCents: number;
   stock: number;
   weightGrams?: number;
+  images?: SanityImage[];
 };
 
 export type SanityImage = {
@@ -30,9 +32,14 @@ export type ProductSummary = {
   shortDescription?: string;
   image: SanityImage;
   category?: { title: string; slug: string };
+  subcategory?: string;
   minPriceCents: number;
   totalStock?: number;
   featured?: boolean;
+  colorGroup?: string;
+  colorHex?: string;
+  variantColorHexes?: string[];
+  colorSiblings?: { slug: string; title?: string; colorHex: string }[];
 };
 
 export type Product = {
@@ -43,5 +50,8 @@ export type Product = {
   description?: PortableTextBlock[];
   images: SanityImage[];
   category: { title: string; slug: string };
+  subcategory?: string;
   variants: Variant[];
+  colorGroup?: string;
+  colorHex?: string;
 };

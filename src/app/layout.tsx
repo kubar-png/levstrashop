@@ -4,6 +4,7 @@ import './globals.css';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { CookieBanner } from '@/components/CookieBanner';
+import { PageTransition } from '@/components/PageTransition';
 
 const poppins = Poppins({
   variable: '--font-sans',
@@ -43,7 +44,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="cs" className={`${poppins.variable} ${forum.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         <SiteHeader />
-        <main className="flex-1 pt-[72px] md:pt-[92px]">{children}</main>
+        <main className="flex-1 pt-[76px] md:pt-[88px]">
+          <PageTransition>{children}</PageTransition>
+        </main>
         <SiteFooter />
         <CookieBanner />
       </body>

@@ -42,6 +42,7 @@ export const product = defineType({
           fields: [{ name: 'alt', type: 'string', title: 'Alt text' }],
         },
       ],
+      options: { layout: 'grid' },
       validation: (r) => r.required().min(1),
     }),
     defineField({
@@ -54,6 +55,16 @@ export const product = defineType({
       name: 'featured',
       type: 'boolean',
       initialValue: false,
+    }),
+    defineField({
+      name: 'colorGroup',
+      type: 'string',
+      description: 'Groups color variants of the same model (e.g. "riga", "nikol")',
+    }),
+    defineField({
+      name: 'colorHex',
+      type: 'string',
+      description: 'Hex color of this product for color swatches (e.g. #e07a3a)',
     }),
     defineField({
       name: 'active',

@@ -8,9 +8,13 @@ export const allProductsQuery = groq`
     shortDescription,
     "image": images[0],
     "category": category->{title, "slug": slug.current},
-    "minPriceCents": math::min(variants[].priceCents),
+    subcategory,
+    "minPriceCents": math::min(variants[].price) * 100,
     "totalStock": math::sum(variants[].stock),
-    featured
+    featured,
+    colorGroup,
+    colorHex,
+    "variantColorHexes": variants[defined(colorHex)].colorHex
   }
 `;
 
@@ -20,7 +24,15 @@ export const featuredProductsQuery = groq`
     title,
     "slug": slug.current,
     "image": images[0],
-    "minPriceCents": math::min(variants[].priceCents)
+    "minPriceCents": math::min(variants[].price) * 100,
+    colorGroup,
+    colorHex,
+    "variantColorHexes": variants[defined(colorHex)].colorHex,
+    "colorSiblings": *[_type == "product" && active == true && defined(^.colorGroup) && colorGroup == ^.colorGroup && _id != ^._id] {
+      "slug": slug.current,
+      title,
+      colorHex
+    }
   }
 `;
 
@@ -33,7 +45,26 @@ export const productBySlugQuery = groq`
     description,
     images,
     "category": category->{title, "slug": slug.current},
-    variants
+    variants[] {
+      sku,
+      size,
+      color,
+      colorHex,
+      "priceCents": price * 100,
+      stock,
+      weightGrams,
+      images
+    },
+    colorGroup,
+    colorHex
+  }
+`;
+
+export const colorSiblingsQuery = groq`
+  *[_type == "product" && active == true && colorGroup == $colorGroup && slug.current != $slug] {
+    "slug": slug.current,
+    title,
+    colorHex
   }
 `;
 
@@ -52,6 +83,6 @@ export const productsByCategoryQuery = groq`
     title,
     "slug": slug.current,
     "image": images[0],
-    "minPriceCents": math::min(variants[].priceCents)
+    "minPriceCents": math::min(variants[].price) * 100
   }
 `;

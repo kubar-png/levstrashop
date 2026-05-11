@@ -14,8 +14,8 @@ export default function TermsPage() {
           <h2 className="text-2xl font-medium">1. Úvodní ustanovení</h2>
           <p className="mt-2">
             Tyto obchodní podmínky upravují vzájemná práva a povinnosti mezi prodávajícím Levstra
-            s.r.o., IČO: 00000000, se sídlem [adresa], zapsaná v obchodním rejstříku vedeném u
-            [soud], oddíl [X], vložka [Y] (dále jen „prodávající") a kupujícím při prodeji zboží
+            s.r.o., IČO: 27686281, se sídlem Hněvkovského 587/39a, Komárov, 617 00 Brno, zapsaná v obchodním rejstříku vedeném u
+            Krajského soudu v Brně, oddíl C, vložka 47338 (dále jen „prodávající") a kupujícím při prodeji zboží
             prostřednictvím internetového obchodu na adrese levstra.cz.
           </p>
         </section>

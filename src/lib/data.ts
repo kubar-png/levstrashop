@@ -15,6 +15,7 @@ import {
   productBySlugQuery,
   productsByCategoryQuery,
   categoriesQuery,
+  colorSiblingsQuery,
 } from '@/sanity/queries';
 import type { Product, ProductSummary, Category } from '@/sanity/types';
 import { mockProducts, mockSummaries, mockCategories } from './mock-data';
@@ -25,6 +26,12 @@ export type PlaceholderSpec = {
   accent: string;
 };
 
+export type ColorSibling = {
+  slug: string;
+  title: string;
+  colorHex: string;
+};
+
 export type ProductSummaryView = {
   _id: string;
   title: string;
@@ -33,18 +40,25 @@ export type ProductSummaryView = {
   imageUrl: string | null;
   placeholder?: PlaceholderSpec;
   category?: { title: string; slug: string };
+  subcategory?: string;
   minPriceCents: number;
   totalStock?: number;
   featured?: boolean;
+  colorGroup?: string;
+  colorHex?: string;
+  variantColorHexes?: string[];
+  colorSiblings?: { slug: string; title?: string; colorHex: string }[];
 };
 
 export type VariantView = {
   sku: string;
   size?: string;
   color?: string;
+  colorHex?: string;
   priceCents: number;
   stock: number;
   weightGrams?: number;
+  imageUrls?: string[];
 };
 
 export type ProductView = {
@@ -56,8 +70,12 @@ export type ProductView = {
   imageUrls: string[];
   placeholder?: PlaceholderSpec;
   category: { title: string; slug: string };
+  subcategory?: string;
   variants: VariantView[];
   featured?: boolean;
+  colorGroup?: string;
+  colorHex?: string;
+  colorSiblings?: ColorSibling[];
 };
 
 export type CategoryView = {
@@ -75,9 +93,14 @@ function toSummary(p: ProductSummary): ProductSummaryView {
     shortDescription: p.shortDescription,
     imageUrl: p.image ? urlFor(p.image).width(800).height(1000).url() : null,
     category: p.category,
+    subcategory: p.subcategory,
     minPriceCents: p.minPriceCents,
     totalStock: p.totalStock,
     featured: p.featured,
+    colorGroup: p.colorGroup,
+    colorHex: p.colorHex,
+    variantColorHexes: p.variantColorHexes?.length ? p.variantColorHexes : undefined,
+    colorSiblings: p.colorSiblings?.length ? p.colorSiblings : undefined,
   };
 }
 
@@ -88,9 +111,26 @@ function toFull(p: Product): ProductView {
     slug: p.slug,
     shortDescription: p.shortDescription,
     descriptionText: undefined, // Portable Text rendered separately when source is Sanity
-    imageUrls: p.images.map((img) => urlFor(img).width(1200).height(1500).url()),
+    imageUrls: p.images
+      .filter((img) => img?.asset?._ref)
+      .map((img) => urlFor(img).width(1200).height(1500).url()),
     category: p.category,
-    variants: p.variants,
+    variants: p.variants.map((v) => ({
+      sku: v.sku,
+      size: v.size,
+      color: v.color,
+      colorHex: v.colorHex,
+      priceCents: v.priceCents,
+      stock: v.stock,
+      weightGrams: v.weightGrams,
+      imageUrls: v.images?.length
+        ? v.images
+            .filter((img) => img?.asset?._ref)
+            .map((img) => urlFor(img).width(1200).height(1500).url())
+        : undefined,
+    })),
+    colorGroup: p.colorGroup,
+    colorHex: p.colorHex,
   };
 }
 
@@ -130,12 +170,40 @@ export async function getProductsByCategory(slug: string): Promise<ProductSummar
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductView | null> {
-  if (!isSanityConfigured()) return mockProducts.find((p) => p.slug === slug) ?? null;
+  if (!isSanityConfigured()) {
+    const product = mockProducts.find((p) => p.slug === slug) ?? null;
+    if (!product) return null;
+    if (product.colorGroup) {
+      const siblings = mockProducts
+        .filter((p) => p.colorGroup === product.colorGroup && p.slug !== product.slug)
+        .map((p) => ({ slug: p.slug, title: p.title, colorHex: p.colorHex ?? '#ccc' }));
+      return { ...product, colorSiblings: siblings };
+    }
+    return product;
+  }
   try {
     const row = await sanityClient.fetch<Product | null>(productBySlugQuery, { slug });
-    if (row) return toFull(row);
+    if (row) {
+      const product = toFull(row);
+      if (product.colorGroup) {
+        const siblings = await sanityClient.fetch<ColorSibling[]>(colorSiblingsQuery, {
+          colorGroup: product.colorGroup,
+          slug,
+        });
+        return { ...product, colorSiblings: siblings };
+      }
+      return product;
+    }
   } catch {}
-  return mockProducts.find((p) => p.slug === slug) ?? null;
+  const product = mockProducts.find((p) => p.slug === slug) ?? null;
+  if (!product) return null;
+  if (product.colorGroup) {
+    const siblings = mockProducts
+      .filter((p) => p.colorGroup === product.colorGroup && p.slug !== product.slug)
+      .map((p) => ({ slug: p.slug, title: p.title, colorHex: p.colorHex ?? '#ccc' }));
+    return { ...product, colorSiblings: siblings };
+  }
+  return product;
 }
 
 export async function getCategories(): Promise<CategoryView[]> {

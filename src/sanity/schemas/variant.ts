@@ -29,10 +29,29 @@ export const variant = defineType({
     }),
     defineField({ name: 'color', type: 'string' }),
     defineField({
-      name: 'priceCents',
-      title: 'Price (cents / haléře)',
+      name: 'images',
+      title: 'Fotky varianty',
+      type: 'array',
+      description: 'Volitelné — přebijí fotky produktu pro tuto barvu/variantu',
+      of: [
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [{ name: 'alt', type: 'string', title: 'Alt text' }],
+        },
+      ],
+      options: { layout: 'grid' },
+    }),
+    defineField({
+      name: 'colorHex',
+      type: 'string',
+      description: 'Hex color for swatch display (e.g. #1c1c1c)',
+    }),
+    defineField({
+      name: 'price',
+      title: 'Cena (Kč)',
       type: 'number',
-      description: 'Stored as smallest currency unit (e.g. cents or haléře)',
+      description: 'Zadejte cenu v celých korunách, např. 299',
       validation: (r) => r.required().min(0).integer(),
     }),
     defineField({

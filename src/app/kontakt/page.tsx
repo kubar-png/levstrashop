@@ -33,7 +33,7 @@ export default function ContactPage() {
       </div>
 
       <p className="mt-10 text-sm text-neutral-500">
-        Levstra s.r.o. · IČO: 00000000 · DIČ: CZ00000000
+        Levstra s.r.o. · IČO: 27686281 · DIČ: CZ27686281 · Hněvkovského 587/39a, 617 00 Brno
       </p>
     </div>
   );

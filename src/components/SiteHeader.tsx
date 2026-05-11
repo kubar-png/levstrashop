@@ -1,62 +1,36 @@
 import Link from 'next/link';
 import { CartButton } from './CartButton';
 import { MobileMenu } from './MobileMenu';
+import { NavLinks } from './NavLinks';
 
-/**
- * Floating pill header — light cream pill, Forum-serif logotype,
- * 4 Poppins nav items with active state in red.
- */
 export function SiteHeader() {
   return (
-    <header className="fixed inset-x-3 top-3 z-50 md:inset-x-6 md:top-5">
+    <header className="fixed inset-x-8 top-6 z-50 md:inset-x-10 md:top-8">
       <div
-        className="mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-full px-4 py-2.5 shadow-[0_4px_22px_-8px_rgba(0,0,0,0.18)] ring-1 ring-black/5 backdrop-blur md:px-7 md:py-3"
+        className="flex w-full items-center justify-between gap-6 rounded-full px-4 py-2.5 shadow-[0_4px_22px_-8px_rgba(0,0,0,0.18)] ring-1 ring-black/5 backdrop-blur md:px-6 md:py-3"
         style={{ background: 'var(--color-pill-bg)' }}
       >
-        {/* Logo — mark + Forum-serif wordmark */}
-        <Link href="/" className="flex items-center gap-2 pl-1 text-[var(--color-pill-ink)]">
-          <LogoMark />
-          <span className="font-serif text-xl leading-none tracking-tight md:text-2xl">
-            levstra
-          </span>
-        </Link>
+        {/* Left: logo + nav */}
+        <div className="flex items-center gap-7">
+          <Link href="/" className="flex items-center gap-2 shrink-0 text-[var(--color-pill-ink)]">
+            <LogoMark />
+            <span className="font-serif text-xl leading-none tracking-tight md:text-2xl">
+              levstra
+            </span>
+          </Link>
 
-        {/* Center nav — Poppins Regular, active 'Domů' in red */}
-        <nav className="hidden items-center gap-7 text-[15px] md:flex">
-          <Link
-            href="/"
-            aria-current="page"
-            className="font-poppins-medium"
-            style={{ color: 'var(--color-red)' }}
-          >
-            Domů
-          </Link>
-          <Link
-            href="/shop"
-            className="font-poppins-regular text-[var(--color-pill-ink)]/85 hover:text-[var(--color-pill-ink)]"
-          >
-            e-shop
-          </Link>
-          <Link
-            href="/o-nas"
-            className="font-poppins-regular text-[var(--color-pill-ink)]/85 hover:text-[var(--color-pill-ink)]"
-          >
-            O nás
-          </Link>
-          <Link
-            href="/blog"
-            className="font-poppins-regular text-[var(--color-pill-ink)]/85 hover:text-[var(--color-pill-ink)]"
-          >
-            Blog
-          </Link>
-        </nav>
+          <nav className="hidden items-center gap-6 md:flex">
+            <NavLinks />
+          </nav>
+        </div>
 
-        {/* Right: Najít + cart + mobile menu trigger */}
+        {/* Right: search + cart + mobile */}
         <div className="flex items-center gap-3">
           <button
             type="button"
             aria-label="Najít"
-            className="hidden h-9 items-center gap-1.5 rounded-full px-2 text-[15px] font-poppins-regular text-[var(--color-pill-ink)]/85 hover:text-[var(--color-pill-ink)] md:inline-flex"
+            className="hidden h-9 cursor-pointer items-center gap-1.5 rounded-full px-2 text-[15px] font-poppins-regular transition-colors duration-200 md:inline-flex"
+            style={{ color: 'var(--color-pill-ink)' }}
           >
             <span>Najít</span>
             <SearchIcon />
@@ -69,7 +43,6 @@ export function SiteHeader() {
   );
 }
 
-/** Stylized 4-petal mark — geometric flower / asterisk in pill ink. */
 function LogoMark() {
   return (
     <span className="inline-flex h-7 w-7 items-center justify-center" aria-hidden="true">

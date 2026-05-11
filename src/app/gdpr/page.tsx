@@ -13,7 +13,7 @@ export default function GdprPage() {
         <section>
           <h2 className="text-2xl font-medium">1. Správce údajů</h2>
           <p className="mt-2">
-            Správcem osobních údajů je Levstra s.r.o., IČO: 00000000, se sídlem [adresa],
+            Správcem osobních údajů je Levstra s.r.o., IČO: 27686281, se sídlem Hněvkovského 587/39a, Komárov, 617 00 Brno,
             e-mail: info@levstra.cz. Při zpracování postupujeme v souladu s nařízením (EU)
             2016/679 (GDPR) a zákonem č. 110/2019 Sb.
           </p>

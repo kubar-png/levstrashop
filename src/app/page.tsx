@@ -1,20 +1,18 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { getFeaturedProducts } from '@/lib/data';
-import { ProductCard } from '@/components/ProductCard';
 import { PromoTicker } from '@/components/PromoTicker';
 import { InstagramSection } from '@/components/InstagramSection';
+import { ProductCarousel } from '@/components/ProductCarousel';
 
 export const revalidate = 60;
 
-/** Wix CDN image map — each ID identifies one of the original Levstra photos. */
 const WIX = 'https://static.wixstatic.com/media';
 const IMG = {
-  hero: `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`,        // orange RIGA + yellow graffiti
-  marinaModel: `${WIX}/f0cf6b_0fb65fabc4d54b149a2b6213e5153e9e~mv2.jpg`, // blonde model w/ white bag
-  catKabelky: `${WIX}/f0cf6b_8a21028ccb924868a7824d820313a55c~mv2.jpg`,  // street + white bag
-  catKufry: `${WIX}/f0cf6b_3ce5a12e7ebe4524a196ef34a03d1e59~mv2.jpg`,    // pink RIGA + jeans
-  storyYellow: `${WIX}/f0cf6b_bf81f093a9fd46868b51b007255b8030~mv2.jpg`, // yellow suitcase lifestyle
+  hero:        `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`,
+  marinaModel: `${WIX}/f0cf6b_0fb65fabc4d54b149a2b6213e5153e9e~mv2.jpg`,
+  catKabelky:  `${WIX}/f0cf6b_8a21028ccb924868a7824d820313a55c~mv2.jpg`,
+  catKufry:    `${WIX}/f0cf6b_3ce5a12e7ebe4524a196ef34a03d1e59~mv2.jpg`,
 };
 
 export default async function HomePage() {
@@ -22,55 +20,36 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* ── HERO — pill header floats above inset rounded photo ─────────── */}
-      <section className="-mt-[72px] px-3 pt-[68px] md:-mt-[92px] md:px-6 md:pt-[88px]">
-        <div className="relative aspect-[16/10] min-h-[520px] w-full overflow-hidden rounded-[2rem] md:aspect-[16/8] md:min-h-0 md:rounded-[2.25rem]">
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      <section className="-mt-[76px] px-4 pt-4 md:-mt-[88px] md:px-6 md:pt-5">
+        <div className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.25rem] aspect-[3/4] sm:aspect-[16/10] md:aspect-[16/8]">
           <Image
             src={IMG.hero}
             alt="Cestujte se stylem — Levstra"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-[65%_center]"
+            fill priority sizes="100vw"
+            className="object-cover object-[50%_20%]"
           />
-          {/* Soft left wash for legibility */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(90deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.18) 40%, rgba(0,0,0,0) 62%)',
-            }}
-          />
-          {/* Text overlay — bottom-left on mobile, center-left on desktop */}
-          <div className="absolute inset-0 flex items-end pb-12 md:items-center md:pb-0">
-            <div className="w-full max-w-7xl px-7 md:mx-auto md:px-16">
-              <div className="max-w-xl">
+          <div className="absolute inset-0 flex items-end pb-8 md:pb-12">
+            <div className="w-full px-4 md:px-6">
+              <div className="max-w-5xl">
                 <h1
-                  className="font-poppins-semibold leading-[0.95] text-white"
-                  style={{
-                    color: '#ffffff',
-                    fontSize: 'clamp(3.25rem, 7.8vw, 6.5rem)',
-                    letterSpacing: '-0.035em',
-                  }}
+                  className="font-poppins-semibold leading-[1.0] text-white"
+                  style={{ fontSize: 'clamp(2rem, 7.5vw, 8rem)', letterSpacing: '-0.035em', color: '#fff' }}
                 >
                   Cestujte se<br />stylem.
                 </h1>
                 <p
-                  className="font-serif mt-5 max-w-md text-white"
-                  style={{
-                    color: '#ffffff',
-                    fontSize: 'clamp(1.05rem, 1.5vw, 1.5rem)',
-                    lineHeight: 1.35,
-                  }}
+                  className="font-serif mt-4 text-white"
+                  style={{ fontSize: 'clamp(1rem, 2.4vw, 2.8rem)', lineHeight: 1.35, color: '#fff' }}
                 >
                   Kufry a kabelky, které zvládnou letiště i&nbsp;večerní rande
                 </p>
                 <Link
                   href="/shop"
-                  className="mt-7 inline-flex items-center rounded-full px-7 py-3 text-sm font-poppins-semibold text-white shadow-lg transition hover:opacity-90"
-                  style={{ background: 'var(--color-pill-ink)' }}
+                  className="marina-btn mt-6 inline-flex items-center rounded-xl border-2 border-white px-9 py-3.5 font-poppins-semibold"
+                  style={{ fontSize: '20px' }}
                 >
-                  Nakupovat
+                  <span className="marina-btn-text text-white">Nakupovat</span>
                 </Link>
               </div>
             </div>
@@ -78,105 +57,108 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── BEST SELLERS ──────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="text-3xl font-extrabold tracking-tight md:text-5xl">
-            Nejoblíbenější kousky
-          </h2>
-          <Link
-            href="/shop"
-            className="rounded-full border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold transition hover:border-black"
-          >
-            Zobrazit vše
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-7">
-          {featured.slice(0, 4).map((p) => (
-            <ProductCard key={p._id} product={p} />
-          ))}
-        </div>
-      </section>
+      {/* ── BEST SELLERS ─────────────────────────────────────────────── */}
+      <ProductCarousel products={featured} />
 
       {/* ── MARINA GALANTI BANNER ─────────────────────────────────────── */}
-      <section>
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-2 md:items-center md:gap-16 md:py-28">
-          <div>
-            <h2 className="text-[clamp(2.5rem,6vw,5.25rem)] font-extrabold leading-[0.98] tracking-[-0.03em]">
-              Lehkost, styl, nadčasovost.
-            </h2>
-            <p className="mt-6 max-w-md text-lg text-neutral-800">
-              Nové kousky Marina Galanti už jsou skladem.
-            </p>
-            <Link
-              href="/shop"
-              className="mt-8 inline-flex items-center rounded-full bg-black px-7 py-3 text-sm font-semibold text-white transition hover:bg-neutral-900"
-            >
-              Prohlédnout kolekci
-            </Link>
+      <section className="px-4 pt-4 md:px-6 md:pt-5">
+        <div
+          className="relative w-full overflow-hidden rounded-[2rem] md:rounded-[2.25rem] aspect-[4/3] sm:aspect-[16/9] md:aspect-[16/6]"
+        >
+          <Image
+            src={IMG.marinaModel}
+            alt="Modelka s kabelkou Marina Galanti"
+            fill sizes="100vw"
+            className="object-cover object-[55%_40%]"
+          />
+          <div
+            className="absolute inset-0 md:hidden"
+            style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.65) 100%)' }}
+          />
+          <div
+            className="absolute inset-0 hidden md:block"
+            style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 45%, rgba(0,0,0,0) 68%)' }}
+          />
+          <div className="absolute inset-0 flex items-end" style={{ paddingBottom: 'calc(2.5rem + 64px)' }}>
+            <div className="w-full px-4 md:px-6">
+              <div className="max-w-lg">
+                <h2
+                  className="font-poppins-semibold leading-[1.05] text-white"
+                  style={{ color: '#fff', fontSize: 'clamp(1.75rem, 4vw, 3rem)', letterSpacing: '-0.03em' }}
+                >
+                  Lehkost, styl,<br />nadčasovost.
+                </h2>
+                <p
+                  className="font-serif mt-3 text-white"
+                  style={{ color: '#fff', fontSize: 'clamp(0.9rem, 1.5vw, 1.3rem)', lineHeight: 1.35 }}
+                >
+                  Nové kousky Marina Galanti už jsou skladem.
+                </p>
+                <Link
+                  href="/shop"
+                  className="marina-btn mt-5 inline-flex items-center rounded-xl border-2 border-white px-7 py-3 font-poppins-semibold"
+                  style={{ fontSize: '16px' }}
+                >
+                  <span className="marina-btn-text text-white">Prohlédnout kolekci</span>
+                </Link>
+              </div>
+            </div>
           </div>
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg shadow-xl md:aspect-[5/6]">
-            <Image
-              src={IMG.marinaModel}
-              alt="Modelka s kabelkou Marina Galanti"
-              fill
-              sizes="(min-width: 768px) 50vw, 100vw"
-              className="object-cover object-[55%_75%] scale-[1.15]"
-            />
+          <div className="absolute bottom-0 left-0 right-0">
+            <PromoTicker message="doprava zdarma při objednávce nad 1500 Kč" />
           </div>
         </div>
       </section>
-
-      {/* ── PROMO TICKER ─────────────────────────────────────────────── */}
-      <PromoTicker message="doprava zdarma při objednávce nad 1500 Kč" />
 
       {/* ── CATEGORY GRID ────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-7xl px-6 py-20 md:py-24">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="text-3xl font-extrabold tracking-tight md:text-5xl">
-            Nakupujte podle kategorie
-          </h2>
-          <Link
-            href="/shop"
-            className="rounded-full border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold transition hover:border-black"
-          >
-            Zobrazit vše
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-4 md:gap-8">
-          <CategoryCard href="/shop/kabelky" label="kabelky" image={IMG.catKabelky} />
-          <CategoryCard href="/shop/kufry" label="kufry" image={IMG.catKufry} />
+      <section className="px-4 py-12 md:px-6 md:py-16">
+        <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
+          <div className="flex flex-col items-start gap-6 md:w-[30%] md:pt-1">
+            <h2
+              className="font-poppins-semibold leading-[1.1] tracking-tight"
+              style={{ color: '#2B312F', fontSize: 'clamp(1.5rem, 2.5vw, 2.25rem)' }}
+            >
+              Nakupujte podle kategorie
+            </h2>
+            <Link
+              href="/shop"
+              className="inline-flex items-center rounded-xl border-2 px-5 py-2 text-sm font-semibold transition hover:opacity-70"
+              style={{ borderColor: '#2D5143', color: '#2D5143' }}
+            >
+              Zobrazit vše
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4 md:w-[70%] md:gap-5">
+            <CategoryCard href="/shop/kabelky" label="kabelky" image={IMG.catKabelky} />
+            <CategoryCard href="/shop/kufry" label="kufry" image={IMG.catKufry} />
+          </div>
         </div>
       </section>
 
-      {/* ── BRAND STORY (Náš příběh) — on Wix sky-blue ─────────────────── */}
-      <section style={{ background: '#a0c8ff' }}>
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-20 md:py-32">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.32em] text-neutral-700">
-              Náš příběh
-            </p>
-            <h2 className="mt-5 text-[clamp(1.75rem,3.6vw,3rem)] font-bold leading-[1.18] tracking-[-0.015em] text-neutral-900">
-              Módu dovážíme už přes dvě desetiletí. Za tu dobu nám rukama prošly stovky kolekcí a
-              my dnes víme přesně, co má smysl nabízet dál.
-            </h2>
-            <div className="mt-10 h-px w-32 bg-neutral-900/30" />
-            <Link
-              href="/o-nas"
-              className="mt-8 inline-flex items-center rounded-full bg-black px-7 py-3 text-sm font-semibold text-white transition hover:bg-neutral-900"
-            >
-              Náš příběh
-            </Link>
-          </div>
-          <div className="relative aspect-[3/4] w-full max-w-md justify-self-end overflow-hidden rounded-lg shadow-xl">
-            <Image
-              src={IMG.storyYellow}
-              alt="Žlutý kufr Levstra"
-              fill
-              sizes="(min-width: 768px) 35vw, 100vw"
-              className="object-cover"
-            />
-          </div>
+      {/* ── BRAND STORY ──────────────────────────────────────────────── */}
+      <section className="px-4 py-12 md:px-6 md:py-16">
+        <div
+          className="reveal-on-scroll rounded-3xl px-8 py-12 text-center md:px-20 md:py-16"
+          style={{ background: '#A0C8FF' }}
+        >
+          <h2
+            className="font-poppins-semibold leading-[1.1]"
+            style={{ color: '#2D5143', fontSize: 'clamp(1.5rem, 3vw, 2.5rem)' }}
+          >
+            Náš příběh
+          </h2>
+          <p
+            className="font-serif mx-auto mt-6 max-w-4xl leading-[1.25]"
+            style={{ color: '#2D5143', fontSize: 'clamp(1.5rem, 3.5vw, 3rem)' }}
+          >
+            Módu dovážíme už přes dvě desetiletí. Za tu dobu nám rukama prošly stovky kolekcí – a my dnes víme přesně, co má smysl nabízet dál.
+          </p>
+          <p
+            className="font-poppins-light mt-8"
+            style={{ color: '#2D5143', fontSize: '13px' }}
+          >
+            Protože každý si zaslouží kvalitní módu.
+          </p>
         </div>
       </section>
 
@@ -186,30 +168,35 @@ export default async function HomePage() {
   );
 }
 
-function CategoryCard({
-  href,
-  label,
-  image,
-}: {
-  href: string;
-  label: string;
-  image: string;
-}) {
+function CategoryCard({ href, label, image }: { href: string; label: string; image: string }) {
   return (
     <Link
       href={href}
-      className="group relative block aspect-[3/4] overflow-hidden rounded-lg bg-neutral-200 md:aspect-[4/5]"
+      className="group block rounded-2xl p-3 transition-colors duration-500 bg-[#F2F0EB] hover:bg-[#C7DFFF]"
     >
-      <Image
-        src={image}
-        alt={label}
-        fill
-        sizes="(min-width: 768px) 45vw, 50vw"
-        className="object-cover transition duration-700 group-hover:scale-[1.04]"
-      />
-      <span className="absolute inset-x-0 bottom-7 mx-auto block w-fit rounded-full bg-white px-9 py-3 text-base font-bold lowercase tracking-wide text-neutral-900 shadow-lg">
-        {label}
-      </span>
+      <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: '3/4', maxHeight: '42vh' }}>
+        <Image
+          src={image} alt={label} fill
+          sizes="(min-width: 768px) 34vw, 50vw"
+          className="object-cover transition duration-700 group-hover:scale-[1.04]"
+        />
+      </div>
+      <div className="mt-3">
+        <div
+          className="cat-label w-full rounded-xl border-2 py-3 md:py-3.5"
+          style={{ borderColor: '#2B312F' }}
+        >
+          <div className="cat-label-inner">
+            <span
+              className="cat-label-word font-poppins-semibold lowercase tracking-wide"
+              style={{ fontSize: 'clamp(1.05rem, 1.6vw, 1.3rem)' }}
+            >
+              {label}
+            </span>
+            <span className="cat-label-arrow" aria-hidden="true">→</span>
+          </div>
+        </div>
+      </div>
     </Link>
   );
 }

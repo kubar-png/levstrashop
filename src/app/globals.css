@@ -21,6 +21,14 @@
   --color-forest-deep: #1f4537;
   --color-lime: #e1f861;
   --color-sky: #a0c8ff;
+  --color-sky-light: #c7dfff;
+  --color-orange: #ee7734;
+  --color-orange-dark: #ea570c;
+  --color-orange-deep: #ae3a00;
+  --color-olive: #627023;
+  --color-gray-warm: #b5b3af;
+  --color-blush: #ddbfb7;
+  --color-cream: #f2f0eb;
   --color-red: #b43e2e;
   --color-pill-bg: #f4f1ea;
   --color-pill-ink: #1a1a1a;
@@ -37,7 +45,7 @@ body {
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-weight: 200; /* ExtraLight body */
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -51,11 +59,23 @@ h1, h2, h3 {
 h1 { letter-spacing: -0.035em; }
 
 /* Convenience utility for serif subheads. */
-.font-serif { font-family: var(--font-serif), Georgia, serif; }
+.font-serif { font-family: var(--font-serif), Georgia, serif; font-weight: 400; }
 .font-poppins-light { font-family: var(--font-sans); font-weight: 200; }
 .font-poppins-regular { font-family: var(--font-sans); font-weight: 400; }
 .font-poppins-medium { font-family: var(--font-sans); font-weight: 500; }
 .font-poppins-semibold { font-family: var(--font-sans); font-weight: 600; }
+
+/* Header nav links — orange hover + active */
+.nav-link {
+  color: var(--color-pill-ink);
+  transition: color 0.18s ease;
+}
+.nav-link:hover { color: var(--color-orange); }
+.nav-link[data-active] { color: var(--color-orange-dark); }
+
+/* Hide scrollbar while keeping scroll functionality. */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
 
 /* Lime ticker marquee. */
 @keyframes ticker-scroll {
@@ -63,9 +83,151 @@ h1 { letter-spacing: -0.035em; }
   100% { transform: translate3d(-50%, 0, 0); }
 }
 .ticker-track {
-  animation: ticker-scroll 38s linear infinite;
+  animation: ticker-scroll 70s linear infinite;
   will-change: transform;
 }
 @media (prefers-reduced-motion: reduce) {
   .ticker-track { animation: none; }
+}
+
+/* Page transition — triggered by key change in PageTransition component. */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-transition {
+  animation: page-enter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-transition { animation: none; }
+}
+
+/* Scroll-triggered reveal — slides up + fades in as element enters viewport. */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(56px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal-on-scroll {
+  animation: reveal-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 40%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll { animation: none; }
+}
+
+
+/* Price range slider — forest green track fill + thumb */
+.price-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  background: linear-gradient(
+    to right,
+    var(--color-forest) 0%,
+    var(--color-forest) var(--slider-pct, 100%),
+    #d1d5db var(--slider-pct, 100%),
+    #d1d5db 100%
+  );
+}
+.price-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-forest);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.price-range::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.price-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-forest);
+  border: none;
+  cursor: pointer;
+}
+
+/* Marina Galanti CTA — lime sweep on ghost button */
+.marina-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: border-color 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.marina-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-lime);
+  transform: translateX(-102%);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.marina-btn:hover::before {
+  transform: translateX(0);
+}
+.marina-btn:hover {
+  border-color: var(--color-lime);
+}
+.marina-btn-text {
+  position: relative;
+  z-index: 1;
+  transition: color 0.28s ease;
+}
+.marina-btn:hover .marina-btn-text {
+  color: var(--color-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .marina-btn::before, .marina-btn-text { transition: none; }
+}
+
+/* Category card label — forest sweep + arrow reveal on hover */
+.cat-label {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.cat-label::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-lime);
+  transform: translateX(-102%);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .cat-label::before {
+  transform: translateX(0);
+}
+.cat-label-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.cat-label-word {
+  color: var(--color-ink);
+  transition: color 0.3s ease;
+}
+.group:hover .cat-label-word {
+  color: var(--color-ink);
+}
+.cat-label-arrow {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.25s ease 0.12s, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.12s;
+  color: var(--color-ink);
+  font-style: normal;
+}
+.group:hover .cat-label-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cat-label::before { transition: none; }
+  .cat-label-word, .cat-label-arrow { transition: none; }
 }

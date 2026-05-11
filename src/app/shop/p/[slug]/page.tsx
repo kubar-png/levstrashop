@@ -1,7 +1,6 @@
 import { getProductBySlug } from '@/lib/data';
-import { ProductImage } from '@/components/ProductImage';
 import { notFound } from 'next/navigation';
-import { ProductBuyBox } from '@/components/ProductBuyBox';
+import { ProductPageClient } from '@/components/ProductPageClient';
 import type { Metadata } from 'next';
 
 export const revalidate = 60;
@@ -53,45 +52,13 @@ export default async function ProductPage({
     },
   };
 
-  const images = product.imageUrls.length > 0 ? product.imageUrls : [null];
-
   return (
-    <div className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:grid-cols-2">
+    <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-24 pt-28 md:grid-cols-2 md:gap-14 md:px-6 md:pt-32 lg:gap-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
       />
-
-      <div className="grid gap-4">
-        {images.map((src, i) => (
-          <ProductImage
-            key={i}
-            src={src}
-            alt={product.title}
-            placeholder={product.placeholder}
-            sizes="(min-width: 768px) 50vw, 100vw"
-            priority={i === 0}
-          />
-        ))}
-      </div>
-
-      <div className="md:sticky md:top-24 md:self-start">
-        <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
-          {product.category?.title}
-        </p>
-        <h1 className="mt-2 text-4xl font-medium md:text-5xl">{product.title}</h1>
-        {product.shortDescription && (
-          <p className="mt-3 text-neutral-600">{product.shortDescription}</p>
-        )}
-
-        <ProductBuyBox product={product} />
-
-        {product.descriptionText && (
-          <p className="mt-10 text-sm leading-relaxed text-neutral-700">
-            {product.descriptionText}
-          </p>
-        )}
-      </div>
+      <ProductPageClient product={product} />
     </div>
   );
 }

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'levstra-cookie-consent';
-
 type Consent = 'all' | 'essential' | null;
 
 export function CookieBanner() {
@@ -13,8 +12,7 @@ export function CookieBanner() {
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem(STORAGE_KEY) as Consent | null;
-    setConsent(stored);
+    setConsent(localStorage.getItem(STORAGE_KEY) as Consent | null);
   }, []);
 
   function accept(value: 'all' | 'essential') {
@@ -28,27 +26,33 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-label="Souhlas s používáním cookies"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-neutral-200 bg-white shadow-xl"
+      className="fixed inset-x-8 bottom-6 z-50 md:inset-x-10 md:bottom-8"
     >
-      <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 py-5 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm text-neutral-700">
+      <div
+        className="flex flex-col gap-4 rounded-2xl px-6 py-5 shadow-[0_4px_22px_-8px_rgba(0,0,0,0.22)] ring-1 ring-black/5 backdrop-blur md:flex-row md:items-center md:justify-between md:gap-8 md:px-8"
+        style={{ background: 'var(--color-pill-bg)' }}
+      >
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--color-ink)' }}>
           Používáme cookies k zajištění základní funkčnosti e-shopu a — s vaším souhlasem — k
           měření návštěvnosti.{' '}
-          <Link href="/cookies" className="underline">
+          <Link href="/cookies" className="underline underline-offset-2 hover:opacity-70 transition">
             Více informací
           </Link>
           .
         </p>
-        <div className="flex gap-2">
+
+        <div className="flex shrink-0 gap-3">
           <button
             onClick={() => accept('essential')}
-            className="rounded-full border border-neutral-300 px-5 py-2 text-sm hover:border-neutral-900"
+            className="inline-flex items-center rounded-xl border-2 px-5 py-2 text-sm font-poppins-semibold transition hover:opacity-70"
+            style={{ borderColor: '#2D5143', color: '#2D5143' }}
           >
             Pouze nezbytné
           </button>
           <button
             onClick={() => accept('all')}
-            className="rounded-full bg-neutral-900 px-5 py-2 text-sm text-white hover:bg-neutral-700"
+            className="inline-flex items-center rounded-xl px-5 py-2 text-sm font-poppins-semibold text-white transition hover:opacity-85"
+            style={{ background: 'var(--color-pill-ink)' }}
           >
             Přijmout vše
           </button>
