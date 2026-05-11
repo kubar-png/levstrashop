@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CartCleaner } from '@/components/CartCleaner';
+import { Eyebrow } from '@/components/ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,23 +26,22 @@ export default async function SuccessPage({
         </svg>
       </div>
 
-      <p
-        className="font-serif text-center"
-        style={{ fontSize: '13px', letterSpacing: '0.1em', color: 'var(--color-forest)', textTransform: 'uppercase' }}
-      >
-        Objednávka přijata
-      </p>
+      <Eyebrow tone="forest" serif size="md">Objednávka přijata</Eyebrow>
 
       <h1
         className="font-poppins-semibold mt-2 text-center leading-[1.05]"
-        style={{ fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', letterSpacing: '-0.03em', color: 'var(--color-ink)' }}
+        style={{
+          fontSize: 'var(--text-display)',
+          letterSpacing: '-0.03em',
+          color: 'var(--color-ink)',
+        }}
       >
         Děkujeme za nákup!
       </h1>
 
       <p
         className="font-poppins-light mx-auto mt-5 max-w-sm text-center leading-relaxed"
-        style={{ fontSize: '15px', color: 'var(--color-gray-warm)' }}
+        style={{ fontSize: 'var(--text-lead)', color: 'var(--color-text-muted)' }}
       >
         Potvrzení vám posíláme e-mailem. Zboží zabalíme a předáme PPL co nejdřív.
       </p>
@@ -49,25 +49,33 @@ export default async function SuccessPage({
       {/* Order reference */}
       {(transId || refId) && (
         <div
-          className="mt-8 rounded-2xl px-8 py-5 text-center"
-          style={{ background: 'var(--color-cream)' }}
+          className="mt-8 px-8 py-5 text-center"
+          style={{
+            background: 'var(--color-cream)',
+            borderRadius: 'var(--radius-md)',
+          }}
         >
           {transId && (
             <div className="mb-2">
-              <p className="font-poppins-semibold" style={{ fontSize: '11px', letterSpacing: '0.06em', color: 'var(--color-gray-warm)', textTransform: 'uppercase' }}>
-                ID transakce
-              </p>
-              <p className="font-poppins-regular mt-1 tabular-nums" style={{ fontSize: '14px', color: 'var(--color-ink)' }}>
+              <Eyebrow>ID transakce</Eyebrow>
+              <p
+                className="font-poppins-regular mt-1 tabular-nums"
+                style={{ fontSize: 'var(--text-body)', color: 'var(--color-ink)' }}
+              >
                 {transId}
               </p>
             </div>
           )}
           {refId && (
-            <div className={transId ? 'mt-3 border-t pt-3' : ''} style={{ borderColor: 'rgba(43,49,47,0.08)' }}>
-              <p className="font-poppins-semibold" style={{ fontSize: '11px', letterSpacing: '0.06em', color: 'var(--color-gray-warm)', textTransform: 'uppercase' }}>
-                Číslo objednávky
-              </p>
-              <p className="font-poppins-regular mt-1 tabular-nums" style={{ fontSize: '14px', color: 'var(--color-ink)' }}>
+            <div
+              className={transId ? 'mt-3 pt-3' : ''}
+              style={transId ? { borderTop: '1px solid var(--color-border-subtle)' } : undefined}
+            >
+              <Eyebrow>Číslo objednávky</Eyebrow>
+              <p
+                className="font-poppins-regular mt-1 tabular-nums"
+                style={{ fontSize: 'var(--text-body)', color: 'var(--color-ink)' }}
+              >
                 {refId}
               </p>
             </div>
@@ -75,14 +83,8 @@ export default async function SuccessPage({
         </div>
       )}
 
-      <Link
-        href="/shop"
-        className="marina-btn mt-10 inline-flex items-center rounded-xl border-2 px-10 py-4 font-poppins-semibold"
-        style={{ borderColor: 'var(--color-ink)', fontSize: '14px' }}
-      >
-        <span className="marina-btn-text" style={{ color: 'var(--color-ink)' }}>
-          Zpět do e-shopu
-        </span>
+      <Link href="/shop" className="btn-secondary mt-10">
+        Zpět do e-shopu
       </Link>
     </div>
   );

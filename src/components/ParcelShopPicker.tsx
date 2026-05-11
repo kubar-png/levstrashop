@@ -45,13 +45,28 @@ export function ParcelShopPicker({
   }
 
   return (
-    <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-      <h2 className="text-2xl font-medium">Vyzvednutí na PPL ParcelShopu</h2>
-      <p className="mt-1 text-sm text-neutral-600">
+    <div
+      className="p-5"
+      style={{
+        background: '#fff',
+        border: '1px solid var(--color-border-subtle)',
+        borderRadius: 'var(--radius-md)',
+      }}
+    >
+      <h2
+        className="font-poppins-semibold"
+        style={{ fontSize: 'var(--text-h3)', color: 'var(--color-forest)' }}
+      >
+        Vyzvednutí na PPL ParcelShopu
+      </h2>
+      <p
+        className="mt-1"
+        style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
+      >
         Zadejte PSČ a vyberte nejbližší výdejnu.
       </p>
 
-      <div className="mt-5 flex gap-2">
+      <div className="mt-4 flex gap-2">
         <input
           type="text"
           inputMode="numeric"
@@ -59,45 +74,98 @@ export function ParcelShopPicker({
           placeholder="612 00"
           value={zip}
           onChange={(e) => setZip(e.target.value.replace(/\s/g, ''))}
-          className="flex-1 rounded-full border border-neutral-300 px-5 py-2.5 text-sm focus:border-neutral-900 focus:outline-none"
+          aria-label="PSČ"
+          className="flex-1 outline-none transition-colors"
+          style={{
+            padding: '0.6rem 1rem',
+            minHeight: 44,
+            borderRadius: '999px',
+            border: '1.5px solid var(--color-border-strong)',
+            fontSize: 'var(--text-small)',
+            color: 'var(--color-ink)',
+            background: '#fff',
+          }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--color-forest)')}
+          onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--color-border-strong)')}
         />
         <button
+          type="button"
           onClick={search}
           disabled={loading || zip.length < 5}
-          className="rounded-full bg-neutral-900 px-6 py-2.5 text-sm font-medium text-white hover:bg-neutral-700 disabled:bg-neutral-400"
+          aria-disabled={loading || zip.length < 5}
+          className="btn-secondary"
+          style={{ borderRadius: '999px' }}
         >
           {loading ? 'Hledám…' : 'Najít'}
         </button>
       </div>
 
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {error && (
+        <p
+          className="mt-3 font-poppins-medium"
+          style={{ fontSize: 'var(--text-small)', color: 'var(--color-danger)' }}
+        >
+          {error}
+        </p>
+      )}
 
       {shops.length > 0 && (
-        <ul className="mt-5 max-h-72 divide-y divide-neutral-200 overflow-y-auto rounded-lg border border-neutral-200">
-          {shops.map((shop) => (
-            <li key={shop.id}>
-              <button
-                onClick={() => pick(shop)}
-                className={`flex w-full flex-col gap-1 px-4 py-3 text-left text-sm transition ${
-                  chosen === shop.id ? 'bg-neutral-900 text-white' : 'hover:bg-neutral-50'
-                }`}
+        <ul
+          className="mt-5 overflow-y-auto"
+          style={{
+            maxHeight: '20rem',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid var(--color-border-subtle)',
+          }}
+        >
+          {shops.map((shop, i) => {
+            const isChosen = chosen === shop.id;
+            return (
+              <li
+                key={shop.id}
+                style={{
+                  borderBottom: i < shops.length - 1 ? '1px solid var(--color-border-subtle)' : undefined,
+                }}
               >
-                <span className="font-medium">{shop.name}</span>
-                <span className={chosen === shop.id ? 'text-neutral-300' : 'text-neutral-500'}>
-                  {shop.street}, {shop.city} {shop.zip}
-                </span>
-                {shop.openingHours && (
+                <button
+                  type="button"
+                  onClick={() => pick(shop)}
+                  aria-pressed={isChosen}
+                  className="flex w-full flex-col gap-1 text-left transition"
+                  style={{
+                    padding: '0.85rem 1rem',
+                    background: isChosen ? 'var(--color-forest)' : 'transparent',
+                    color: isChosen ? '#fff' : 'var(--color-ink)',
+                  }}
+                >
                   <span
-                    className={`text-xs ${
-                      chosen === shop.id ? 'text-neutral-400' : 'text-neutral-500'
-                    }`}
+                    className="font-poppins-semibold"
+                    style={{ fontSize: 'var(--text-small)' }}
                   >
-                    {shop.openingHours}
+                    {shop.name}
                   </span>
-                )}
-              </button>
-            </li>
-          ))}
+                  <span
+                    style={{
+                      fontSize: 'var(--text-micro)',
+                      color: isChosen ? 'rgba(255,255,255,0.85)' : 'var(--color-text-muted)',
+                    }}
+                  >
+                    {shop.street}, {shop.city} {shop.zip}
+                  </span>
+                  {shop.openingHours && (
+                    <span
+                      style={{
+                        fontSize: 'var(--text-micro)',
+                        color: isChosen ? 'rgba(255,255,255,0.7)' : 'var(--color-text-muted)',
+                      }}
+                    >
+                      {shop.openingHours}
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

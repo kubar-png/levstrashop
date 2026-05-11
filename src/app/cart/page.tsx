@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
 import { ParcelShopPicker, type SelectedParcelShop } from '@/components/ParcelShopPicker';
+import { Eyebrow, FormField } from '@/components/ui';
 
 type ShippingMode = 'home' | 'parcelshop';
 
@@ -17,6 +18,7 @@ export default function CartPage() {
   const { items, setQty, remove, totalCents, clear } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [mode, setMode]       = useState<ShippingMode>('home');
   const [shop, setShop]       = useState<SelectedParcelShop | null>(null);
   const [email, setEmail]     = useState('');
@@ -27,11 +29,23 @@ export default function CartPage() {
   const total        = subtotal + shippingCents;
   const progress     = Math.min((subtotal / FREE_THRESHOLD) * 100, 100);
 
+  function validateEmail(v: string): string | null {
+    if (!v) return 'Zadejte prosím e-mail.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Zadejte prosím platný e-mail.';
+    return null;
+  }
+
   async function checkout() {
     if (mode === 'parcelshop' && !shop) { setError('Vyberte prosím výdejnu PPL ParcelShop.'); return; }
-    if (!email || !email.includes('@'))  { setError('Zadejte prosím platný e-mail.');          return; }
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      setEmailError(emailErr);
+      setError(null);
+      return;
+    }
     setLoading(true);
     setError(null);
+    setEmailError(null);
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
@@ -55,20 +69,20 @@ export default function CartPage() {
           <circle cx="28" cy="28" r="27" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--color-ink)' }} />
           <path d="M17 28h22M28 17v22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" style={{ color: 'var(--color-ink)' }} />
         </svg>
-        <p className="font-serif" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: 'var(--color-forest)' }}>
+        <p
+          className="font-serif"
+          style={{ fontSize: 'var(--text-h1)', color: 'var(--color-forest)' }}
+        >
           Košík je prázdný.
         </p>
-        <p className="font-poppins-light mt-3" style={{ fontSize: '14px', color: 'var(--color-gray-warm)', maxWidth: '260px' }}>
+        <p
+          className="font-poppins-light mt-3"
+          style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-muted)', maxWidth: '260px' }}
+        >
           Ještě jste nic nevybrali — prozkoumejte naši kolekci.
         </p>
-        <Link
-          href="/shop"
-          className="marina-btn mt-8 inline-flex items-center rounded-xl border-2 px-8 py-3.5 font-poppins-semibold"
-          style={{ borderColor: 'var(--color-ink)', fontSize: '14px' }}
-        >
-          <span className="marina-btn-text" style={{ color: 'var(--color-ink)' }}>
-            Prohlédnout e-shop
-          </span>
+        <Link href="/shop" className="btn-secondary mt-8">
+          Prohlédnout e-shop
         </Link>
       </div>
     );
@@ -80,19 +94,21 @@ export default function CartPage() {
 
         {/* ── Page heading ── */}
         <div className="mb-10">
-          <p
-            className="font-serif"
-            style={{ fontSize: '12px', letterSpacing: '0.12em', color: 'var(--color-forest)', textTransform: 'uppercase' }}
-          >
-            Nákup
-          </p>
+          <Eyebrow tone="forest" serif size="md">Nákup</Eyebrow>
           <h1
-            className="font-poppins-semibold mt-0.5 leading-none"
-            style={{ fontSize: 'clamp(2.6rem, 6vw, 5rem)', letterSpacing: '-0.035em', color: 'var(--color-ink)' }}
+            className="font-poppins-semibold mt-1 leading-none"
+            style={{
+              fontSize: 'var(--text-display)',
+              letterSpacing: '-0.035em',
+              color: 'var(--color-ink)',
+            }}
           >
             Košík
           </h1>
-          <p className="font-poppins-light mt-1.5" style={{ fontSize: '13px', color: 'var(--color-gray-warm)' }}>
+          <p
+            className="font-poppins-light mt-1.5"
+            style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
+          >
             {items.length}&nbsp;{items.length === 1 ? 'položka' : items.length < 5 ? 'položky' : 'položek'}
           </p>
         </div>
@@ -102,20 +118,31 @@ export default function CartPage() {
 
           {/* ── LEFT: Item list ── */}
           <div className="space-y-3">
-            <div className="overflow-hidden rounded-3xl" style={{ background: 'var(--color-cream)' }}>
+            <div
+              className="overflow-hidden"
+              style={{
+                background: 'var(--color-cream)',
+                borderRadius: 'var(--radius-xl)',
+              }}
+            >
               {items.map((item, i) => (
                 <div
                   key={item.variantSku}
                   className="flex gap-4 sm:gap-5"
                   style={{
                     padding: '20px 24px',
-                    borderBottom: i < items.length - 1 ? '1px solid rgba(43,49,47,0.08)' : undefined,
+                    borderBottom: i < items.length - 1 ? '1px solid var(--color-border-subtle)' : undefined,
                   }}
                 >
                   {/* Thumbnail */}
                   <div
-                    className="relative shrink-0 overflow-hidden rounded-2xl"
-                    style={{ width: '84px', height: '104px', background: '#e5e1d8' }}
+                    className="relative shrink-0 overflow-hidden"
+                    style={{
+                      width: '84px',
+                      height: '104px',
+                      background: '#e5e1d8',
+                      borderRadius: 'var(--radius-md)',
+                    }}
                   >
                     {item.image && (
                       <Image src={item.image} alt={item.title} fill className="object-contain" sizes="84px" />
@@ -128,13 +155,13 @@ export default function CartPage() {
                       <Link
                         href={`/shop/p/${item.slug}`}
                         className="font-poppins-semibold leading-tight hover:opacity-50 transition-opacity duration-200"
-                        style={{ fontSize: '14px', color: 'var(--color-ink)' }}
+                        style={{ fontSize: 'var(--text-body)', color: 'var(--color-ink)' }}
                       >
                         {item.title}
                       </Link>
                       <span
                         className="font-poppins-semibold shrink-0"
-                        style={{ fontSize: '14px', color: 'var(--color-ink)' }}
+                        style={{ fontSize: 'var(--text-body)', color: 'var(--color-ink)' }}
                       >
                         {formatPrice(item.priceCents * item.qty)}
                       </span>
@@ -143,48 +170,56 @@ export default function CartPage() {
                     {[item.size, item.color].filter(Boolean).length > 0 && (
                       <p
                         className="font-poppins-regular mt-0.5"
-                        style={{ fontSize: '11px', color: 'var(--color-gray-warm)' }}
+                        style={{ fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)' }}
                       >
                         {[item.size, item.color].filter(Boolean).join(' · ')}
                       </p>
                     )}
                     <p
                       className="font-poppins-light mt-0.5"
-                      style={{ fontSize: '11px', color: 'var(--color-gray-warm)' }}
+                      style={{ fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)' }}
                     >
                       {formatPrice(item.priceCents)} / ks
                     </p>
 
                     {/* Qty + remove */}
                     <div className="mt-auto flex items-center justify-between pt-4">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1">
                         <button
+                          type="button"
                           onClick={() => setQty(item.variantSku, item.qty - 1)}
                           aria-label="Ubrat"
-                          className="flex h-7 w-7 items-center justify-center rounded-full transition-opacity hover:opacity-60"
-                          style={{ background: 'var(--color-ink)', color: '#fff' }}
+                          className="flex h-11 w-11 items-center justify-center rounded-full transition-opacity hover:opacity-70"
+                          style={{ color: 'var(--color-ink)' }}
                         >
-                          <span style={{ fontSize: '15px', lineHeight: 1 }}>−</span>
+                          <span
+                            className="flex h-7 w-7 items-center justify-center rounded-full"
+                            style={{ background: 'var(--color-ink)', color: '#fff', fontSize: '15px', lineHeight: 1 }}
+                          >−</span>
                         </button>
                         <span
                           className="font-poppins-semibold w-7 text-center tabular-nums"
-                          style={{ fontSize: '13px', color: 'var(--color-ink)' }}
+                          style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
                         >
                           {item.qty}
                         </span>
                         <button
+                          type="button"
                           onClick={() => setQty(item.variantSku, item.qty + 1)}
                           aria-label="Přidat"
-                          className="flex h-7 w-7 items-center justify-center rounded-full transition-opacity hover:opacity-60"
-                          style={{ background: 'var(--color-ink)', color: '#fff' }}
+                          className="flex h-11 w-11 items-center justify-center rounded-full transition-opacity hover:opacity-70"
+                          style={{ color: 'var(--color-ink)' }}
                         >
-                          <span style={{ fontSize: '15px', lineHeight: 1 }}>+</span>
+                          <span
+                            className="flex h-7 w-7 items-center justify-center rounded-full"
+                            style={{ background: 'var(--color-ink)', color: '#fff', fontSize: '15px', lineHeight: 1 }}
+                          >+</span>
                         </button>
                       </div>
                       <button
+                        type="button"
                         onClick={() => remove(item.variantSku)}
-                        className="font-poppins-regular transition-opacity hover:opacity-40"
-                        style={{ fontSize: '11px', color: 'var(--color-gray-warm)' }}
+                        className="btn-destructive"
                       >
                         Odebrat
                       </button>
@@ -196,8 +231,17 @@ export default function CartPage() {
 
             {/* Free shipping progress */}
             {!freeShipping ? (
-              <div className="rounded-2xl px-5 py-4" style={{ background: 'var(--color-sky-light)' }}>
-                <p className="font-poppins-semibold" style={{ fontSize: '12px', color: 'var(--color-forest)' }}>
+              <div
+                className="px-5 py-4"
+                style={{
+                  background: 'var(--color-sky-light)',
+                  borderRadius: 'var(--radius-md)',
+                }}
+              >
+                <p
+                  className="font-poppins-semibold"
+                  style={{ fontSize: 'var(--text-small)', color: 'var(--color-forest)' }}
+                >
                   Do dopravy zdarma zbývá {formatPrice(FREE_THRESHOLD - subtotal)}
                 </p>
                 <div
@@ -211,8 +255,17 @@ export default function CartPage() {
                 </div>
               </div>
             ) : (
-              <div className="rounded-2xl px-5 py-3.5" style={{ background: 'var(--color-lime)' }}>
-                <p className="font-poppins-semibold" style={{ fontSize: '12px', color: 'var(--color-ink)' }}>
+              <div
+                className="px-5 py-3.5"
+                style={{
+                  background: 'var(--color-lime)',
+                  borderRadius: 'var(--radius-md)',
+                }}
+              >
+                <p
+                  className="font-poppins-semibold"
+                  style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
+                >
                   ✓&nbsp; Máte dopravu zdarma
                 </p>
               </div>
@@ -224,13 +277,11 @@ export default function CartPage() {
             <div className="sticky top-28 space-y-3">
 
               {/* Shipping */}
-              <div className="rounded-3xl p-6" style={{ background: 'var(--color-cream)' }}>
-                <p
-                  className="font-poppins-semibold"
-                  style={{ fontSize: '11px', letterSpacing: '0.08em', color: 'var(--color-gray-warm)', textTransform: 'uppercase' }}
-                >
-                  Doprava
-                </p>
+              <div
+                className="p-6"
+                style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-lg)' }}
+              >
+                <Eyebrow>Doprava</Eyebrow>
                 <div className="mt-3.5 space-y-2">
                   <ShippingCard active={mode === 'home'} onClick={() => setMode('home')}
                     title="PPL na adresu" price={freeShipping ? 'Zdarma' : '199 Kč'} eta="1–2 pracovní dny" />
@@ -243,13 +294,22 @@ export default function CartPage() {
                     <ParcelShopPicker onSelect={setShop} />
                     {shop && (
                       <div
-                        className="mt-3 rounded-xl px-4 py-3"
-                        style={{ background: 'rgba(45,81,67,0.07)' }}
+                        className="mt-3 px-4 py-3"
+                        style={{
+                          background: 'rgba(45,81,67,0.07)',
+                          borderRadius: 'var(--radius-md)',
+                        }}
                       >
-                        <p className="font-poppins-semibold" style={{ fontSize: '12px', color: 'var(--color-forest)' }}>
+                        <p
+                          className="font-poppins-semibold"
+                          style={{ fontSize: 'var(--text-small)', color: 'var(--color-forest)' }}
+                        >
                           {shop.name}
                         </p>
-                        <p className="font-poppins-regular" style={{ fontSize: '11px', color: 'var(--color-gray-warm)' }}>
+                        <p
+                          className="font-poppins-regular"
+                          style={{ fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)' }}
+                        >
                           {shop.street}, {shop.city}
                         </p>
                       </div>
@@ -259,62 +319,83 @@ export default function CartPage() {
               </div>
 
               {/* Contact */}
-              <div className="rounded-3xl p-6" style={{ background: 'var(--color-cream)' }}>
-                <p
-                  className="font-poppins-semibold"
-                  style={{ fontSize: '11px', letterSpacing: '0.08em', color: 'var(--color-gray-warm)', textTransform: 'uppercase' }}
-                >
-                  Kontakt
-                </p>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="váš@email.cz"
-                  required
-                  className="mt-3.5 w-full rounded-xl px-4 py-3 font-poppins-regular outline-none"
-                  style={{
-                    background: 'var(--color-bg)',
-                    border: '1.5px solid rgba(43,49,47,0.14)',
-                    fontSize: '14px',
-                    color: 'var(--color-ink)',
-                    transition: 'border-color 0.18s ease',
-                  }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--color-forest)')}
-                  onBlur={(e)  => (e.currentTarget.style.borderColor = 'rgba(43,49,47,0.14)')}
-                />
+              <div
+                className="p-6"
+                style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-lg)' }}
+              >
+                <Eyebrow>Kontakt</Eyebrow>
+                <div className="mt-3.5">
+                  <FormField
+                    label=""
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (emailError) setEmailError(null);
+                    }}
+                    onBlur={() => {
+                      if (email) setEmailError(validateEmail(email));
+                    }}
+                    placeholder="váš@email.cz"
+                    required
+                    autoComplete="email"
+                    error={emailError ?? undefined}
+                    aria-label="E-mail"
+                  />
+                </div>
               </div>
 
               {/* Totals + CTA */}
-              <div className="rounded-3xl p-6" style={{ background: 'var(--color-forest)' }}>
+              <div
+                className="p-6"
+                style={{ background: 'var(--color-forest)', borderRadius: 'var(--radius-lg)' }}
+              >
                 <div className="space-y-2.5">
                   <div className="flex justify-between">
-                    <span className="font-poppins-regular" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
+                    <span
+                      className="font-poppins-regular"
+                      style={{ fontSize: 'var(--text-small)', color: 'rgba(255,255,255,0.65)' }}
+                    >
                       Mezisoučet
                     </span>
-                    <span className="font-poppins-regular" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
+                    <span
+                      className="font-poppins-regular"
+                      style={{ fontSize: 'var(--text-small)', color: 'rgba(255,255,255,0.65)' }}
+                    >
                       {formatPrice(subtotal)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-poppins-regular" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}>
+                    <span
+                      className="font-poppins-regular"
+                      style={{ fontSize: 'var(--text-small)', color: 'rgba(255,255,255,0.65)' }}
+                    >
                       Doprava
                     </span>
                     <span
                       className="font-poppins-regular"
-                      style={{ fontSize: '13px', color: freeShipping ? 'var(--color-lime)' : 'rgba(255,255,255,0.55)' }}
+                      style={{
+                        fontSize: 'var(--text-small)',
+                        color: freeShipping ? 'var(--color-lime)' : 'rgba(255,255,255,0.65)',
+                      }}
                     >
                       {freeShipping ? 'Zdarma' : formatPrice(shippingCents)}
                     </span>
                   </div>
                   <div
                     className="flex justify-between pt-3"
-                    style={{ borderTop: '1px solid rgba(255,255,255,0.12)' }}
+                    style={{ borderTop: '1px solid rgba(255,255,255,0.18)' }}
                   >
-                    <span className="font-poppins-semibold" style={{ fontSize: '16px', color: '#fff' }}>
+                    <span
+                      className="font-poppins-semibold"
+                      style={{ fontSize: 'var(--text-lead)', color: '#fff' }}
+                    >
                       Celkem
                     </span>
-                    <span className="font-poppins-semibold" style={{ fontSize: '16px', color: '#fff' }}>
+                    <span
+                      className="font-poppins-semibold"
+                      style={{ fontSize: 'var(--text-lead)', color: '#fff' }}
+                    >
                       {formatPrice(total)}
                     </span>
                   </div>
@@ -322,31 +403,45 @@ export default function CartPage() {
 
                 {error && (
                   <p
-                    className="mt-4 rounded-xl px-3 py-2.5 font-poppins-regular"
-                    style={{ fontSize: '12px', color: '#fff', background: 'rgba(180,62,46,0.45)', lineHeight: 1.4 }}
+                    className="mt-4 px-3 py-2.5 font-poppins-regular"
+                    style={{
+                      fontSize: 'var(--text-small)',
+                      color: '#fff',
+                      background: 'rgba(180,62,46,0.55)',
+                      borderRadius: 'var(--radius-md)',
+                      lineHeight: 1.4,
+                    }}
                   >
                     {error}
                   </p>
                 )}
 
                 <button
+                  type="button"
                   onClick={checkout}
                   disabled={loading}
-                  className="marina-btn mt-5 w-full rounded-xl border-2 py-4 font-poppins-semibold disabled:opacity-40"
-                  style={{ borderColor: 'var(--color-lime)', fontSize: '15px', letterSpacing: '-0.01em' }}
+                  className="btn-primary mt-5 w-full"
+                  data-on-dark="true"
+                  style={{ borderRadius: 'var(--radius-md)' }}
                 >
-                  <span className="marina-btn-text" style={{ color: '#fff' }}>
-                    {loading ? 'Přesměrování…' : 'K platbě →'}
-                  </span>
+                  {loading ? 'Přesměrování…' : 'K platbě →'}
                 </button>
 
-                <button
-                  onClick={clear}
-                  className="mt-4 w-full font-poppins-regular transition-opacity hover:opacity-40"
-                  style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', textAlign: 'center' }}
-                >
-                  Vyprázdnit košík
-                </button>
+                <div className="mt-3 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={clear}
+                    className="font-poppins-regular transition-opacity hover:opacity-70"
+                    style={{
+                      fontSize: 'var(--text-small)',
+                      color: 'rgba(255,255,255,0.55)',
+                      minHeight: 32,
+                      padding: '0.25rem 0.5rem',
+                    }}
+                  >
+                    Vyprázdnit košík
+                  </button>
+                </div>
               </div>
 
             </div>
@@ -367,24 +462,39 @@ function ShippingCard({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3.5 text-left transition-all duration-200"
+      aria-pressed={active}
+      className="flex w-full cursor-pointer items-center justify-between px-4 py-3.5 text-left transition-all duration-200"
       style={{
         background: active ? 'var(--color-forest-deep)' : 'var(--color-bg)',
-        border: `1.5px solid ${active ? 'transparent' : 'rgba(43,49,47,0.10)'}`,
+        border: `1.5px solid ${active ? 'transparent' : 'var(--color-border-subtle)'}`,
         outline: active ? '1.5px solid var(--color-forest-deep)' : 'none',
+        borderRadius: 'var(--radius-md)',
+        minHeight: 56,
       }}
     >
       <div>
-        <p className="font-poppins-semibold" style={{ fontSize: '13px', color: active ? '#fff' : 'var(--color-ink)' }}>
+        <p
+          className="font-poppins-semibold"
+          style={{ fontSize: 'var(--text-small)', color: active ? '#fff' : 'var(--color-ink)' }}
+        >
           {title}
         </p>
-        <p className="font-poppins-light mt-0.5" style={{ fontSize: '11px', color: active ? 'rgba(255,255,255,0.5)' : 'var(--color-gray-warm)' }}>
+        <p
+          className="font-poppins-light mt-0.5"
+          style={{
+            fontSize: 'var(--text-micro)',
+            color: active ? 'rgba(255,255,255,0.6)' : 'var(--color-text-muted)',
+          }}
+        >
           {eta}
         </p>
       </div>
       <p
         className="font-poppins-semibold ml-4 shrink-0"
-        style={{ fontSize: '13px', color: active ? 'var(--color-lime)' : 'var(--color-ink)' }}
+        style={{
+          fontSize: 'var(--text-small)',
+          color: active ? 'var(--color-lime)' : 'var(--color-ink)',
+        }}
       >
         {price}
       </p>
