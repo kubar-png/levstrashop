@@ -25,7 +25,9 @@ export function InstagramSection() {
               <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" />
             </svg>
           </span>
-          <h2 className="mt-5 text-2xl font-bold md:text-3xl">Sledujte nás na Instagramu</h2>
+          <h2 className="mt-5 text-2xl font-bold text-white md:text-3xl" style={{ color: '#fff' }}>
+            Sledujte nás na Instagramu
+          </h2>
           <a
             href="https://instagram.com/levstra"
             target="_blank"
