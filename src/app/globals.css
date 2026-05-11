@@ -1,18 +1,23 @@
 @import "tailwindcss";
 
+/**
+ * Palette extracted directly from the rendered Wix HTML.
+ *   --color-forest     #2d5143  brand green (headings + footer)
+ *   --color-lime       #e1f861  promo ticker background
+ *   --color-bg         #eeeeee  page background
+ *   --color-ink        #2b312f  body text
+ *   --color-sky        #c5d6e8  pastel-blue accent (Marina Galanti / Náš příběh)
+ */
 :root {
-  /* Base */
-  --color-bg: #fbf9f4;
-  --color-ink: #131313;
-  --color-ink-soft: #4a4a4a;
-
-  /* Section accents — sampled from the Wix screenshot */
-  --color-sky: #c5d6e8;        /* Marina Galanti banner + brand story */
-  --color-sky-deep: #b4c8df;   /* slightly deeper accent */
-  --color-promo: #0a1830;      /* dark navy promo ticker */
-  --color-forest: #1f3528;     /* dark green footer */
-  --color-accent: #e6692a;     /* RIGA orange */
-  --color-pink: #f0adb6;       /* RIGA pink */
+  --color-bg: #eeeeee;
+  --color-ink: #2b312f;
+  --color-ink-soft: #5a5a5a;
+  --color-forest: #2d5143;
+  --color-forest-deep: #1f3528;
+  --color-lime: #e1f861;
+  --color-sky: #c5d6e8;
+  --color-sky-deep: #b4c8df;
+  --color-promo-text: #2d5143;
 }
 
 @theme inline {
@@ -28,11 +33,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
+/* Brand headings use the deep green. */
+h1, h2 {
+  color: var(--color-forest);
   letter-spacing: -0.02em;
 }
+h3 { letter-spacing: -0.015em; }
 
-/* Ticker marquee — duplicated track translates by 50% for a seamless loop. */
+/* Ticker marquee. */
 @keyframes ticker-scroll {
   0% { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(-50%, 0, 0); }

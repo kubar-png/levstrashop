@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { Manrope } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { CookieBanner } from '@/components/CookieBanner';
 
-const manrope = Manrope({
+const poppins = Poppins({
   variable: '--font-sans',
   subsets: ['latin', 'latin-ext'],
   weight: ['300', '400', '500', '600', '700', '800'],
@@ -21,13 +21,12 @@ export const metadata: Metadata = {
   },
   description:
     'Kabelky a kufry Marina Galanti. Módu dovážíme už přes dvě desetiletí. Doprava zdarma nad 1 500 Kč.',
-  keywords: ['kabelky', 'kufry', 'Marina Galanti', 'cestovní zavazadla', 'Levstra'],
   openGraph: {
     type: 'website',
     locale: 'cs_CZ',
     siteName: 'Levstra',
     title: 'Levstra — Cestujte se stylem',
-    description: 'Kabelky a kufry Marina Galanti. Módu dovážíme už přes dvě desetiletí.',
+    description: 'Kabelky a kufry Marina Galanti.',
   },
   alternates: { canonical: '/' },
   robots: { index: true, follow: true },
@@ -35,7 +34,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="cs" className={`${manrope.variable} h-full`}>
+    <html lang="cs" className={`${poppins.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         <SiteHeader />
         <main className="flex-1">{children}</main>

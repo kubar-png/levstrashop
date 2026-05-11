@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export function SiteFooter() {
   return (
-    <footer className="bg-[var(--color-forest)] text-neutral-100" style={{ background: '#1f3528' }}>
+    <footer className="text-neutral-100" style={{ background: 'var(--color-forest)' }}>
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-1">

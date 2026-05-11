@@ -4,7 +4,7 @@ import { MobileMenu } from './MobileMenu';
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200/70 bg-[#faf8f4]/85 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-neutral-300/60 bg-[#eeeeee]/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-5">
         <Link href="/" className="text-lg font-semibold tracking-[0.22em]">
           LEVSTRA

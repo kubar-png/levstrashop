@@ -83,7 +83,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── MARINA GALANTI BANNER ─────────────────────────────────────── */}
-      <section style={{ background: 'var(--color-sky)' }}>
+      <section>
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-2 md:items-center md:gap-16 md:py-28">
           <div>
             <h2 className="text-[clamp(2.5rem,6vw,5.25rem)] font-extrabold leading-[0.98] tracking-[-0.03em]">
@@ -133,8 +133,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── BRAND STORY ──────────────────────────────────────────────── */}
-      <section style={{ background: 'var(--color-sky)' }}>
+      {/* ── BRAND STORY (Náš příběh) — on Wix sky-blue ─────────────────── */}
+      <section style={{ background: '#a0c8ff' }}>
         <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-20 md:py-32">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.32em] text-neutral-700">
