@@ -13,7 +13,17 @@ export function CartButton() {
     <Link
       href="/cart"
       aria-label="Košík"
-      className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-neutral-300 transition hover:border-black"
+      className="relative inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+      style={{
+        border: '1.5px solid var(--color-border-strong)',
+        color: 'var(--color-ink)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'var(--color-forest)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'var(--color-border-strong)';
+      }}
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path
@@ -30,7 +40,14 @@ export function CartButton() {
         />
       </svg>
       {mounted && count > 0 && (
-        <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-black px-1 text-[11px] font-semibold text-white">
+        <span
+          className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 font-semibold"
+          style={{
+            background: 'var(--color-forest)',
+            color: '#fff',
+            fontSize: '11px',
+          }}
+        >
           {count}
         </span>
       )}

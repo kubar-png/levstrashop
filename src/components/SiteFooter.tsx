@@ -4,7 +4,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer style={{ background: '#2D5143' }}>
+    <footer style={{ background: 'var(--color-forest)' }}>
       {/* ── Link columns ── */}
       <div className="px-8 pt-14 md:px-14 md:pt-16">
         <div className="flex flex-col gap-10 sm:flex-row sm:gap-16 md:gap-20">
@@ -42,7 +42,7 @@ export function SiteFooter() {
           <LogoMark />
           <span
             className="font-serif leading-none"
-            style={{ fontSize: 'clamp(2.8rem, 6vw, 5rem)' }}
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }}
           >
             levstra
           </span>
@@ -60,7 +60,10 @@ export function SiteFooter() {
               <TkIcon />
             </a>
           </div>
-          <p className="font-poppins-light text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          <p
+            className="font-poppins-light"
+            style={{ color: 'rgba(255,255,255,0.72)', fontSize: 'var(--text-small)' }}
+          >
             © {year} by Levstra.
           </p>
         </div>
@@ -74,13 +77,13 @@ function FooterColumn({ title, children }: { title: string; children: React.Reac
     <div className="min-w-[120px]">
       <h3
         className="font-poppins-semibold text-white"
-        style={{ fontSize: '15px', letterSpacing: '-0.01em' }}
+        style={{ fontSize: 'var(--text-small)', letterSpacing: '0.04em', textTransform: 'uppercase' }}
       >
         {title}
       </h3>
       <ul
         className="mt-3.5 space-y-1.5 font-poppins-regular [&_a]:transition [&_a]:hover:opacity-100"
-        style={{ fontSize: '13px', color: 'rgba(255,255,255,0.72)' }}
+        style={{ fontSize: 'var(--text-small)', color: 'rgba(255,255,255,0.82)', lineHeight: 1.6 }}
       >
         {children}
       </ul>

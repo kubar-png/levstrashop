@@ -31,7 +31,8 @@ export function MobileMenu() {
         aria-label="Otevřít menu"
         aria-expanded={open}
         onClick={() => setOpen(true)}
-        className="inline-flex h-9 w-9 items-center justify-center md:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{ color: 'var(--color-ink)' }}
       >
         <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
           <line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="1.6" />
@@ -50,17 +51,29 @@ export function MobileMenu() {
 
       <aside
         aria-hidden={!open}
-        className={`fixed inset-y-0 right-0 z-50 w-[82%] max-w-sm transform bg-white shadow-2xl transition-transform duration-300 md:hidden ${
+        className={`fixed inset-y-0 right-0 z-50 w-[82%] max-w-sm transform shadow-2xl transition-transform duration-300 md:hidden ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{ background: '#fff' }}
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-neutral-200">
-          <span className="text-sm font-semibold tracking-[0.25em]">LEVSTRA</span>
+        <div
+          className="flex items-center justify-between px-6 py-5"
+          style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
+        >
+          <Link
+            href="/"
+            onClick={() => setOpen(false)}
+            className="font-serif leading-none"
+            style={{ fontSize: '1.5rem', color: 'var(--color-ink)' }}
+          >
+            levstra
+          </Link>
           <button
             type="button"
             aria-label="Zavřít menu"
             onClick={() => setOpen(false)}
-            className="inline-flex h-9 w-9 items-center justify-center"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full"
+            style={{ color: 'var(--color-ink)' }}
           >
             <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
               <line x1="5" y1="5" x2="17" y2="17" stroke="currentColor" strokeWidth="1.6" />
@@ -74,20 +87,41 @@ export function MobileMenu() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="rounded-lg px-4 py-3 text-xl hover:bg-neutral-100"
+              className="font-poppins-medium transition-colors duration-150"
+              style={{
+                padding: '0.85rem 1rem',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '1.15rem',
+                color: 'var(--color-ink)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--color-cream)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = '';
+              }}
             >
               {item.label}
             </Link>
           ))}
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 border-t border-neutral-200 bg-neutral-50 px-6 py-5 text-sm text-neutral-600">
+        <div
+          className="absolute bottom-0 left-0 right-0 px-6 py-5"
+          style={{
+            background: 'var(--color-cream)',
+            borderTop: '1px solid var(--color-border-subtle)',
+            color: 'var(--color-text-muted)',
+            fontSize: 'var(--text-small)',
+          }}
+        >
           <a
             href="https://instagram.com/levstra"
             target="_blank"
             rel="noreferrer"
-            className="font-medium"
+            className="font-poppins-medium hover:underline"
+            style={{ color: 'var(--color-ink)' }}
           >
-            Instagram @levstra →
+            Sledujte @levstra na Instagramu →
           </a>
         </div>
       </aside>
