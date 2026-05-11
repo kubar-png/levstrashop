@@ -74,7 +74,7 @@ export function MobileMenu() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="font-display rounded-lg px-4 py-3 text-xl hover:bg-neutral-100"
+              className="rounded-lg px-4 py-3 text-xl hover:bg-neutral-100"
             >
               {item.label}
             </Link>

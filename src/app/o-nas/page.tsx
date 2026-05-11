@@ -4,7 +4,7 @@ export default function AboutPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
       <p className="text-sm uppercase tracking-[0.25em] text-neutral-500">O značce</p>
-      <h1 className="font-display mt-3 text-5xl font-medium leading-tight md:text-6xl">
+      <h1 className="mt-3 text-5xl font-medium leading-tight md:text-6xl">
         Módu dovážíme<br />už přes dvě desetiletí.
       </h1>
       <div className="mt-8 space-y-5 text-neutral-700">

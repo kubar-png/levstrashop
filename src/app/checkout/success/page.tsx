@@ -27,7 +27,7 @@ export default async function SuccessPage({
     <div className="mx-auto max-w-xl px-6 py-24 text-center">
       <CartCleaner />
       <p className="text-5xl">🎉</p>
-      <h1 className="font-display mt-4 text-4xl font-medium md:text-5xl">Děkujeme za objednávku!</h1>
+      <h1 className="mt-4 text-4xl font-medium md:text-5xl">Děkujeme za objednávku!</h1>
       <p className="mt-4 text-neutral-600">
         Potvrzení posíláme {email ? <strong>na {email}</strong> : 'e-mailem'}. Zboží zabalíme a
         předáme PPL co nejdřív.

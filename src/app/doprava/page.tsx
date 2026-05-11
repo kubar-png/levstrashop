@@ -4,7 +4,7 @@ export default function ShippingPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
       <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Informace</p>
-      <h1 className="font-display mt-2 text-5xl font-medium">Doprava</h1>
+      <h1 className="mt-2 text-5xl font-medium">Doprava</h1>
 
       <div className="mt-10 space-y-6 text-neutral-700">
         <p>

@@ -46,7 +46,7 @@ export function ParcelShopPicker({
 
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white p-6">
-      <h2 className="font-display text-2xl font-medium">Vyzvednutí na PPL ParcelShopu</h2>
+      <h2 className="text-2xl font-medium">Vyzvednutí na PPL ParcelShopu</h2>
       <p className="mt-1 text-sm text-neutral-600">
         Zadejte PSČ a vyberte nejbližší výdejnu.
       </p>

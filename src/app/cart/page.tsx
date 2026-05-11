@@ -45,7 +45,7 @@ export default function CartPage() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
       <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Nákup</p>
-      <h1 className="font-display mt-2 text-5xl font-medium md:text-6xl">Košík</h1>
+      <h1 className="mt-2 text-5xl font-medium md:text-6xl">Košík</h1>
 
       {items.length === 0 ? (
         <div className="mt-12 text-neutral-600">
@@ -105,7 +105,7 @@ export default function CartPage() {
 
           {/* Shipping mode picker */}
           <div className="mt-10">
-            <h2 className="font-display text-2xl font-medium">Doprava</h2>
+            <h2 className="text-2xl font-medium">Doprava</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <ShippingOption
                 active={mode === 'home'}

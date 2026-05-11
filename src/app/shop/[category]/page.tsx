@@ -28,7 +28,7 @@ export default async function CategoryPage({
   return (
     <div className="mx-auto max-w-7xl px-6 py-16">
       <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Kategorie</p>
-      <h1 className="font-display mt-2 text-5xl font-medium md:text-6xl">{TITLE[category]}</h1>
+      <h1 className="mt-2 text-5xl font-medium md:text-6xl">{TITLE[category]}</h1>
       <p className="mt-3 max-w-xl text-neutral-600">{SUBTITLE[category]}</p>
 
       {products.length === 0 ? (

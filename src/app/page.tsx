@@ -1,188 +1,202 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getFeaturedProducts } from '@/lib/data';
 import { ProductCard } from '@/components/ProductCard';
-import { HeroIllustration, HandbagIllustration } from '@/components/HeroIllustration';
+import { PromoTicker } from '@/components/PromoTicker';
+import { InstagramSection } from '@/components/InstagramSection';
 
 export const revalidate = 60;
+
+const WIX = 'https://static.wixstatic.com/media';
+const IMG_HERO = `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`;        // orange suitcase
+const IMG_MARINA = `${WIX}/f0cf6b_8a21028ccb924868a7824d820313a55c~mv2.jpg`;     // model w/ handbag
+const IMG_KABELKY = `${WIX}/f0cf6b_962f00502d2a46f5b535c2d1fbe3095e~mv2.jpg`;    // category — kabelky
+const IMG_KUFRY = `${WIX}/f0cf6b_3ce5a12e7ebe4524a196ef34a03d1e59~mv2.jpg`;      // category — kufry pink
+const IMG_STORY = `${WIX}/f0cf6b_eae5f5bd32ea4057a3e7c5dd47647233~mv2.png`;      // brand story
 
 export default async function HomePage() {
   const featured = await getFeaturedProducts();
 
   return (
     <>
-      {/* Hero */}
-      <section className="border-b border-neutral-200 bg-[#fdf6f0]">
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 md:grid-cols-2 md:items-center">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-[#c46a3d]">
-              Marina Galanti · Levstra
-            </p>
-            <h1 className="font-display mt-4 text-6xl font-medium leading-[1.05] md:text-7xl">
-              Cestujte<br />se stylem.
-            </h1>
-            <p className="mt-7 max-w-md text-lg text-neutral-700">
-              Kufry a kabelky, které vás doprovodí na letiště i na večerní rande.
-            </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Link
-                href="/shop"
-                className="rounded-full bg-neutral-900 px-8 py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-neutral-700"
-              >
-                Nakupovat
-              </Link>
-              <Link
-                href="/shop/kufry"
-                className="rounded-full border border-neutral-300 px-8 py-3.5 text-sm font-medium tracking-wide hover:border-neutral-900"
-              >
-                Kufry
-              </Link>
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      <section className="relative">
+        <div className="relative h-[68vh] min-h-[480px] w-full overflow-hidden md:h-[78vh]">
+          <Image
+            src={IMG_HERO}
+            alt="Cestujte se stylem — kufr Marina Galanti"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[70%_center]"
+          />
+          {/* Left-side gradient for legibility */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0) 60%)',
+            }}
+          />
+          <div className="absolute inset-0 flex items-end md:items-center">
+            <div className="mx-auto w-full max-w-7xl px-6 pb-12 md:pb-0">
+              <div className="max-w-lg text-white">
+                <h1 className="text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl">
+                  Cestujte se stylem.
+                </h1>
+                <p className="mt-5 max-w-md text-lg text-white/90">
+                  Kufry a kabelky, které zvládnou letiště i&nbsp;večerní rande.
+                </p>
+                <Link
+                  href="/shop"
+                  className="mt-7 inline-flex items-center rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
+                >
+                  Nakupovat
+                </Link>
+              </div>
             </div>
-          </div>
-          <div className="md:pl-10">
-            <HeroIllustration />
           </div>
         </div>
       </section>
 
-      {/* Free shipping strip */}
-      <div className="bg-neutral-900 py-3 text-center text-xs uppercase tracking-[0.25em] text-white">
-        Doprava zdarma při objednávce nad 1 500 Kč
-      </div>
-
-      {/* Best sellers */}
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Výběr sezóny</p>
-            <h2 className="font-display mt-2 text-4xl font-medium tracking-tight md:text-5xl">
-              Nejoblíbenější kousky
-            </h2>
-          </div>
+      {/* ── BEST SELLERS ──────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+            Nejoblíbenější kousky
+          </h2>
           <Link
             href="/shop"
-            className="hidden text-sm text-neutral-600 hover:text-neutral-900 md:block"
+            className="hidden rounded-full border border-neutral-300 px-5 py-2 text-sm font-medium transition hover:border-black md:inline-block"
           >
-            Zobrazit vše →
+            Zobrazit vše
           </Link>
         </div>
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.map((p) => (
+        <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-7">
+          {featured.slice(0, 4).map((p) => (
             <ProductCard key={p._id} product={p} />
           ))}
         </div>
+        <div className="mt-8 text-center md:hidden">
+          <Link
+            href="/shop"
+            className="inline-block rounded-full border border-neutral-300 px-6 py-2.5 text-sm font-medium"
+          >
+            Zobrazit vše
+          </Link>
+        </div>
       </section>
 
-      {/* Marina Galanti collection */}
-      <section className="border-y border-neutral-200 bg-[#f6efe5]">
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 md:grid-cols-2 md:items-center">
-          <div className="md:order-1">
-            <HandbagIllustration />
-          </div>
-          <div className="md:order-2">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#c46a3d]">
-              Kolekce Marina Galanti
-            </p>
-            <h2 className="font-display mt-4 text-4xl font-medium md:text-5xl">
-              Lehkost,<br />styl,<br />nadčasovost.
+      {/* ── MARINA GALANTI BANNER ─────────────────────────────────────── */}
+      <section style={{ background: 'var(--color-sky)' }}>
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 md:grid-cols-2 md:items-center md:py-24">
+          <div>
+            <h2 className="text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">
+              Lehkost, styl, nadčasovost.
             </h2>
-            <p className="mt-6 max-w-md text-neutral-700">
-              Italská značka, kterou už přes dvě desetiletí přivážíme do Česka. Kabelky a kufry
-              pro ženy, které si potrpí na detail.
+            <p className="mt-6 max-w-md text-lg text-neutral-700">
+              Nové kousky Marina Galanti už jsou skladem.
             </p>
             <Link
               href="/shop"
-              className="mt-8 inline-block rounded-full border border-neutral-900 px-8 py-3.5 text-sm font-medium hover:bg-neutral-900 hover:text-white"
+              className="mt-7 inline-flex items-center rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
             >
               Prohlédnout kolekci
             </Link>
           </div>
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl md:aspect-square">
+            <Image
+              src={IMG_MARINA}
+              alt="Kolekce Marina Galanti"
+              fill
+              sizes="(min-width: 768px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
         </div>
       </section>
 
-      {/* Category grid */}
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Kategorie</p>
-        <h2 className="font-display mt-2 mb-12 text-4xl font-medium md:text-5xl">
-          Co hledáte?
-        </h2>
-        <div className="grid gap-6 md:grid-cols-2">
-          <CategoryTile
-            href="/shop/kabelky"
-            title="Kabelky"
-            subtitle="Pro každý den i pro výjimečné chvíle."
-            variant="bag"
-          />
-          <CategoryTile
-            href="/shop/kufry"
-            title="Kufry"
-            subtitle="Cestovní zavazadla pro letiště i víkend."
-            variant="suitcase"
-          />
-        </div>
-      </section>
+      {/* ── PROMO TICKER ─────────────────────────────────────────────── */}
+      <PromoTicker message="doprava zdarma při objednávce nad 1500 Kč" />
 
-      {/* Brand story */}
-      <section className="bg-neutral-900 text-neutral-100">
-        <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#e9a878]">O značce</p>
-          <h2 className="font-display mt-4 text-4xl font-medium md:text-5xl">
-            Módu dovážíme už přes dvě desetiletí.
+      {/* ── CATEGORY GRID ────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
+            Nakupujte podle kategorie
           </h2>
-          <p className="mt-7 text-neutral-300">
-            Levstra je rodinný projekt postavený na kvalitě, vkusu a dlouhých přátelstvích s
-            italskými výrobci. Každý kus, který u nás najdete, si nejdřív vybereme sami.
-          </p>
           <Link
-            href="/o-nas"
-            className="mt-9 inline-block rounded-full border border-neutral-100 px-8 py-3.5 text-sm font-medium hover:bg-white hover:text-neutral-900"
+            href="/shop"
+            className="rounded-full bg-white px-5 py-2 text-sm font-medium shadow-sm ring-1 ring-neutral-200 transition hover:ring-black"
           >
-            Náš příběh
+            Zobrazit vše
           </Link>
         </div>
+        <div className="grid grid-cols-2 gap-5 md:gap-8">
+          <CategoryCard href="/shop/kabelky" label="kabelky" image={IMG_KABELKY} />
+          <CategoryCard href="/shop/kufry" label="kufry" image={IMG_KUFRY} />
+        </div>
       </section>
 
-      {/* Instagram */}
-      <section className="mx-auto max-w-7xl px-6 py-24 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">Sledujte nás</p>
-        <h2 className="font-display mt-2 text-5xl font-medium md:text-6xl">@levstra</h2>
-        <p className="mt-4 text-neutral-600">Novinky, zákulisí a inspirace na Instagramu.</p>
-        <a
-          href="https://instagram.com/levstra"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-8 inline-block rounded-full bg-neutral-900 px-8 py-3.5 text-sm font-medium text-white hover:bg-neutral-700"
-        >
-          Otevřít Instagram
-        </a>
+      {/* ── BRAND STORY ──────────────────────────────────────────────── */}
+      <section style={{ background: 'var(--color-sky-deep)' }}>
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-24 md:grid-cols-[1fr_auto] md:items-center md:gap-16">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-700">
+              Náš příběh
+            </p>
+            <h2 className="mt-4 text-3xl font-bold leading-[1.15] tracking-tight md:text-5xl">
+              Módu dovážíme už přes dvě desetiletí. Za tu dobu nám rukama prošly stovky kolekcí
+              a my dnes víme přesně, co má smysl nabízet dál.
+            </h2>
+            <Link
+              href="/o-nas"
+              className="mt-8 inline-flex items-center rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
+            >
+              Náš příběh
+            </Link>
+          </div>
+          <div className="relative aspect-square w-full max-w-sm overflow-hidden rounded-3xl bg-[#f7d54a] md:w-[320px]">
+            <Image
+              src={IMG_STORY}
+              alt="Příběh Levstra"
+              fill
+              sizes="320px"
+              className="object-cover"
+            />
+          </div>
+        </div>
       </section>
+
+      {/* ── INSTAGRAM ────────────────────────────────────────────────── */}
+      <InstagramSection />
     </>
   );
 }
 
-function CategoryTile({
+function CategoryCard({
   href,
-  title,
-  subtitle,
-  variant,
+  label,
+  image,
 }: {
   href: string;
-  title: string;
-  subtitle: string;
-  variant: 'bag' | 'suitcase';
+  label: string;
+  image: string;
 }) {
-  const bg =
-    variant === 'suitcase'
-      ? 'bg-gradient-to-br from-[#f8d4b0] to-[#e9a878]'
-      : 'bg-gradient-to-br from-[#f6efe5] to-[#e8d5b8]';
   return (
     <Link
       href={href}
-      className={`group relative flex aspect-[16/10] flex-col justify-end overflow-hidden rounded-2xl p-10 ${bg}`}
+      className="group relative block aspect-[3/4] overflow-hidden rounded-3xl bg-neutral-200"
     >
-      <h3 className="font-display text-4xl font-medium md:text-5xl">{title}</h3>
-      <p className="mt-2 max-w-xs text-sm text-neutral-800">{subtitle}</p>
-      <span className="mt-4 inline-block text-sm font-medium tracking-wide group-hover:underline">
-        Nakupovat →
+      <Image
+        src={image}
+        alt={label}
+        fill
+        sizes="(min-width: 768px) 40vw, 50vw"
+        className="object-cover transition duration-700 group-hover:scale-105"
+      />
+      <span className="absolute inset-x-0 bottom-6 mx-auto block w-fit rounded-full bg-white px-7 py-2.5 text-sm font-semibold lowercase tracking-wide shadow-md">
+        {label}
       </span>
     </Link>
   );

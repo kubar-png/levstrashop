@@ -79,7 +79,7 @@ export default async function ProductPage({
         <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
           {product.category?.title}
         </p>
-        <h1 className="font-display mt-2 text-4xl font-medium md:text-5xl">{product.title}</h1>
+        <h1 className="mt-2 text-4xl font-medium md:text-5xl">{product.title}</h1>
         {product.shortDescription && (
           <p className="mt-3 text-neutral-600">{product.shortDescription}</p>
         )}

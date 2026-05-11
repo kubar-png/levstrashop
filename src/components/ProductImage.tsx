@@ -1,10 +1,7 @@
 import Image from 'next/image';
 import type { PlaceholderSpec } from '@/lib/data';
 
-/**
- * Renders either the real product image, or a per-product SVG placeholder
- * (suitcase / handbag in the product's accent color).
- */
+/** Real image or per-product SVG placeholder, in a rounded card. */
 export function ProductImage({
   src,
   alt,
@@ -27,14 +24,16 @@ export function ProductImage({
 
   if (src) {
     return (
-      <div className={`relative ${aspectClass} overflow-hidden rounded-2xl bg-[#f6efe5] ${className ?? ''}`}>
+      <div
+        className={`relative ${aspectClass} overflow-hidden rounded-3xl bg-neutral-100 ${className ?? ''}`}
+      >
         <Image
           src={src}
           alt={alt}
           fill
           sizes={sizes}
           priority={priority}
-          className="object-cover transition duration-500 group-hover:scale-[1.03]"
+          className="object-cover transition duration-700 group-hover:scale-[1.04]"
         />
       </div>
     );
@@ -43,7 +42,7 @@ export function ProductImage({
   const spec = placeholder ?? { kind: 'suitcase' as const, color: '#c46a3d', accent: '#3d2418' };
   return (
     <div
-      className={`relative ${aspectClass} overflow-hidden rounded-2xl ${className ?? ''}`}
+      className={`relative ${aspectClass} overflow-hidden rounded-3xl ${className ?? ''}`}
       style={{
         background: `linear-gradient(135deg, ${shade(spec.color, 0.35)} 0%, ${spec.color} 60%, ${shade(spec.color, -0.15)} 100%)`,
       }}
@@ -62,7 +61,7 @@ function SuitcaseSvg({ color, accent }: { color: string; accent: string }) {
   return (
     <svg
       viewBox="0 0 400 500"
-      className="absolute inset-0 h-full w-full transition duration-500 group-hover:scale-[1.03]"
+      className="absolute inset-0 h-full w-full transition duration-700 group-hover:scale-[1.04]"
       aria-hidden="true"
     >
       <ellipse cx="200" cy="430" rx="130" ry="12" fill="#000" opacity="0.18" />
@@ -89,7 +88,7 @@ function HandbagSvg({ color, accent }: { color: string; accent: string }) {
   return (
     <svg
       viewBox="0 0 400 500"
-      className="absolute inset-0 h-full w-full transition duration-500 group-hover:scale-[1.03]"
+      className="absolute inset-0 h-full w-full transition duration-700 group-hover:scale-[1.04]"
       aria-hidden="true"
     >
       <ellipse cx="200" cy="430" rx="120" ry="10" fill="#000" opacity="0.18" />
@@ -114,7 +113,6 @@ function HandbagSvg({ color, accent }: { color: string; accent: string }) {
   );
 }
 
-/** Lighten (+) or darken (-) a hex color. */
 function shade(hex: string, amount: number): string {
   const c = hex.replace('#', '');
   const r = parseInt(c.slice(0, 2), 16);
