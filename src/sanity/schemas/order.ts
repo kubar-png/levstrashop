@@ -248,22 +248,53 @@ export const order = defineType({
       status: 'status',
       total: 'totalCents',
       createdAt: 'createdAt',
+      firstName: 'customer.firstName',
+      lastName: 'customer.lastName',
+      phone: 'customer.phone',
+      shippingMode: 'shippingMode',
+      city: 'shipping.city',
+      parcelShopName: 'shipping.parcelShopName',
     },
-    prepare: ({ refId, email, status, total, createdAt }) => {
-      const date = createdAt ? new Date(createdAt).toLocaleDateString('cs-CZ') : '—';
+    prepare: ({
+      refId,
+      email,
+      status,
+      total,
+      createdAt,
+      firstName,
+      lastName,
+      phone,
+      shippingMode,
+      city,
+      parcelShopName,
+    }) => {
+      const date = createdAt
+        ? new Date(createdAt).toLocaleDateString('cs-CZ', {
+            day: '2-digit',
+            month: '2-digit',
+          })
+        : '—';
       const statusLabel: Record<string, string> = {
-        pending: '⌛ Čeká na platbu',
+        pending: '⌛ Čeká',
         paid: '✓ Zaplaceno',
         packed: '📦 Zabaleno',
         shipped: '🚚 Odesláno',
         delivered: '✓ Doručeno',
         cancelled: '✗ Zrušeno',
         refunded: '↩ Vráceno',
-        failed: '✗ Platba selhala',
+        failed: '✗ Selhalo',
       };
+      const recipient =
+        [firstName, lastName].filter(Boolean).join(' ').trim() || email || '—';
+      const shipLabel =
+        shippingMode === 'parcelshop'
+          ? `📍 ${parcelShopName ?? 'ParcelShop'}`
+          : city
+            ? `🏠 ${city}`
+            : '🏠 doručit';
       return {
-        title: `${refId || '—'} · ${email || '—'}`,
-        subtitle: `${statusLabel[status] ?? status} · ${((total ?? 0) / 100).toFixed(0)} Kč · ${date}`,
+        title: `${refId || '—'}  ·  ${recipient}`,
+        subtitle: `${statusLabel[status] ?? status}  ·  ${((total ?? 0) / 100).toFixed(0)} Kč  ·  ${shipLabel}  ·  ${phone ?? ''}  ·  ${date}`,
       };
     },
   },
