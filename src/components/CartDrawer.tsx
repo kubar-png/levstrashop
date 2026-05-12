@@ -197,7 +197,7 @@ export function CartDrawer() {
                   <Link
                     href={`/shop/p/${item.slug}`}
                     onClick={close}
-                    className="relative h-20 w-16 shrink-0 overflow-hidden"
+                    className="relative h-20 w-20 shrink-0 overflow-hidden"
                     style={{
                       background: 'var(--color-cream)',
                       borderRadius: 'var(--radius-md)',
@@ -208,7 +208,7 @@ export function CartDrawer() {
                         src={item.image}
                         alt={item.title}
                         fill
-                        sizes="64px"
+                        sizes="80px"
                         className="object-contain"
                       />
                     )}

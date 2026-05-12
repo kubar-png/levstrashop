@@ -184,18 +184,18 @@ export default function CartPage() {
                     borderBottom: i < items.length - 1 ? '1px solid var(--color-border-subtle)' : undefined,
                   }}
                 >
-                  {/* Thumbnail */}
+                  {/* Thumbnail (1:1 to match product cards across the site) */}
                   <div
                     className="relative shrink-0 overflow-hidden"
                     style={{
-                      width: '84px',
-                      height: '104px',
+                      width: '88px',
+                      height: '88px',
                       background: '#e5e1d8',
                       borderRadius: 'var(--radius-md)',
                     }}
                   >
                     {item.image && (
-                      <Image src={item.image} alt={item.title} fill className="object-contain" sizes="84px" />
+                      <Image src={item.image} alt={item.title} fill className="object-contain" sizes="88px" />
                     )}
                   </div>
 
