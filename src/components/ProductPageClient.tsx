@@ -172,7 +172,7 @@ export function ProductPageClient({
       </div>
 
       {/* ── Info panel ── */}
-      <div className="md:sticky md:self-start" style={{ top: 'calc(88px + 1.5rem)' }}>
+      <div>
         {/* Eyebrow */}
         <Eyebrow tone="forest" serif size="md">
           {product.category?.title ?? 'Produkt'}
