@@ -64,6 +64,37 @@ export const order = defineType({
       type: 'string',
       validation: (r) => r.email(),
     }),
+    defineField({
+      name: 'customer',
+      title: 'Zákazník',
+      type: 'object',
+      fields: [
+        { name: 'firstName', title: 'Jméno', type: 'string' },
+        { name: 'lastName', title: 'Příjmení', type: 'string' },
+        { name: 'phone', title: 'Telefon', type: 'string' },
+      ],
+    }),
+    defineField({
+      name: 'billing',
+      title: 'Fakturační údaje',
+      type: 'object',
+      description: 'Vyplněno pouze pokud zákazník chtěl fakturu na firmu nebo zadal odlišnou fakturační adresu.',
+      fields: [
+        { name: 'companyName', title: 'Název firmy', type: 'string' },
+        { name: 'ic', title: 'IČO', type: 'string' },
+        { name: 'dic', title: 'DIČ', type: 'string' },
+        {
+          name: 'sameAsShipping',
+          title: 'Fakturační adresa = doručovací',
+          type: 'boolean',
+          initialValue: true,
+        },
+        { name: 'street', title: 'Ulice a č.p.', type: 'string' },
+        { name: 'city', title: 'Město', type: 'string' },
+        { name: 'zip', title: 'PSČ', type: 'string' },
+        { name: 'country', title: 'Země', type: 'string', initialValue: 'CZ' },
+      ],
+    }),
 
     /* ── Money (everything in haléře / cents) ─────────────────── */
     defineField({ name: 'subtotalCents', title: 'Zboží (haléře)', type: 'number', readOnly: true }),

@@ -47,7 +47,7 @@ export function SiteFooter() {
       </div>
 
       {/* ── Bottom bar: logo left, socials + copyright right ── */}
-      <div className="mt-20 flex items-end justify-between px-8 pb-10 md:mt-28 md:px-14 md:pb-12">
+      <div className="mt-20 flex items-end justify-between px-8 pb-6 md:mt-28 md:px-14 md:pb-7">
         <Link href="/" className="flex items-center gap-3 text-white hover:opacity-80 transition">
           <LogoMark />
           <span
@@ -77,6 +77,35 @@ export function SiteFooter() {
             © {year} by Levstra.
           </p>
         </div>
+      </div>
+
+      {/* ── Studio credit — playful agency-tag line, centered under everything ── */}
+      <div
+        className="border-t px-8 py-5 text-center md:px-14"
+        style={{ borderColor: 'rgba(255,255,255,0.08)' }}
+      >
+        <a
+          href="https://instagram.com/larp"
+          target="_blank"
+          rel="noreferrer"
+          className="font-serif inline-flex items-center gap-1.5 italic transition-colors hover:text-white"
+          style={{
+            color: 'rgba(255,255,255,0.45)',
+            fontSize: 'var(--text-micro)',
+            letterSpacing: '0.01em',
+          }}
+        >
+          uplácáno v larpu, léta páně {year}
+          <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="opacity-70">
+            <path
+              d="M4 3h5v5M9 3L3 9"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </a>
       </div>
     </footer>
   );

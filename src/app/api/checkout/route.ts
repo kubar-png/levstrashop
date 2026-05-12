@@ -8,6 +8,8 @@ import type { SelectedParcelShop } from '@/components/ParcelShopPicker';
 import {
   createPendingOrder,
   generateRefId,
+  type OrderBilling,
+  type OrderCustomer,
   type OrderDiscount,
   type OrderItem,
   type OrderShipping,
@@ -46,6 +48,14 @@ type CheckoutBody = {
   shippingMode?: 'home' | 'parcelshop';
   parcelShop?: SelectedParcelShop | null;
   discountCode?: string;
+  customer?: OrderCustomer;
+  shippingAddress?: {
+    street?: string;
+    city?: string;
+    zip?: string;
+    country?: string;
+  };
+  billing?: OrderBilling;
 };
 
 export async function POST(req: Request) {
@@ -56,6 +66,9 @@ export async function POST(req: Request) {
       shippingMode = 'home',
       parcelShop,
       discountCode,
+      customer,
+      shippingAddress,
+      billing,
     }: CheckoutBody = await req.json();
 
     if (!Array.isArray(items) || items.length === 0) {
@@ -66,6 +79,21 @@ export async function POST(req: Request) {
     }
     if (shippingMode === 'parcelshop' && !parcelShop) {
       return NextResponse.json({ error: 'Vyberte výdejnu PPL ParcelShop' }, { status: 400 });
+    }
+
+    /* Server-side guards for recipient details — UI validates these too but
+       never trust the client. PPL needs a recipient name + phone for both
+       home delivery and parcel-shop pickup. */
+    if (!customer?.firstName?.trim() || !customer?.lastName?.trim()) {
+      return NextResponse.json({ error: 'Zadejte jméno a příjmení.' }, { status: 400 });
+    }
+    if (!customer?.phone?.trim()) {
+      return NextResponse.json({ error: 'Zadejte telefon (PPL ho potřebuje pro SMS).' }, { status: 400 });
+    }
+    if (shippingMode === 'home') {
+      if (!shippingAddress?.street?.trim() || !shippingAddress?.city?.trim() || !shippingAddress?.zip?.trim()) {
+        return NextResponse.json({ error: 'Vyplňte celou doručovací adresu.' }, { status: 400 });
+      }
     }
 
     /* ── Re-validate each line against Sanity (or mocks) ─────────── */
@@ -139,19 +167,36 @@ export async function POST(req: Request) {
       .slice(0, 127);
 
     /* ── Persist a pending order BEFORE payment redirect ─────────── */
+    const recipientName = `${customer.firstName.trim()} ${customer.lastName.trim()}`.trim();
+
     const shipping: OrderShipping =
       shippingMode === 'parcelshop' && parcelShop
         ? {
+            name: recipientName,
+            phone: customer.phone,
             parcelShopId: parcelShop.id,
             parcelShopName: parcelShop.name,
             parcelShopAddress: [parcelShop.street, parcelShop.city].filter(Boolean).join(', '),
           }
-        : {};
+        : {
+            name: recipientName,
+            phone: customer.phone,
+            street: shippingAddress?.street?.trim(),
+            city: shippingAddress?.city?.trim(),
+            zip: shippingAddress?.zip?.trim(),
+            country: shippingAddress?.country ?? 'CZ',
+          };
 
     await createPendingOrder({
       refId,
       paymentProvider: 'comgate',
       email,
+      customer: {
+        firstName: customer.firstName.trim(),
+        lastName: customer.lastName.trim(),
+        phone: customer.phone,
+      },
+      billing: billing && billing.companyName?.trim() ? billing : undefined,
       subtotalCents: subtotal,
       shippingCents,
       discountCents,

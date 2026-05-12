@@ -33,6 +33,23 @@ export type OrderShipping = {
   parcelShopAddress?: string;
 };
 
+export type OrderCustomer = {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+};
+
+export type OrderBilling = {
+  companyName?: string;
+  ic?: string;
+  dic?: string;
+  sameAsShipping?: boolean;
+  street?: string;
+  city?: string;
+  zip?: string;
+  country?: string;
+};
+
 export type OrderDiscount = {
   code: string;
   type: 'percent' | 'fixed' | 'free-shipping';
@@ -44,6 +61,8 @@ export type PendingOrderInput = {
   refId: string;
   paymentProvider: 'comgate' | 'stripe';
   email: string;
+  customer?: OrderCustomer;
+  billing?: OrderBilling;
   subtotalCents: number;
   shippingCents: number;
   discountCents?: number;

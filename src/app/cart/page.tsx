@@ -25,10 +25,30 @@ export default function CartPage() {
   const clearDiscount = useCart((s) => s.clearDiscount);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
-  const [emailError, setEmailError] = useState<string | null>(null);
   const [mode, setMode]       = useState<ShippingMode>('home');
   const [shop, setShop]       = useState<SelectedParcelShop | null>(null);
   const [email, setEmail]     = useState('');
+
+  /* Contact + shipping recipient details */
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName]   = useState('');
+  const [phone, setPhone]         = useState('');
+  const [street, setStreet]       = useState('');
+  const [city, setCity]           = useState('');
+  const [zip, setZip]             = useState('');
+
+  /* Billing (collapsible) */
+  const [needsInvoice, setNeedsInvoice]                 = useState(false);
+  const [companyName, setCompanyName]                   = useState('');
+  const [ic, setIc]                                     = useState('');
+  const [dic, setDic]                                   = useState('');
+  const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
+  const [billingStreet, setBillingStreet]               = useState('');
+  const [billingCity, setBillingCity]                   = useState('');
+  const [billingZip, setBillingZip]                     = useState('');
+
+  /* Field-level error map (key = field name). */
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const subtotal     = totalCentsFn();
   const thresholdHit = subtotal >= FREE_THRESHOLD;
@@ -44,32 +64,120 @@ export default function CartPage() {
   const progress = Math.min((subtotal / FREE_THRESHOLD) * 100, 100);
 
   function validateEmail(v: string): string | null {
-    if (!v) return 'Zadejte prosím e-mail.';
+    if (!v.trim()) return 'Zadejte prosím e-mail.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Zadejte prosím platný e-mail.';
     return null;
   }
+  function validatePhone(v: string): string | null {
+    const cleaned = v.replace(/[\s\-()]/g, '');
+    if (!cleaned) return 'Zadejte telefon.';
+    /* Accept CZ formats: 9 digits, +420 prefix, or generic E.164. */
+    if (!/^(\+?420)?\d{9}$|^\+\d{10,14}$/.test(cleaned))
+      return 'Telefon v podobě +420 777 123 456 nebo 9 číslic.';
+    return null;
+  }
+  function validateZip(v: string): string | null {
+    const cleaned = v.replace(/\s+/g, '');
+    if (!cleaned) return 'Zadejte PSČ.';
+    if (!/^\d{5}$/.test(cleaned)) return 'PSČ má 5 číslic.';
+    return null;
+  }
+  function validateIc(v: string): string | null {
+    if (!v.trim()) return null;
+    if (!/^\d{8}$/.test(v.replace(/\s+/g, ''))) return 'IČO má 8 číslic.';
+    return null;
+  }
+
+  function clearFieldError(name: string) {
+    if (!errors[name]) return;
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  }
 
   async function checkout() {
-    if (mode === 'parcelshop' && !shop) { setError('Vyberte prosím výdejnu PPL ParcelShop.'); return; }
+    /* ── Gather + validate ── */
+    const newErrors: Record<string, string> = {};
+
     const emailErr = validateEmail(email);
-    if (emailErr) {
-      setEmailError(emailErr);
-      setError(null);
+    if (emailErr) newErrors.email = emailErr;
+    if (!firstName.trim()) newErrors.firstName = 'Zadejte jméno.';
+    if (!lastName.trim())  newErrors.lastName = 'Zadejte příjmení.';
+    const phoneErr = validatePhone(phone);
+    if (phoneErr) newErrors.phone = phoneErr;
+
+    if (mode === 'home') {
+      if (!street.trim()) newErrors.street = 'Zadejte ulici a č.p.';
+      if (!city.trim())   newErrors.city = 'Zadejte město.';
+      const zipErr = validateZip(zip);
+      if (zipErr) newErrors.zip = zipErr;
+    } else if (!shop) {
+      setError('Vyberte prosím výdejnu PPL ParcelShop.');
       return;
     }
+
+    if (needsInvoice) {
+      if (!companyName.trim()) newErrors.companyName = 'Zadejte název firmy.';
+      const icErr = validateIc(ic);
+      if (icErr) newErrors.ic = icErr;
+      if (!billingSameAsShipping) {
+        if (!billingStreet.trim()) newErrors.billingStreet = 'Zadejte ulici a č.p.';
+        if (!billingCity.trim())   newErrors.billingCity = 'Zadejte město.';
+        const bzipErr = validateZip(billingZip);
+        if (bzipErr) newErrors.billingZip = bzipErr;
+      }
+    }
+
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      setError('Zkontrolujte prosím vyplněné údaje.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    setEmailError(null);
     try {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items,
-          email,
+          email: email.trim(),
           shippingMode: mode,
           parcelShop: shop,
           discountCode: discount?.code,
+          customer: {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            phone: phone.replace(/[\s\-()]/g, ''),
+          },
+          shippingAddress:
+            mode === 'home'
+              ? {
+                  street: street.trim(),
+                  city: city.trim(),
+                  zip: zip.replace(/\s+/g, ''),
+                  country: 'CZ',
+                }
+              : undefined,
+          billing: needsInvoice
+            ? {
+                companyName: companyName.trim(),
+                ic: ic.replace(/\s+/g, ''),
+                dic: dic.trim().toUpperCase(),
+                sameAsShipping: billingSameAsShipping,
+                ...(billingSameAsShipping
+                  ? {}
+                  : {
+                      street: billingStreet.trim(),
+                      city: billingCity.trim(),
+                      zip: billingZip.replace(/\s+/g, ''),
+                      country: 'CZ',
+                    }),
+              }
+            : undefined,
         }),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Chyba při platbě');
@@ -368,32 +476,148 @@ export default function CartPage() {
                 )}
               </div>
 
-              {/* Contact */}
+              {/* Vaše údaje — contact + shipping recipient details */}
               <div
                 className="p-6"
                 style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-lg)' }}
               >
-                <Eyebrow>Kontakt</Eyebrow>
-                <div className="mt-3.5">
+                <Eyebrow>Vaše údaje</Eyebrow>
+
+                <div className="mt-3.5 space-y-3">
                   <FormField
-                    label=""
+                    label="E-mail"
                     type="email"
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
-                      if (emailError) setEmailError(null);
-                    }}
-                    onBlur={() => {
-                      if (email) setEmailError(validateEmail(email));
+                      clearFieldError('email');
                     }}
                     placeholder="váš@email.cz"
                     required
                     autoComplete="email"
-                    error={emailError ?? undefined}
-                    aria-label="E-mail"
+                    error={errors.email}
                   />
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <FormField
+                      label="Jméno"
+                      value={firstName}
+                      onChange={(e) => {
+                        setFirstName(e.target.value);
+                        clearFieldError('firstName');
+                      }}
+                      required
+                      autoComplete="given-name"
+                      error={errors.firstName}
+                    />
+                    <FormField
+                      label="Příjmení"
+                      value={lastName}
+                      onChange={(e) => {
+                        setLastName(e.target.value);
+                        clearFieldError('lastName');
+                      }}
+                      required
+                      autoComplete="family-name"
+                      error={errors.lastName}
+                    />
+                  </div>
+
+                  <FormField
+                    label="Telefon"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      clearFieldError('phone');
+                    }}
+                    placeholder="+420 777 123 456"
+                    required
+                    autoComplete="tel"
+                    helper={mode === 'parcelshop' ? 'PPL pošle SMS s kódem k vyzvednutí.' : undefined}
+                    error={errors.phone}
+                  />
+
+                  {mode === 'home' && (
+                    <>
+                      <FormField
+                        label="Ulice a č.p."
+                        value={street}
+                        onChange={(e) => {
+                          setStreet(e.target.value);
+                          clearFieldError('street');
+                        }}
+                        required
+                        autoComplete="street-address"
+                        error={errors.street}
+                      />
+                      <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
+                        <FormField
+                          label="Město"
+                          value={city}
+                          onChange={(e) => {
+                            setCity(e.target.value);
+                            clearFieldError('city');
+                          }}
+                          required
+                          autoComplete="address-level2"
+                          error={errors.city}
+                        />
+                        <FormField
+                          label="PSČ"
+                          value={zip}
+                          onChange={(e) => {
+                            setZip(e.target.value);
+                            clearFieldError('zip');
+                          }}
+                          required
+                          autoComplete="postal-code"
+                          inputMode="numeric"
+                          placeholder="617 00"
+                          error={errors.zip}
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
+
+              {/* Fakturace — collapsible toggle for company invoice */}
+              <BillingDetails
+                open={needsInvoice}
+                onToggle={() => setNeedsInvoice((v) => !v)}
+                companyName={companyName}
+                setCompanyName={(v) => {
+                  setCompanyName(v);
+                  clearFieldError('companyName');
+                }}
+                ic={ic}
+                setIc={(v) => {
+                  setIc(v);
+                  clearFieldError('ic');
+                }}
+                dic={dic}
+                setDic={setDic}
+                sameAsShipping={billingSameAsShipping}
+                setSameAsShipping={setBillingSameAsShipping}
+                shippingMode={mode}
+                bStreet={billingStreet}
+                setBStreet={(v) => {
+                  setBillingStreet(v);
+                  clearFieldError('billingStreet');
+                }}
+                bCity={billingCity}
+                setBCity={(v) => {
+                  setBillingCity(v);
+                  clearFieldError('billingCity');
+                }}
+                bZip={billingZip}
+                setBZip={(v) => {
+                  setBillingZip(v);
+                  clearFieldError('billingZip');
+                }}
+                errors={errors}
+              />
 
               <PromoCodeField
                 subtotalCents={subtotal}
@@ -722,6 +946,173 @@ function PromoCodeField({
             </p>
           )}
         </form>
+      )}
+    </div>
+  );
+}
+
+function BillingDetails({
+  open,
+  onToggle,
+  companyName,
+  setCompanyName,
+  ic,
+  setIc,
+  dic,
+  setDic,
+  sameAsShipping,
+  setSameAsShipping,
+  shippingMode,
+  bStreet,
+  setBStreet,
+  bCity,
+  setBCity,
+  bZip,
+  setBZip,
+  errors,
+}: {
+  open: boolean;
+  onToggle: () => void;
+  companyName: string;
+  setCompanyName: (v: string) => void;
+  ic: string;
+  setIc: (v: string) => void;
+  dic: string;
+  setDic: (v: string) => void;
+  sameAsShipping: boolean;
+  setSameAsShipping: (v: boolean) => void;
+  shippingMode: ShippingMode;
+  bStreet: string;
+  setBStreet: (v: string) => void;
+  bCity: string;
+  setBCity: (v: string) => void;
+  bZip: string;
+  setBZip: (v: string) => void;
+  errors: Record<string, string>;
+}) {
+  /* Parcel-shop orders don't have a shipping address to mirror — only a pickup
+     point — so the "stejná jako doručovací" checkbox is auto-off then. */
+  const canMirror = shippingMode === 'home';
+
+  return (
+    <div
+      className="overflow-hidden"
+      style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-lg)' }}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="font-poppins-medium flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-[rgba(43,49,47,0.04)]"
+        style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
+        aria-expanded={open}
+      >
+        <span className="inline-flex items-center gap-2.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+            <path d="M8 9h7M8 13h7M8 17h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+          Účtenku na firmu
+        </span>
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+          style={{ transition: 'transform 200ms', transform: open ? 'rotate(90deg)' : 'rotate(0)' }}
+        >
+          <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="border-t px-6 pb-6 pt-4" style={{ borderColor: 'var(--color-border-subtle)' }}>
+          <div className="space-y-3">
+            <FormField
+              label="Název firmy"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              required
+              autoComplete="organization"
+              error={errors.companyName}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <FormField
+                label="IČO"
+                value={ic}
+                onChange={(e) => setIc(e.target.value)}
+                inputMode="numeric"
+                placeholder="12345678"
+                error={errors.ic}
+              />
+              <FormField
+                label="DIČ"
+                value={dic}
+                onChange={(e) => setDic(e.target.value.toUpperCase())}
+                placeholder="CZ12345678"
+                helper="Volitelné"
+              />
+            </div>
+
+            <label
+              className="mt-2 inline-flex cursor-pointer items-start gap-2.5"
+              style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
+            >
+              <input
+                type="checkbox"
+                checked={canMirror && sameAsShipping}
+                disabled={!canMirror}
+                onChange={(e) => setSameAsShipping(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--color-forest)]"
+                style={{ cursor: canMirror ? 'pointer' : 'not-allowed' }}
+              />
+              <span className="font-poppins-regular leading-snug">
+                Fakturační adresa je stejná jako doručovací
+                {!canMirror && (
+                  <span
+                    className="font-poppins-light ml-1"
+                    style={{ color: 'var(--color-text-muted)' }}
+                  >
+                    (u ParcelShopu vyplňte zvlášť)
+                  </span>
+                )}
+              </span>
+            </label>
+
+            {(!canMirror || !sameAsShipping) && (
+              <div className="space-y-3 pt-2">
+                <FormField
+                  label="Ulice a č.p."
+                  value={bStreet}
+                  onChange={(e) => setBStreet(e.target.value)}
+                  required
+                  autoComplete="billing street-address"
+                  error={errors.billingStreet}
+                />
+                <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
+                  <FormField
+                    label="Město"
+                    value={bCity}
+                    onChange={(e) => setBCity(e.target.value)}
+                    required
+                    autoComplete="billing address-level2"
+                    error={errors.billingCity}
+                  />
+                  <FormField
+                    label="PSČ"
+                    value={bZip}
+                    onChange={(e) => setBZip(e.target.value)}
+                    required
+                    autoComplete="billing postal-code"
+                    inputMode="numeric"
+                    placeholder="617 00"
+                    error={errors.billingZip}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
