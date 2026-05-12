@@ -42,28 +42,33 @@ export default async function ShopPage({
 
   return (
     <>
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
-        {/* ── HERO ───────────────────────────────────────────────────── */}
+      {/* ── HERO — pulled behind the fixed pill nav, same as homepage ── */}
+      <section className="mx-auto max-w-7xl -mt-[76px] px-4 pt-4 md:-mt-[88px] md:px-6 md:pt-5">
         <div
-          className="relative w-full overflow-hidden mt-4 md:mt-5"
-          style={{
-            aspectRatio: '21/5',
-            minHeight: '140px',
-            borderRadius: 'var(--radius-2xl)',
-          }}
+          className="relative w-full overflow-hidden aspect-[4/5] sm:aspect-[16/10] md:aspect-[16/7]"
+          style={{ borderRadius: 'var(--radius-2xl)' }}
         >
           <Image
             src={heroSrc}
             alt={title}
-            fill priority
+            fill
+            priority
             sizes="(min-width: 1280px) 1280px, 100vw"
             className="object-cover object-[50%_30%]"
           />
+          {/* Top scrim so the white pill nav stays readable over the image. */}
           <div
-            className="absolute inset-0"
-            style={{ background: 'linear-gradient(90deg,rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.2) 55%,rgba(0,0,0,0) 80%)' }}
+            className="absolute inset-x-0 top-0 h-[120px] md:h-[140px] pointer-events-none"
+            style={{ background: 'linear-gradient(180deg,rgba(0,0,0,0.35) 0%,rgba(0,0,0,0) 100%)' }}
           />
-          <div className="absolute inset-0 flex items-end pb-6 md:pb-8 px-7 md:px-10">
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(90deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.18) 55%,rgba(0,0,0,0) 80%)',
+            }}
+          />
+          <div className="absolute inset-0 flex items-end pb-7 md:pb-10 px-7 md:px-10">
             <div>
               <h1
                 className="font-poppins-semibold leading-[1.0]"
@@ -76,10 +81,10 @@ export default async function ShopPage({
                 {title}
               </h1>
               <p
-                className="font-serif mt-1"
+                className="font-serif mt-1.5"
                 style={{
                   fontSize: 'var(--text-lead)',
-                  color: 'rgba(242,240,235,0.85)',
+                  color: 'rgba(242,240,235,0.88)',
                 }}
               >
                 {sub}
@@ -87,8 +92,10 @@ export default async function ShopPage({
             </div>
           </div>
         </div>
+      </section>
 
-        {/* ── FILTERS + GRID ─────────────────────────────────────────── */}
+      {/* ── FILTERS + GRID ─────────────────────────────────────────── */}
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
         <ShopClient
           products={products}
           activeCategory={cat}
