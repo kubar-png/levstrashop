@@ -140,11 +140,6 @@ export function MobileMenu() {
               boxShadow: '0 10px 24px -10px rgba(45,81,67,0.55)',
             }}
           >
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full"
-              style={{ background: 'var(--color-lime)', opacity: 0.18 }}
-            />
             <span className="relative z-10 flex flex-col items-start gap-0.5">
               <span
                 className="font-poppins-regular"
