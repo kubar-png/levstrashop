@@ -100,27 +100,38 @@ Jeden TXT záznam SPF — nikdy ne dva. Pokud Resend vyžaduje `send.levstra.cz`
 Už nastavené v repu, jen prosím vyplňte hodnoty:
 
 ```env
-# Comgate — primární platební brána pro CZK
-COMGATE_MERCHANT_ID=…
-COMGATE_SECRET=…
-COMGATE_TEST=true            # ⚠ až do ostrého testu nech true
+# Comgate REST v2.0 — primární platební brána pro CZK
+COMGATE_MERCHANT=…           # "Identifikátor obchodu" z portálu
+COMGATE_SECRET=…             # "Heslo" k tomu konkrétnímu propojení
+COMGATE_TEST=1               # 1 = sandbox, 0 = ostré platby
 
 # Stripe — sekundární (karty bez Comgate, fallback)
 STRIPE_SECRET_KEY=sk_test_…
 STRIPE_WEBHOOK_SECRET=whsec_…
 ```
 
-### Webhook URL k zaregistrování v dashboardech:
+### Comgate — Portál nastavení (jednou)
 
-- **Comgate** notifyUrl: `https://levstra.cz/api/webhooks/comgate` (automaticky předáváno v každé objednávce, nemusíte zvlášť registrovat)
-- **Stripe** webhook endpoint: `https://levstra.cz/api/webhooks/stripe` → events `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_failed`
+V https://portal.comgate.cz/ → **Integrace → Propojení obchodu → tvoje napojení**:
+
+- **URL pro PUSH notifikace:** `https://levstra.cz/api/webhooks/comgate`
+- **Návratová URL (úspěch):** `https://levstra.cz/checkout/success?refId={refId}&transId={transId}`
+- **Návratová URL (storno):** `https://levstra.cz/cart?cancelled=1`
+- **Návratová URL (čekající):** `https://levstra.cz/checkout/success?refId={refId}&transId={transId}`
+
+V2.0 už návratové URL nepředáváme per-payment — Comgate používá ty z portálu. Po každé změně nastavení v portálu může být potřeba pár minut, než se to propíše.
+
+### Stripe (fallback)
+
+- **Webhook endpoint:** `https://levstra.cz/api/webhooks/stripe`
+- **Events:** `checkout.session.completed`, `checkout.session.expired`, `checkout.session.async_payment_failed`
 
 ---
 
 ## 6. Test scenario po nastavení
 
 1. `npm run dev`
-2. Přidat něco do košíku, projít checkoutem v Comgate test módu (`COMGATE_TEST=true`)
+2. Přidat něco do košíku, projít checkoutem v Comgate test módu (`COMGATE_TEST=1`)
 3. Po zaplacení by se mělo stát:
    - Order doc v Sanity přejde z `pending` → `paid`
    - Skladová zásoba varianty se sníží o objednané kusy

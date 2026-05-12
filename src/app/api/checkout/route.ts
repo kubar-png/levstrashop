@@ -6,6 +6,7 @@ import { mockProducts } from '@/lib/mock-data';
 import type { CartItem } from '@/lib/cart';
 import type { SelectedParcelShop } from '@/components/ParcelShopPicker';
 import {
+  attachTransIdToOrder,
   createPendingOrder,
   generateRefId,
   type OrderBilling,
@@ -208,18 +209,21 @@ export async function POST(req: Request) {
       discount: orderDiscount,
     });
 
-    const origin =
-      req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-
+    /* Comgate v2.0 — return/cancel/notify URLs live in the Portal, NOT per-payment.
+       Configure once at https://portal.comgate.cz/ → Integrace → Propojení obchodu. */
+    const fullName = `${customer.firstName.trim()} ${customer.lastName.trim()}`.trim();
     const { transId, redirect } = await createPayment({
-      price: totalCents,
+      price: totalCents,                                  // already in haléře (smallest unit)
       refId,
-      email,
+      email: email.trim(),
+      fullName,
+      phone: customer.phone,
       label,
-      returnUrl: `${origin}/checkout/success?transId={transId}&refId=${encodeURIComponent(refId)}`,
-      cancelUrl: `${origin}/cart?cancelled=1&refId=${encodeURIComponent(refId)}`,
-      notifyUrl: `${origin}/api/webhooks/comgate`,
     });
+
+    /* Persist transId on the order BEFORE the payer hits Comgate — the PUSH
+       webhook can otherwise arrive before our order doc knows it owns this transId. */
+    await attachTransIdToOrder(refId, transId);
 
     return NextResponse.json({ url: redirect, transId, refId });
   } catch (err) {

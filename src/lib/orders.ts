@@ -245,6 +245,25 @@ export async function markEmailSent(
   }
 }
 
+/**
+ * Save Comgate transId on the pending order after the payment session is
+ * created. Must happen BEFORE the payer is redirected — otherwise the
+ * webhook can arrive on an order doc that doesn't know which transId it owns.
+ */
+export async function attachTransIdToOrder(refId: string, transId: string): Promise<void> {
+  if (!isSanityWritable()) return;
+  try {
+    const order = await findOrderByRefId(refId);
+    if (!order) {
+      console.warn(`[orders] attachTransIdToOrder: order with refId=${refId} not found`);
+      return;
+    }
+    await sanityWriteClient.patch(order._id).set({ comgateTransId: transId }).commit();
+  } catch (err) {
+    console.error('[orders] attachTransIdToOrder failed:', err);
+  }
+}
+
 export async function setEcomailContactId(orderId: string, contactId: string): Promise<void> {
   if (!isSanityWritable()) return;
   try {
