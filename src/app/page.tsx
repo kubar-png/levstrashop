@@ -148,7 +148,7 @@ export default async function HomePage() {
         style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}
       >
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:gap-12">
-          <div className="flex flex-col items-start gap-6 md:w-[30%] md:pt-1">
+          <div className="md:w-[30%] md:pt-1">
             <h2
               className="font-poppins-semibold leading-[1.1]"
               style={{
@@ -159,9 +159,6 @@ export default async function HomePage() {
             >
               Nakupujte podle kategorie
             </h2>
-            <Link href="/shop" className="btn-secondary">
-              Zobrazit vše
-            </Link>
           </div>
           <div className="grid grid-cols-2 gap-4 md:w-[70%] md:gap-5">
             <CategoryCard href="/shop/kabelky" label="kabelky" image={IMG.catKabelky} />

@@ -245,7 +245,6 @@ h1 { letter-spacing: -0.035em; }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
 }
 .cat-label-word {
   color: var(--color-ink);
@@ -254,14 +253,26 @@ h1 { letter-spacing: -0.035em; }
 .group:hover .cat-label-word {
   color: var(--color-ink);
 }
+/* Arrow takes zero width at rest so the word stays perfectly centered.
+   On hover, width + margin animate in alongside the slide/fade. */
 .cat-label-arrow {
+  display: inline-block;
+  width: 0;
+  margin-left: 0;
   opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity 0.25s ease 0.12s, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.12s;
+  overflow: hidden;
+  white-space: nowrap;
+  transform: translateX(-6px);
+  transition: width 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+              margin-left 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.25s ease 0.1s,
+              transform 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
   color: var(--color-ink);
   font-style: normal;
 }
 .group:hover .cat-label-arrow {
+  width: 0.9em;
+  margin-left: 0.45rem;
   opacity: 1;
   transform: translateX(0);
 }
