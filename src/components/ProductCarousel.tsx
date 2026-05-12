@@ -51,33 +51,33 @@ export function ProductCarousel({ products }: { products: ProductSummaryView[] }
           Nejoblíbenější kousky
         </h2>
 
-        <div className="flex items-center gap-2.5">
+        <div className="ml-auto flex items-center gap-1.5 md:gap-2.5">
           <button
             type="button"
-            className="btn-icon"
+            className="carousel-arrow"
             aria-label="Posunout doleva"
             onClick={() => scroll('left')}
             aria-disabled={!canLeft}
             disabled={!canLeft}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
             type="button"
-            className="btn-icon"
+            className="carousel-arrow"
             aria-label="Posunout doprava"
             onClick={() => scroll('right')}
             aria-disabled={!canRight}
             disabled={!canRight}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
 
-          <Link href="/shop" className="btn-secondary ml-2 hidden sm:inline-flex">
+          <Link href="/shop" className="btn-secondary ml-2 hidden md:inline-flex">
             Zobrazit vše
           </Link>
         </div>
