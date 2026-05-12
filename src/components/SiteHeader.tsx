@@ -46,7 +46,7 @@ export function SiteHeader() {
 
   return (
     <header
-      className={`fixed inset-x-8 top-6 z-50 transition-transform duration-300 ease-out will-change-transform md:inset-x-10 md:top-8 ${
+      className={`fixed inset-x-6 top-6 z-50 transition-transform duration-300 ease-out will-change-transform md:inset-x-8 md:top-8 ${
         hidden ? '-translate-y-[140%]' : 'translate-y-0'
       }`}
     >
