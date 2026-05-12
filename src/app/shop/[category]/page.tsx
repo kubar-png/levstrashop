@@ -1,21 +1,34 @@
-import { getProductsByCategory } from '@/lib/data';
-import { ProductCard } from '@/components/ProductCard';
-import { Eyebrow } from '@/components/ui';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { getProductsByCategory } from '@/lib/data';
+import { ShopClient } from '@/components/ShopClient';
 
 export const revalidate = 60;
 
-const KNOWN = new Set(['kabelky', 'kufry']);
+const WIX = 'https://static.wixstatic.com/media';
+const KNOWN = ['kabelky', 'kufry'] as const;
+type Cat = (typeof KNOWN)[number];
 
-const TITLE: Record<string, string> = {
-  kabelky: 'Kabelky',
-  kufry: 'Kufry',
+const HERO: Record<Cat, string> = {
+  kabelky: `${WIX}/f0cf6b_0fb65fabc4d54b149a2b6213e5153e9e~mv2.jpg`,
+  kufry: `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`,
 };
 
-const SUBTITLE: Record<string, string> = {
-  kabelky: 'Pro každý den i pro výjimečné chvíle.',
-  kufry: 'Cestovní zavazadla pro letiště i víkend.',
+const HERO_TEXT: Record<Cat, { title: string; sub: string }> = {
+  kabelky: { title: 'Kabelky', sub: 'Pro každý den i pro výjimečné chvíle.' },
+  kufry: { title: 'Kufry', sub: 'Cestovní zavazadla pro letiště i víkend.' },
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ category: string }>;
+}) {
+  const { category } = await params;
+  const c = category as Cat;
+  if (!(KNOWN as readonly string[]).includes(c)) return { title: 'E-shop — Levstra' };
+  return { title: `${HERO_TEXT[c].title} — Levstra` };
+}
 
 export default async function CategoryPage({
   params,
@@ -23,54 +36,76 @@ export default async function CategoryPage({
   params: Promise<{ category: string }>;
 }) {
   const { category } = await params;
-  if (!KNOWN.has(category)) notFound();
-  const products = await getProductsByCategory(category);
+  if (!(KNOWN as readonly string[]).includes(category)) notFound();
+  const cat = category as Cat;
+
+  const products = await getProductsByCategory(cat);
+
+  const prices = products.map((p) => p.minPriceCents);
+  const globalMin = prices.length ? Math.min(...prices) : 0;
+  const globalMax = prices.length ? Math.max(...prices) : 1000000;
+
+  const { title, sub } = HERO_TEXT[cat];
+  const heroSrc = HERO[cat];
 
   return (
-    <div
-      className="mx-auto max-w-7xl px-6"
-      style={{
-        paddingTop: 'var(--section-py)',
-        paddingBottom: 'var(--section-py)',
-      }}
-    >
-      <Eyebrow>Kategorie</Eyebrow>
-      <h1
-        className="mt-2 font-poppins-semibold"
+    <div className="mx-auto max-w-7xl px-4 md:px-6">
+      {/* ── HERO ───────────────────────────────────────────────────── */}
+      <div
+        className="relative w-full overflow-hidden mt-4 md:mt-5"
         style={{
-          fontSize: 'var(--text-h1)',
-          color: 'var(--color-forest)',
-          letterSpacing: '-0.03em',
-          lineHeight: 1.05,
+          aspectRatio: '21/5',
+          minHeight: '140px',
+          borderRadius: 'var(--radius-2xl)',
         }}
       >
-        {TITLE[category]}
-      </h1>
-      <p
-        className="font-serif mt-3 max-w-xl"
-        style={{
-          fontSize: 'var(--text-lead)',
-          color: 'var(--color-text-muted)',
-          lineHeight: 1.45,
-        }}
-      >
-        {SUBTITLE[category]}
-      </p>
-
-      {products.length === 0 ? (
-        <p
-          className="mt-12"
-          style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-body)' }}
-        >
-          Pro zvolené filtry jsme nenašli žádné produkty.
-        </p>
-      ) : (
-        <div className="mt-12 grid gap-5 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.map((p) => (
-            <ProductCard key={p._id} product={p} />
-          ))}
+        <Image
+          src={heroSrc}
+          alt={title}
+          fill
+          priority
+          sizes="(min-width: 1280px) 1280px, 100vw"
+          className="object-cover object-[50%_30%]"
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(90deg,rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.2) 55%,rgba(0,0,0,0) 80%)',
+          }}
+        />
+        <div className="absolute inset-0 flex items-end pb-6 md:pb-8 px-7 md:px-10">
+          <div>
+            <h1
+              className="font-poppins-semibold leading-[1.0]"
+              style={{
+                fontSize: 'var(--text-h1)',
+                letterSpacing: '-0.03em',
+                color: 'var(--color-cream)',
+              }}
+            >
+              {title}
+            </h1>
+            <p
+              className="font-serif mt-1"
+              style={{
+                fontSize: 'var(--text-lead)',
+                color: 'rgba(242,240,235,0.85)',
+              }}
+            >
+              {sub}
+            </p>
+          </div>
         </div>
-      )}
+      </div>
+
+      {/* ── FILTERS + GRID — same component as /shop ───────────────── */}
+      <ShopClient
+        products={products}
+        activeCategory={cat}
+        globalMin={globalMin}
+        globalMax={globalMax}
+      />
     </div>
   );
 }
