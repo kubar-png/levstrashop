@@ -5,8 +5,15 @@ import { createPayment } from '@/lib/comgate';
 import { mockProducts } from '@/lib/mock-data';
 import type { CartItem } from '@/lib/cart';
 import type { SelectedParcelShop } from '@/components/ParcelShopPicker';
-import { createPendingOrder, generateRefId, type OrderItem, type OrderShipping } from '@/lib/orders';
+import {
+  createPendingOrder,
+  generateRefId,
+  type OrderDiscount,
+  type OrderItem,
+  type OrderShipping,
+} from '@/lib/orders';
 import { isSanityConfigured } from '@/sanity/env';
+import { validateDiscount } from '@/lib/discount';
 
 export const runtime = 'nodejs';
 
@@ -38,11 +45,18 @@ type CheckoutBody = {
   email: string;
   shippingMode?: 'home' | 'parcelshop';
   parcelShop?: SelectedParcelShop | null;
+  discountCode?: string;
 };
 
 export async function POST(req: Request) {
   try {
-    const { items, email, shippingMode = 'home', parcelShop }: CheckoutBody = await req.json();
+    const {
+      items,
+      email,
+      shippingMode = 'home',
+      parcelShop,
+      discountCode,
+    }: CheckoutBody = await req.json();
 
     if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'Košík je prázdný' }, { status: 400 });
@@ -91,9 +105,32 @@ export async function POST(req: Request) {
     );
 
     const subtotal = verifiedItems.reduce((s, i) => s + i.priceCents * i.qty, 0);
-    const freeShipping = subtotal >= FREE_SHIPPING_THRESHOLD_CENTS;
-    const shippingCents = freeShipping ? 0 : shippingMode === 'parcelshop' ? PARCEL_SHIPPING_CENTS : HOME_SHIPPING_CENTS;
-    const totalCents = subtotal + shippingCents;
+    const thresholdHit = subtotal >= FREE_SHIPPING_THRESHOLD_CENTS;
+    const baseShipping = shippingMode === 'parcelshop' ? PARCEL_SHIPPING_CENTS : HOME_SHIPPING_CENTS;
+
+    /* ── Server-side discount re-validation ───────────────────────── */
+    let discountCents = 0;
+    let orderDiscount: OrderDiscount | undefined;
+    let forcesFreeShipping = false;
+
+    if (discountCode && discountCode.trim()) {
+      const result = await validateDiscount(discountCode, subtotal, baseShipping);
+      if (!result.ok) {
+        return NextResponse.json({ error: `Slevový kód: ${result.error}` }, { status: 400 });
+      }
+      forcesFreeShipping = result.forcesFreeShipping;
+      discountCents = result.type === 'free-shipping' ? 0 : result.discountCents;
+      orderDiscount = {
+        code: result.code,
+        type: result.type,
+        value: result.value,
+        discountRef: { _type: 'reference', _ref: result.docId },
+      };
+    }
+
+    const freeShipping = thresholdHit || forcesFreeShipping;
+    const shippingCents = freeShipping ? 0 : baseShipping;
+    const totalCents = Math.max(0, subtotal + shippingCents - discountCents);
 
     const refId = generateRefId();
     const label = verifiedItems
@@ -117,11 +154,13 @@ export async function POST(req: Request) {
       email,
       subtotalCents: subtotal,
       shippingCents,
+      discountCents,
       totalCents,
       currency: 'CZK',
       shippingMode,
       shipping,
       items: verifiedItems,
+      discount: orderDiscount,
     });
 
     const origin =

@@ -33,17 +33,26 @@ export type OrderShipping = {
   parcelShopAddress?: string;
 };
 
+export type OrderDiscount = {
+  code: string;
+  type: 'percent' | 'fixed' | 'free-shipping';
+  value: number;
+  discountRef?: { _type: 'reference'; _ref: string };
+};
+
 export type PendingOrderInput = {
   refId: string;
   paymentProvider: 'comgate' | 'stripe';
   email: string;
   subtotalCents: number;
   shippingCents: number;
+  discountCents?: number;
   totalCents: number;
   currency: string;
   shippingMode: 'home' | 'parcelshop';
   shipping: OrderShipping;
   items: OrderItem[];
+  discount?: OrderDiscount;
 };
 
 export type PaidOrderUpdate = {
@@ -58,13 +67,14 @@ export type PaidOrderUpdate = {
 /* ── Queries ─────────────────────────────────────────────────────── */
 
 const orderByRefIdQuery = groq`*[_type == "order" && refId == $refId][0]{
-  _id, _rev, refId, status, email, totalCents, subtotalCents, shippingCents, currency,
+  _id, _rev, refId, status, email, totalCents, subtotalCents, shippingCents, discountCents, currency,
   paymentProvider, comgateTransId, stripeSessionId, paymentMethod, isTest,
   shippingMode, shipping, items, fulfilment, emailsSent, ecomailContactId,
+  discount{ code, type, value, "discountRefId": discountRef._ref },
   createdAt, paidAt, shippedAt
 }`;
 
-export type OrderDoc = PendingOrderInput & {
+export type OrderDoc = Omit<PendingOrderInput, 'discount'> & {
   _id: string;
   _rev: string;
   status: 'pending' | 'paid' | 'packed' | 'shipped' | 'delivered' | 'cancelled' | 'refunded' | 'failed';
@@ -78,6 +88,12 @@ export type OrderDoc = PendingOrderInput & {
     paymentFailed?: string;
   };
   ecomailContactId?: string;
+  discount?: {
+    code?: string;
+    type?: 'percent' | 'fixed' | 'free-shipping';
+    value?: number;
+    discountRefId?: string;
+  };
   createdAt: string;
   paidAt?: string;
   shippedAt?: string;

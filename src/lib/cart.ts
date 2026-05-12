@@ -15,9 +15,19 @@ export type CartItem = {
   slug: string;
 };
 
+export type AppliedDiscount = {
+  code: string;
+  type: 'percent' | 'fixed' | 'free-shipping';
+  value: number;
+  /** Computed against the cart subtotal at apply-time. Re-validated on checkout. */
+  discountCents: number;
+  forcesFreeShipping: boolean;
+};
+
 type CartState = {
   items: CartItem[];
   drawerOpen: boolean;
+  discount: AppliedDiscount | null;
   add: (item: CartItem) => void;
   remove: (sku: string) => void;
   setQty: (sku: string, qty: number) => void;
@@ -25,6 +35,8 @@ type CartState = {
   openDrawer: () => void;
   closeDrawer: () => void;
   toggleDrawer: () => void;
+  applyDiscount: (d: AppliedDiscount) => void;
+  clearDiscount: () => void;
   totalCents: () => number;
   itemCount: () => number;
 };
@@ -34,6 +46,7 @@ export const useCart = create<CartState>()(
     (set, get) => ({
       items: [],
       drawerOpen: false,
+      discount: null,
       add: (item) =>
         set((state) => {
           const existing = state.items.find((i) => i.variantSku === item.variantSku);
@@ -54,18 +67,20 @@ export const useCart = create<CartState>()(
             .map((i) => (i.variantSku === sku ? { ...i, qty } : i))
             .filter((i) => i.qty > 0),
         })),
-      clear: () => set({ items: [] }),
+      clear: () => set({ items: [], discount: null }),
       openDrawer: () => set({ drawerOpen: true }),
       closeDrawer: () => set({ drawerOpen: false }),
       toggleDrawer: () => set((state) => ({ drawerOpen: !state.drawerOpen })),
+      applyDiscount: (d) => set({ discount: d }),
+      clearDiscount: () => set({ discount: null }),
       totalCents: () => get().items.reduce((sum, i) => sum + i.priceCents * i.qty, 0),
       itemCount: () => get().items.reduce((sum, i) => sum + i.qty, 0),
     }),
     {
       name: 'levstra-cart',
-      /* Only persist items — drawer state is ephemeral UI. */
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ items: state.items }),
+      /* Only persist items + discount; drawer state is ephemeral UI. */
+      partialize: (state) => ({ items: state.items, discount: state.discount }),
     },
   ),
 );

@@ -11,6 +11,7 @@ import {
 } from '@/lib/orders';
 import { sendOrderConfirmation } from '@/lib/resend';
 import { notifyEcomailOfOrder, trackPurchase } from '@/lib/ecomail';
+import { incrementRedemption } from '@/lib/discount';
 
 export const runtime = 'nodejs';
 
@@ -61,6 +62,10 @@ export async function POST(req: Request) {
       const fresh = order ?? (await findOrderByRefId(refId));
       if (fresh) {
         await decrementStockForOrder(fresh.items);
+
+        if (fresh.discount?.discountRefId) {
+          await incrementRedemption(fresh.discount.discountRefId);
+        }
 
         if (!fresh.emailsSent?.confirmation) {
           const result = await sendOrderConfirmation(fresh);

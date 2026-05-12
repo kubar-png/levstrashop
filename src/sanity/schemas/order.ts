@@ -68,8 +68,33 @@ export const order = defineType({
     /* ── Money (everything in haléře / cents) ─────────────────── */
     defineField({ name: 'subtotalCents', title: 'Zboží (haléře)', type: 'number', readOnly: true }),
     defineField({ name: 'shippingCents', title: 'Doprava (haléře)', type: 'number', readOnly: true }),
+    defineField({ name: 'discountCents', title: 'Sleva (haléře)', type: 'number', readOnly: true }),
     defineField({ name: 'totalCents', title: 'Celkem (haléře)', type: 'number', readOnly: true }),
     defineField({ name: 'currency', title: 'Měna', type: 'string', initialValue: 'CZK', readOnly: true }),
+
+    /* ── Discount ─────────────────────────────────────────── */
+    defineField({
+      name: 'discount',
+      title: 'Uplatněná sleva',
+      type: 'object',
+      readOnly: true,
+      fields: [
+        { name: 'code', title: 'Kód', type: 'string' },
+        {
+          name: 'type',
+          title: 'Typ',
+          type: 'string',
+          options: { list: ['percent', 'fixed', 'free-shipping'] },
+        },
+        { name: 'value', title: 'Hodnota slevy', type: 'number' },
+        {
+          name: 'discountRef',
+          title: 'Reference na slevový kód',
+          type: 'reference',
+          to: [{ type: 'discount' }],
+        },
+      ],
+    }),
 
     /* ── Items ─────────────────────────────────────────────────── */
     defineField({

@@ -16,7 +16,13 @@ const PARCEL_CENTS = 12900;
 const FREE_THRESHOLD = 150000;
 
 export default function CartPage() {
-  const { items, setQty, remove, totalCents, clear } = useCart();
+  const items = useCart((s) => s.items);
+  const setQty = useCart((s) => s.setQty);
+  const remove = useCart((s) => s.remove);
+  const totalCentsFn = useCart((s) => s.totalCents);
+  const clear = useCart((s) => s.clear);
+  const discount = useCart((s) => s.discount);
+  const clearDiscount = useCart((s) => s.clearDiscount);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -24,11 +30,18 @@ export default function CartPage() {
   const [shop, setShop]       = useState<SelectedParcelShop | null>(null);
   const [email, setEmail]     = useState('');
 
-  const subtotal     = totalCents();
-  const freeShipping = subtotal >= FREE_THRESHOLD;
-  const shippingCents = freeShipping ? 0 : mode === 'home' ? HOME_CENTS : PARCEL_CENTS;
-  const total        = subtotal + shippingCents;
-  const progress     = Math.min((subtotal / FREE_THRESHOLD) * 100, 100);
+  const subtotal     = totalCentsFn();
+  const thresholdHit = subtotal >= FREE_THRESHOLD;
+  const baseShipping = mode === 'home' ? HOME_CENTS : PARCEL_CENTS;
+  const freeShipping = thresholdHit || discount?.forcesFreeShipping === true;
+  const shippingCents = freeShipping ? 0 : baseShipping;
+
+  /* Discount only ever reduces the goods line, not shipping (free-shipping
+     promos already zero out shippingCents via the forcesFreeShipping flag). */
+  const discountCents =
+    discount && discount.type !== 'free-shipping' ? Math.min(discount.discountCents, subtotal) : 0;
+  const total = subtotal + shippingCents - discountCents;
+  const progress = Math.min((subtotal / FREE_THRESHOLD) * 100, 100);
 
   function validateEmail(v: string): string | null {
     if (!v) return 'Zadejte prosím e-mail.';
@@ -51,7 +64,13 @@ export default function CartPage() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, email, shippingMode: mode, parcelShop: shop }),
+        body: JSON.stringify({
+          items,
+          email,
+          shippingMode: mode,
+          parcelShop: shop,
+          discountCode: discount?.code,
+        }),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Chyba při platbě');
       const { url } = await res.json();
@@ -376,7 +395,13 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <PromoCodeField />
+              <PromoCodeField
+                subtotalCents={subtotal}
+                shippingCents={baseShipping}
+                applied={discount}
+                onApplied={(d) => useCart.getState().applyDiscount(d)}
+                onRemove={clearDiscount}
+              />
 
 
               {/* Totals + CTA */}
@@ -416,6 +441,39 @@ export default function CartPage() {
                       {freeShipping ? 'Zdarma' : formatPrice(shippingCents)}
                     </span>
                   </div>
+
+                  {discount && (discountCents > 0 || discount.forcesFreeShipping) && (
+                    <div className="flex justify-between">
+                      <span
+                        className="font-poppins-regular inline-flex items-center gap-1.5"
+                        style={{ fontSize: 'var(--text-small)', color: 'var(--color-lime)' }}
+                      >
+                        Sleva
+                        <span
+                          className="font-poppins-semibold tabular-nums"
+                          style={{
+                            fontSize: 'var(--text-micro)',
+                            background: 'rgba(225,248,97,0.18)',
+                            color: 'var(--color-lime)',
+                            padding: '2px 7px',
+                            borderRadius: 999,
+                            letterSpacing: '0.06em',
+                          }}
+                        >
+                          {discount.code}
+                        </span>
+                      </span>
+                      <span
+                        className="font-poppins-regular tabular-nums"
+                        style={{ fontSize: 'var(--text-small)', color: 'var(--color-lime)' }}
+                      >
+                        {discount.forcesFreeShipping
+                          ? `− ${formatPrice(baseShipping)}`
+                          : `− ${formatPrice(discountCents)}`}
+                      </span>
+                    </div>
+                  )}
+
                   <div
                     className="flex justify-between pt-3"
                     style={{ borderTop: '1px solid rgba(255,255,255,0.18)' }}
@@ -486,16 +544,109 @@ export default function CartPage() {
   );
 }
 
-function PromoCodeField() {
-  const [open, setOpen] = useState(false);
+function PromoCodeField({
+  subtotalCents,
+  shippingCents,
+  applied,
+  onApplied,
+  onRemove,
+}: {
+  subtotalCents: number;
+  shippingCents: number;
+  applied: ReturnType<typeof useCart.getState>['discount'];
+  onApplied: (d: NonNullable<ReturnType<typeof useCart.getState>['discount']>) => void;
+  onRemove: () => void;
+}) {
+  const [open, setOpen] = useState(!!applied);
   const [code, setCode] = useState('');
-  const [status, setStatus] = useState<'idle' | 'invalid' | 'applied'>('idle');
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  /* Visual affordance only for now — wiring to checkout discount flow is a
-     separate task. Signals "promotions exist" to shoppers searching elsewhere. */
-  function apply() {
-    if (!code.trim()) return;
-    setStatus('invalid');
+  async function apply(e?: React.FormEvent) {
+    e?.preventDefault();
+    if (!code.trim() || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/discount/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: code.trim(),
+          subtotalCents,
+          shippingCents,
+        }),
+      });
+      const data = (await res.json()) as
+        | { ok: true; code: string; type: 'percent' | 'fixed' | 'free-shipping'; value: number; discountCents: number; forcesFreeShipping: boolean }
+        | { ok: false; error: string };
+      if (!data.ok) {
+        setError(data.error);
+        return;
+      }
+      onApplied({
+        code: data.code,
+        type: data.type,
+        value: data.value,
+        discountCents: data.discountCents,
+        forcesFreeShipping: data.forcesFreeShipping,
+      });
+      setCode('');
+    } catch {
+      setError('Něco se nepovedlo, zkuste to znovu.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /* ── Applied state — compact confirmation row with remove ── */
+  if (applied) {
+    return (
+      <div
+        className="flex items-center justify-between px-6 py-4"
+        style={{
+          background: 'var(--color-cream)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1.5px solid var(--color-forest)',
+        }}
+      >
+        <div className="min-w-0">
+          <p
+            className="font-poppins-semibold inline-flex items-center gap-2"
+            style={{ fontSize: 'var(--text-small)', color: 'var(--color-forest)' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Kód <span className="tabular-nums">{applied.code}</span> uplatněn
+          </p>
+          <p
+            className="font-poppins-regular mt-0.5 truncate"
+            style={{ fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)' }}
+          >
+            {applied.type === 'percent' && `Sleva ${applied.value} % z mezisoučtu`}
+            {applied.type === 'fixed' && `Sleva ${applied.value} Kč z mezisoučtu`}
+            {applied.type === 'free-shipping' && 'Doprava zdarma'}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            onRemove();
+            setOpen(false);
+          }}
+          className="font-poppins-medium shrink-0 transition-opacity hover:opacity-60"
+          style={{
+            fontSize: 'var(--text-micro)',
+            color: 'var(--color-text-muted)',
+            padding: '0.4rem 0.6rem',
+            marginRight: '-0.6rem',
+          }}
+        >
+          Zrušit
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -522,19 +673,20 @@ function PromoCodeField() {
           </svg>
         </button>
       ) : (
-        <div className="p-6">
+        <form className="p-6" onSubmit={apply}>
           <Eyebrow>Slevový kód</Eyebrow>
           <div className="mt-3 flex gap-2">
             <input
               type="text"
               value={code}
               onChange={(e) => {
-                setCode(e.target.value.toUpperCase());
-                if (status !== 'idle') setStatus('idle');
+                setCode(e.target.value.toUpperCase().replace(/\s+/g, ''));
+                if (error) setError(null);
               }}
-              placeholder="VANOCE2026"
+              placeholder="VITEJTE10"
               autoComplete="off"
               spellCheck={false}
+              disabled={busy}
               className="font-poppins-regular flex-1 px-3.5 py-2.5 outline-none"
               style={{
                 fontSize: 'var(--text-small)',
@@ -547,9 +699,9 @@ function PromoCodeField() {
               }}
             />
             <button
-              type="button"
-              onClick={apply}
-              className="font-poppins-semibold px-4 py-2.5 transition-opacity hover:opacity-85"
+              type="submit"
+              disabled={busy || !code.trim()}
+              className="font-poppins-semibold px-4 py-2.5 transition-opacity hover:opacity-85 disabled:opacity-50"
               style={{
                 background: 'var(--color-ink)',
                 color: '#fff',
@@ -557,27 +709,19 @@ function PromoCodeField() {
                 fontSize: 'var(--text-small)',
               }}
             >
-              Uplatnit
+              {busy ? '…' : 'Uplatnit'}
             </button>
           </div>
-          {status === 'invalid' && (
+          {error && (
             <p
               className="font-poppins-regular mt-2.5"
               style={{ fontSize: 'var(--text-micro)', color: 'var(--color-danger)' }}
               role="alert"
             >
-              Tento kód není platný nebo expiroval.
+              {error}
             </p>
           )}
-          {status === 'applied' && (
-            <p
-              className="font-poppins-medium mt-2.5"
-              style={{ fontSize: 'var(--text-micro)', color: 'var(--color-forest)' }}
-            >
-              ✓ Sleva byla uplatněna.
-            </p>
-          )}
-        </div>
+        </form>
       )}
     </div>
   );
