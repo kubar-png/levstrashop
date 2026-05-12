@@ -459,17 +459,19 @@ h1 { letter-spacing: -0.035em; }
   backdrop-filter: blur(6px);
 }
 
-/* Compact carousel arrow: visually lighter than btn-icon, scales up on md+. */
+/* Editorial-style ghost arrow — no chrome at rest, hint of presence on hover.
+   Tap target stays ≥36px so it remains accessible, but visually it disappears
+   into the page so the product row carries the eye. */
 .carousel-arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
   border: 0;
-  background: rgba(43, 49, 47, 0.06);
-  color: var(--color-ink);
+  background: transparent;
+  color: rgba(43, 49, 47, 0.5);
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out),
               color var(--dur-fast) var(--ease-out),
@@ -478,22 +480,21 @@ h1 { letter-spacing: -0.035em; }
 }
 @media (min-width: 768px) {
   .carousel-arrow {
-    width: 44px;
-    height: 44px;
-    background: rgba(43, 49, 47, 0.08);
+    width: 40px;
+    height: 40px;
   }
 }
 .carousel-arrow:hover,
 .carousel-arrow:focus-visible {
-  background: var(--color-forest);
-  color: #fff;
+  background: rgba(43, 49, 47, 0.06);
+  color: var(--color-ink);
 }
 .carousel-arrow:active {
   transform: scale(0.92);
 }
 .carousel-arrow:focus-visible {
   outline: 2px solid var(--color-lime);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 .carousel-arrow[aria-disabled='true'],
 .carousel-arrow:disabled {

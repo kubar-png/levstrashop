@@ -51,7 +51,7 @@ export function ProductCarousel({ products }: { products: ProductSummaryView[] }
           Nejoblíbenější kousky
         </h2>
 
-        <div className="ml-auto flex items-center gap-1.5 md:gap-2.5">
+        <div className="ml-auto flex items-center gap-0.5">
           <button
             type="button"
             className="carousel-arrow"
@@ -60,8 +60,8 @@ export function ProductCarousel({ products }: { products: ProductSummaryView[] }
             aria-disabled={!canLeft}
             disabled={!canLeft}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           <button
@@ -72,14 +72,10 @@ export function ProductCarousel({ products }: { products: ProductSummaryView[] }
             aria-disabled={!canRight}
             disabled={!canRight}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-
-          <Link href="/shop" className="btn-secondary ml-2 hidden md:inline-flex">
-            Zobrazit vše
-          </Link>
         </div>
       </div>
 
