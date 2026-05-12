@@ -1,22 +1,25 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useCart } from '@/lib/cart';
 
 export function CartButton() {
   const count = useCart((s) => s.itemCount());
+  const openDrawer = useCart((s) => s.openDrawer);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   return (
-    <Link
-      href="/cart"
-      aria-label="Košík"
+    <button
+      type="button"
+      onClick={openDrawer}
+      aria-label={count > 0 ? `Košík (${count} položek)` : 'Košík'}
       className="relative inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
       style={{
         border: '1.5px solid var(--color-border-strong)',
         color: 'var(--color-ink)',
+        background: 'transparent',
+        cursor: 'pointer',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'var(--color-forest)';
@@ -39,18 +42,22 @@ export function CartButton() {
           strokeLinecap="round"
         />
       </svg>
-      {mounted && count > 0 && (
-        <span
-          className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 font-semibold"
-          style={{
-            background: 'var(--color-forest)',
-            color: '#fff',
-            fontSize: '11px',
-          }}
-        >
-          {count}
-        </span>
-      )}
-    </Link>
+      <span
+        aria-live="polite"
+        aria-atomic="true"
+        className={mounted && count > 0 ? 'absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 font-semibold' : 'sr-only'}
+        style={
+          mounted && count > 0
+            ? {
+                background: 'var(--color-forest)',
+                color: '#fff',
+                fontSize: '11px',
+              }
+            : undefined
+        }
+      >
+        {mounted && count > 0 ? count : count > 0 ? `${count} položek v košíku` : 'Košík prázdný'}
+      </span>
+    </button>
   );
 }

@@ -74,17 +74,10 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        {/* Right: search + cart + mobile */}
+        {/* Right: cart + mobile menu trigger.
+            Search will return when there's a real autocomplete implementation;
+            a non-functional "Najít" affordance erodes first-impression trust. */}
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            aria-label="Najít"
-            className="hidden h-9 cursor-pointer items-center gap-1.5 rounded-full px-2 text-[15px] font-poppins-regular transition-colors duration-200 md:inline-flex"
-            style={{ color: 'var(--color-pill-ink)' }}
-          >
-            <span>Najít</span>
-            <SearchIcon />
-          </button>
           <CartButton />
           <MobileMenu />
         </div>
@@ -104,11 +97,3 @@ function LogoMark() {
   );
 }
 
-function SearchIcon() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.6" />
-      <line x1="16" y1="16" x2="20" y2="20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}

@@ -7,6 +7,7 @@ import { useCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
 import { ParcelShopPicker, type SelectedParcelShop } from '@/components/ParcelShopPicker';
 import { Eyebrow, FormField } from '@/components/ui';
+import { NewsletterSignup } from '@/components/NewsletterSignup';
 
 type ShippingMode = 'home' | 'parcelshop';
 
@@ -64,7 +65,7 @@ export default function CartPage() {
   /* ── Empty state ── */
   if (items.length === 0) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-start px-6 pt-28 text-center md:pt-32">
         <svg viewBox="0 0 56 56" width="52" height="52" fill="none" aria-hidden="true" className="mb-6 opacity-25">
           <circle cx="28" cy="28" r="27" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--color-ink)' }} />
           <path d="M17 28h22M28 17v22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" style={{ color: 'var(--color-ink)' }} />
@@ -84,6 +85,36 @@ export default function CartPage() {
         <Link href="/shop" className="btn-secondary mt-8">
           Prohlédnout e-shop
         </Link>
+
+        {/* Highest-intent moment to capture an email — they care, just no items yet. */}
+        <div
+          className="mt-16 w-full max-w-md p-6 text-left"
+          style={{
+            background: 'var(--color-forest)',
+            borderRadius: 'var(--radius-lg)',
+          }}
+        >
+          <p
+            className="font-poppins-semibold"
+            style={{
+              fontSize: '0.7rem',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'var(--color-lime)',
+            }}
+          >
+            10 % sleva na první nákup
+          </p>
+          <p
+            className="font-serif mt-2"
+            style={{ fontSize: 'var(--text-h3)', color: '#fff', lineHeight: 1.15 }}
+          >
+            Než se rozhodnete — pošleme vám slevu na e-mail.
+          </p>
+          <div className="mt-4">
+            <NewsletterSignup variant="dark" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -345,6 +376,9 @@ export default function CartPage() {
                 </div>
               </div>
 
+              <PromoCodeField />
+
+
               {/* Totals + CTA */}
               <div
                 className="p-6"
@@ -448,6 +482,103 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function PromoCodeField() {
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState('');
+  const [status, setStatus] = useState<'idle' | 'invalid' | 'applied'>('idle');
+
+  /* Visual affordance only for now — wiring to checkout discount flow is a
+     separate task. Signals "promotions exist" to shoppers searching elsewhere. */
+  function apply() {
+    if (!code.trim()) return;
+    setStatus('invalid');
+  }
+
+  return (
+    <div
+      className="overflow-hidden"
+      style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-lg)' }}
+    >
+      {!open ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="font-poppins-medium flex w-full items-center justify-between px-6 py-4 transition-colors hover:bg-[rgba(43,49,47,0.04)]"
+          style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
+        >
+          <span className="inline-flex items-center gap-2.5">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V9Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+              <path d="M12 7v10" stroke="currentColor" strokeWidth="1.6" strokeDasharray="2 2" />
+            </svg>
+            Mám slevový kód
+          </span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      ) : (
+        <div className="p-6">
+          <Eyebrow>Slevový kód</Eyebrow>
+          <div className="mt-3 flex gap-2">
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value.toUpperCase());
+                if (status !== 'idle') setStatus('idle');
+              }}
+              placeholder="VANOCE2026"
+              autoComplete="off"
+              spellCheck={false}
+              className="font-poppins-regular flex-1 px-3.5 py-2.5 outline-none"
+              style={{
+                fontSize: 'var(--text-small)',
+                color: 'var(--color-ink)',
+                background: '#fff',
+                border: '1.5px solid var(--color-border-strong)',
+                borderRadius: 'var(--radius-md)',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+              }}
+            />
+            <button
+              type="button"
+              onClick={apply}
+              className="font-poppins-semibold px-4 py-2.5 transition-opacity hover:opacity-85"
+              style={{
+                background: 'var(--color-ink)',
+                color: '#fff',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--text-small)',
+              }}
+            >
+              Uplatnit
+            </button>
+          </div>
+          {status === 'invalid' && (
+            <p
+              className="font-poppins-regular mt-2.5"
+              style={{ fontSize: 'var(--text-micro)', color: 'var(--color-danger)' }}
+              role="alert"
+            >
+              Tento kód není platný nebo expiroval.
+            </p>
+          )}
+          {status === 'applied' && (
+            <p
+              className="font-poppins-medium mt-2.5"
+              style={{ fontSize: 'var(--text-micro)', color: 'var(--color-forest)' }}
+            >
+              ✓ Sleva byla uplatněna.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

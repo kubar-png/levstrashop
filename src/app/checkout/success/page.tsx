@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { CartCleaner } from '@/components/CartCleaner';
 import { Eyebrow } from '@/components/ui';
+import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { findOrderByRefId } from '@/lib/orders';
 import { formatPrice } from '@/lib/format';
 import { OrderStatusPoller } from './OrderStatusPoller';
@@ -160,6 +161,44 @@ export default async function SuccessPage({
           </Link>
         )}
       </div>
+
+      {/* Highest-intent moment for newsletter capture — they just bought. */}
+      {isPaid && (
+        <div
+          className="mt-16 w-full max-w-md p-6 text-left"
+          style={{
+            background: 'var(--color-forest)',
+            borderRadius: 'var(--radius-lg)',
+          }}
+        >
+          <p
+            className="font-poppins-semibold"
+            style={{
+              fontSize: '0.7rem',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'var(--color-lime)',
+            }}
+          >
+            Buďte v obraze
+          </p>
+          <p
+            className="font-serif mt-2"
+            style={{ fontSize: 'var(--text-h3)', color: '#fff', lineHeight: 1.15 }}
+          >
+            Nové kousky a tipy do schránky.
+          </p>
+          <p
+            className="font-poppins-light mt-2"
+            style={{ fontSize: 'var(--text-small)', color: 'rgba(255,255,255,0.72)' }}
+          >
+            Posíláme párkrát do měsíce, vždy k věci.
+          </p>
+          <div className="mt-4">
+            <NewsletterSignup variant="dark" hideHeader source="checkout-success" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { CookieBanner } from '@/components/CookieBanner';
 import { PageTransition } from '@/components/PageTransition';
+import { CartDrawer } from '@/components/CartDrawer';
 
 const poppins = Poppins({
   variable: '--font-sans',
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PageTransition>{children}</PageTransition>
         </main>
         <SiteFooter />
+        <CartDrawer />
         <CookieBanner />
       </body>
     </html>
