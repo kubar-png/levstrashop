@@ -114,12 +114,53 @@ export function ProductCarousel({ products }: { products: ProductSummaryView[] }
         })}
       </div>
 
-      {/* Mobile "Zobrazit vše" CTA below the row */}
-      <div className="mt-6 flex justify-center sm:hidden">
-        <Link href="/shop" className="btn-secondary">
-          Zobrazit vše
-        </Link>
-      </div>
+      {/* Mobile full-width conversion CTA below the row.
+          Same horizontal padding as the section, so the button spans the
+          content column edge-to-edge. Visual language matches the
+          mobile-menu CTA for brand consistency. */}
+      <Link
+        href="/shop"
+        aria-label="Zobrazit celý e-shop"
+        className="font-poppins-semibold mt-8 flex w-full items-center justify-between overflow-hidden transition-transform duration-200 active:scale-[0.985] md:hidden"
+        style={{
+          background: 'var(--color-forest)',
+          color: '#ffffff',
+          padding: '20px 22px',
+          borderRadius: 'var(--radius-lg)',
+          minHeight: 60,
+          boxShadow: '0 10px 24px -10px rgba(45,81,67,0.55)',
+        }}
+      >
+        <span className="flex flex-col items-start gap-0.5">
+          <span
+            className="font-poppins-regular"
+            style={{
+              fontSize: '0.7rem',
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: 'var(--color-lime)',
+            }}
+          >
+            Celá kolekce
+          </span>
+          <span style={{ fontSize: '1.15rem', lineHeight: 1 }}>Zobrazit vše</span>
+        </span>
+        <span
+          aria-hidden="true"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+          style={{ background: 'var(--color-lime)', color: 'var(--color-ink)' }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M5 12h13M13 6l6 6-6 6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      </Link>
     </section>
   );
 }
