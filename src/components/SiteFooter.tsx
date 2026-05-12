@@ -9,20 +9,25 @@ export function SiteFooter() {
       {/* ── Link columns ── */}
       <div className="px-8 pt-14 md:px-14 md:pt-16">
         <div className="flex flex-col gap-10 sm:flex-row sm:gap-16 md:gap-20">
-          <FooterColumn title="Obchod">
-            <li><Link href="/">Domů</Link></li>
-            <li><Link href="/o-nas">O nás</Link></li>
-            <li><Link href="/shop">E-shop</Link></li>
-            <li><Link href="/blog">Blog</Link></li>
-          </FooterColumn>
+          {/* Obchod + Podmínky sit side-by-side on mobile (saves vertical
+              height); sm:contents flattens this wrapper so the rest of the
+              layout stays identical on tablet/desktop. */}
+          <div className="grid grid-cols-2 gap-8 sm:contents">
+            <FooterColumn title="Obchod">
+              <li><Link href="/">Domů</Link></li>
+              <li><Link href="/o-nas">O nás</Link></li>
+              <li><Link href="/shop">E-shop</Link></li>
+              <li><Link href="/blog">Blog</Link></li>
+            </FooterColumn>
 
-          <FooterColumn title="Podmínky">
-            <li><Link href="/obchodni-podminky">Obchodní podmínky</Link></li>
-            <li><Link href="/gdpr">Ochrana osobních údajů</Link></li>
-            <li><Link href="/vraceni">Reklamace a vrácení</Link></li>
-            <li><Link href="/doprava">Doprava a platba</Link></li>
-            <li><Link href="/cookies">Cookies</Link></li>
-          </FooterColumn>
+            <FooterColumn title="Podmínky">
+              <li><Link href="/obchodni-podminky">Obchodní podmínky</Link></li>
+              <li><Link href="/gdpr">Ochrana osobních údajů</Link></li>
+              <li><Link href="/vraceni">Reklamace a vrácení</Link></li>
+              <li><Link href="/doprava">Doprava a platba</Link></li>
+              <li><Link href="/cookies">Cookies</Link></li>
+            </FooterColumn>
+          </div>
 
           <FooterColumn title="Kontakt">
             <li>Levstra s.r.o. · IČO: 27686281</li>
