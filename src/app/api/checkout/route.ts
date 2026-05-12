@@ -5,20 +5,20 @@ import { createPayment } from '@/lib/comgate';
 import { mockProducts } from '@/lib/mock-data';
 import type { CartItem } from '@/lib/cart';
 import type { SelectedParcelShop } from '@/components/ParcelShopPicker';
+import { createPendingOrder, generateRefId, type OrderItem, type OrderShipping } from '@/lib/orders';
+import { isSanityConfigured } from '@/sanity/env';
 
 export const runtime = 'nodejs';
 
 const FREE_SHIPPING_THRESHOLD_CENTS = 150000; // 1 500 Kč
-
-function isSanityConfigured() {
-  const id = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-  return !!id && id !== 'placeholder';
-}
+const HOME_SHIPPING_CENTS = 19900;
+const PARCEL_SHIPPING_CENTS = 12900;
 
 const variantLookupQuery = groq`
   *[_type == "product" && _id == $productId][0] {
     title,
     "slug": slug.current,
+    "image": images[0].asset->url,
     "variant": variants[sku == $sku][0] {
       sku, "priceCents": price * 100, stock, size, color
     }
@@ -30,7 +30,7 @@ function lookupMock(productId: string, sku: string) {
   if (!p) return null;
   const v = p.variants.find((x) => x.sku === sku);
   if (!v) return null;
-  return { title: p.title, slug: p.slug, variant: v };
+  return { title: p.title, slug: p.slug, image: undefined, variant: v };
 }
 
 type CheckoutBody = {
@@ -54,11 +54,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Vyberte výdejnu PPL ParcelShop' }, { status: 400 });
     }
 
-    const verifiedItems = await Promise.all(
+    /* ── Re-validate each line against Sanity (or mocks) ─────────── */
+    const verifiedItems: OrderItem[] = await Promise.all(
       items.map(async (item) => {
         let data: {
           title: string;
           slug: string;
+          image?: string;
           variant: { sku: string; priceCents: number; stock: number; size?: string; color?: string } | null;
         } | null = null;
 
@@ -70,29 +72,57 @@ export async function POST(req: Request) {
             });
           } catch {}
         }
-        if (!data || !data.variant) data = lookupMock(item.productId, item.variantSku);
+        if (!data || !data.variant) data = lookupMock(item.productId, item.variantSku) as typeof data;
         if (!data || !data.variant) throw new Error(`Varianta nenalezena: ${item.variantSku}`);
         if (data.variant.stock < item.qty) throw new Error(`Nedostatek zásob: ${data.title}`);
 
         return {
+          productId: item.productId,
+          slug: data.slug,
           title: data.title,
           sku: data.variant.sku,
-          priceCents: data.variant.priceCents,
+          size: data.variant.size,
+          color: data.variant.color,
+          image: data.image ?? item.image,
           qty: item.qty,
+          priceCents: data.variant.priceCents,
         };
       }),
     );
 
     const subtotal = verifiedItems.reduce((s, i) => s + i.priceCents * i.qty, 0);
     const freeShipping = subtotal >= FREE_SHIPPING_THRESHOLD_CENTS;
-    const shippingCents = freeShipping ? 0 : shippingMode === 'parcelshop' ? 12900 : 19900;
+    const shippingCents = freeShipping ? 0 : shippingMode === 'parcelshop' ? PARCEL_SHIPPING_CENTS : HOME_SHIPPING_CENTS;
     const totalCents = subtotal + shippingCents;
 
-    const refId = `lev_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const refId = generateRefId();
     const label = verifiedItems
       .map((i) => `${i.title} ×${i.qty}`)
       .join(', ')
       .slice(0, 127);
+
+    /* ── Persist a pending order BEFORE payment redirect ─────────── */
+    const shipping: OrderShipping =
+      shippingMode === 'parcelshop' && parcelShop
+        ? {
+            parcelShopId: parcelShop.id,
+            parcelShopName: parcelShop.name,
+            parcelShopAddress: [parcelShop.street, parcelShop.city].filter(Boolean).join(', '),
+          }
+        : {};
+
+    await createPendingOrder({
+      refId,
+      paymentProvider: 'comgate',
+      email,
+      subtotalCents: subtotal,
+      shippingCents,
+      totalCents,
+      currency: 'CZK',
+      shippingMode,
+      shipping,
+      items: verifiedItems,
+    });
 
     const origin =
       req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -103,7 +133,7 @@ export async function POST(req: Request) {
       email,
       label,
       returnUrl: `${origin}/checkout/success?transId={transId}&refId=${encodeURIComponent(refId)}`,
-      cancelUrl: `${origin}/cart`,
+      cancelUrl: `${origin}/cart?cancelled=1&refId=${encodeURIComponent(refId)}`,
       notifyUrl: `${origin}/api/webhooks/comgate`,
     });
 

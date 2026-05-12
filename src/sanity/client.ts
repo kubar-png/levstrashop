@@ -10,7 +10,13 @@ export const sanityClient = createClient({
   perspective: 'published',
 });
 
-/** Server-only client with write access. Do NOT import in client components. */
+/**
+ * Server-only client with write access. Do NOT import in client components.
+ * Use for order mutations, stock decrement, etc.
+ *
+ * Throws on first write call if SANITY_API_WRITE_TOKEN is missing — that way
+ * the build doesn't crash, only runtime mutation attempts do.
+ */
 export const sanityWriteClient = createClient({
   projectId,
   dataset,

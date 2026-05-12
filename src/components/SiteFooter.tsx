@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { NewsletterSignup } from './NewsletterSignup';
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
@@ -33,6 +34,10 @@ export function SiteFooter() {
               </a>
             </li>
           </FooterColumn>
+
+          <div className="min-w-[260px] flex-1">
+            <NewsletterSignup />
+          </div>
         </div>
       </div>
 

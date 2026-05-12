@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const NAV = [
   { href: '/', label: 'Domů' },
@@ -16,6 +17,11 @@ const NAV = [
 
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
@@ -24,26 +30,17 @@ export function MobileMenu() {
     };
   }, [open]);
 
-  return (
+  /**
+   * Drawer + backdrop are portaled to <body> so they're positioned relative to
+   * the viewport instead of the SiteHeader pill — the pill uses backdrop-filter,
+   * which creates a containing block for `position: fixed` descendants and
+   * would otherwise leak ~32px of the closed drawer onto the screen.
+   */
+  const overlay = (
     <>
-      <button
-        type="button"
-        aria-label="Otevřít menu"
-        aria-expanded={open}
-        onClick={() => setOpen(true)}
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        style={{ color: 'var(--color-ink)' }}
-      >
-        <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
-          <line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="1.6" />
-          <line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" strokeWidth="1.6" />
-          <line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" strokeWidth="1.6" />
-        </svg>
-      </button>
-
       {open && (
         <div
-          className="fixed inset-0 z-50 bg-black/30 md:hidden"
+          className="fixed inset-0 z-[100] bg-black/30 md:hidden"
           onClick={() => setOpen(false)}
           aria-hidden="true"
         />
@@ -51,7 +48,7 @@ export function MobileMenu() {
 
       <aside
         aria-hidden={!open}
-        className={`fixed inset-y-0 right-0 z-50 w-[82%] max-w-sm transform shadow-2xl transition-transform duration-300 md:hidden ${
+        className={`fixed inset-y-0 right-0 z-[101] w-[82%] max-w-sm transform shadow-2xl transition-transform duration-300 md:hidden ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{ background: '#fff' }}
@@ -125,6 +122,27 @@ export function MobileMenu() {
           </a>
         </div>
       </aside>
+    </>
+  );
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="Otevřít menu"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+        style={{ color: 'var(--color-ink)' }}
+      >
+        <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+          <line x1="3" y1="6" x2="19" y2="6" stroke="currentColor" strokeWidth="1.6" />
+          <line x1="3" y1="11" x2="19" y2="11" stroke="currentColor" strokeWidth="1.6" />
+          <line x1="3" y1="16" x2="19" y2="16" stroke="currentColor" strokeWidth="1.6" />
+        </svg>
+      </button>
+
+      {mounted ? createPortal(overlay, document.body) : null}
     </>
   );
 }
