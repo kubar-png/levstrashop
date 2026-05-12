@@ -85,7 +85,7 @@ export function SiteFooter() {
         style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <a
-          href="https://instagram.com/larp"
+          href="https://larp.solutions"
           target="_blank"
           rel="noreferrer"
           className="font-serif inline-flex items-center gap-1.5 italic transition-colors hover:text-white"
