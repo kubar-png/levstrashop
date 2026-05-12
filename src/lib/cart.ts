@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export type CartItem = {
   productId: string;
@@ -17,10 +17,14 @@ export type CartItem = {
 
 type CartState = {
   items: CartItem[];
+  drawerOpen: boolean;
   add: (item: CartItem) => void;
   remove: (sku: string) => void;
   setQty: (sku: string, qty: number) => void;
   clear: () => void;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+  toggleDrawer: () => void;
   totalCents: () => number;
   itemCount: () => number;
 };
@@ -29,6 +33,7 @@ export const useCart = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      drawerOpen: false,
       add: (item) =>
         set((state) => {
           const existing = state.items.find((i) => i.variantSku === item.variantSku);
@@ -50,9 +55,17 @@ export const useCart = create<CartState>()(
             .filter((i) => i.qty > 0),
         })),
       clear: () => set({ items: [] }),
+      openDrawer: () => set({ drawerOpen: true }),
+      closeDrawer: () => set({ drawerOpen: false }),
+      toggleDrawer: () => set((state) => ({ drawerOpen: !state.drawerOpen })),
       totalCents: () => get().items.reduce((sum, i) => sum + i.priceCents * i.qty, 0),
       itemCount: () => get().items.reduce((sum, i) => sum + i.qty, 0),
     }),
-    { name: 'levstra-cart' },
+    {
+      name: 'levstra-cart',
+      /* Only persist items — drawer state is ephemeral UI. */
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ items: state.items }),
+    },
   ),
 );

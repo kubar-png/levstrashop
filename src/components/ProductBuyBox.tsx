@@ -18,6 +18,7 @@ export function ProductBuyBox({
 }) {
   const [added, setAdded] = useState(false);
   const add = useCart((s) => s.add);
+  const openDrawer = useCart((s) => s.openDrawer);
 
   const sizes = Array.from(
     new Set(product.variants.map((v) => v.size).filter((s): s is string => !!s)),
@@ -26,13 +27,27 @@ export function ProductBuyBox({
     new Set(product.variants.map((v) => v.color).filter((c): c is string => !!c)),
   );
 
+  /** Find best variant matching the requested size/color.
+   *  Prefers an in-stock match; falls back to any match. */
   function pickVariant(size?: string, color?: string) {
-    const match = product.variants.find(
+    const matches = product.variants.filter(
       (v) =>
         (size === undefined || v.size === size) &&
         (color === undefined || v.color === color),
     );
-    if (match) onVariantChange(match);
+    if (matches.length === 0) return;
+    const inStock = matches.find((v) => v.stock > 0);
+    onVariantChange(inStock ?? matches[0]);
+  }
+
+  /** Does any variant exist with this (size, color) AND have stock > 0? */
+  function hasStock(opts: { size?: string; color?: string }): boolean {
+    return product.variants.some(
+      (v) =>
+        v.stock > 0 &&
+        (opts.size === undefined || v.size === opts.size) &&
+        (opts.color === undefined || v.color === opts.color),
+    );
   }
 
   function handleAdd() {
@@ -48,7 +63,9 @@ export function ProductBuyBox({
       slug: product.slug,
     });
     setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    setTimeout(() => setAdded(false), 1200);
+    /* Slide the mini-cart in so the buyer sees confirmation + the next step. */
+    openDrawer();
   }
 
   const outOfStock = selectedVariant.stock <= 0;
@@ -143,26 +160,44 @@ export function ProductBuyBox({
               const variant = product.variants.find((v) => v.color === color);
               const hex = variant?.colorHex ?? '#ccc';
               const isSelected = selectedVariant.color === color;
+              const available = hasStock({ size: selectedVariant.size, color });
               return (
                 <button
                   key={color}
                   type="button"
                   onClick={() => pickVariant(selectedVariant.size, color)}
-                  title={color}
-                  aria-label={color}
+                  title={available ? color : `${color} — vyprodáno`}
+                  aria-label={available ? color : `${color}, vyprodáno`}
                   aria-pressed={isSelected}
-                  style={swatchWrapper}
+                  style={{
+                    ...swatchWrapper,
+                    opacity: available || isSelected ? 1 : 0.45,
+                  }}
                   className="transition-transform hover:scale-110"
                 >
                   <span
-                    className="h-8 w-8 rounded-full block"
+                    className="relative h-8 w-8 rounded-full block"
                     style={{
                       background: hex,
                       boxShadow: isSelected
                         ? `0 0 0 2.5px white, 0 0 0 4px ${hex}`
                         : '0 0 0 1px var(--color-border-strong)',
                     }}
-                  />
+                  >
+                    {!available && !isSelected && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                        style={{
+                          width: '120%',
+                          height: '1.5px',
+                          background: '#fff',
+                          transform: 'translate(-50%,-50%) rotate(-45deg)',
+                          boxShadow: '0 0 0 0.5px rgba(0,0,0,0.3)',
+                        }}
+                      />
+                    )}
+                  </span>
                 </button>
               );
             })}
@@ -170,23 +205,38 @@ export function ProductBuyBox({
         </div>
       )}
 
-      {/* ── Size picker ── */}
+      {/* ── Size picker (stock-aware) ── */}
       {sizes.length > 0 && (
         <div>
           <p className="font-poppins-semibold mb-3" style={variantLabelStyle}>
             Velikost
           </p>
           <div className="flex flex-wrap gap-2">
-            {sizes.map((size) => (
-              <Chip
-                key={size}
-                kind="size"
-                selected={selectedVariant.size === size}
-                onClick={() => pickVariant(size, selectedVariant.color)}
-              >
-                {sizeLabel(size)}
-              </Chip>
-            ))}
+            {sizes.map((size) => {
+              const available = hasStock({ size, color: selectedVariant.color });
+              const isSelected = selectedVariant.size === size;
+              return (
+                <Chip
+                  key={size}
+                  kind="size"
+                  selected={isSelected}
+                  onClick={() => pickVariant(size, selectedVariant.color)}
+                  disabled={!available && !isSelected}
+                  title={available ? undefined : 'Tato kombinace je vyprodaná'}
+                  style={
+                    !available && !isSelected
+                      ? {
+                          opacity: 0.45,
+                          textDecoration: 'line-through',
+                          cursor: 'not-allowed',
+                        }
+                      : undefined
+                  }
+                >
+                  {sizeLabel(size)}
+                </Chip>
+              );
+            })}
           </div>
         </div>
       )}
@@ -219,21 +269,60 @@ export function ProductBuyBox({
         )}
       </div>
 
-      {/* ── Meta ── */}
-      <div
-        className="px-5 py-4 space-y-1.5"
-        style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-md)' }}
+      {/* ── Trust signals — reassurance at the decision moment ── */}
+      <ul
+        className="grid grid-cols-1 gap-0 overflow-hidden"
+        style={{
+          background: 'var(--color-cream)',
+          borderRadius: 'var(--radius-lg)',
+        }}
       >
-        <MetaRow label="Skladem" value={`${selectedVariant.stock} ks`} />
-        {selectedVariant.weightGrams && (
-          <MetaRow
-            label="Hmotnost"
-            value={`${(selectedVariant.weightGrams / 1000).toFixed(2)} kg`}
-          />
-        )}
-      </div>
+        <TrustRow
+          icon={
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <path d="M3 7h13l5 5v5h-3M6 17H3V7M9 17h7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="7.5" cy="17.5" r="2" stroke="currentColor" strokeWidth="1.6" />
+              <circle cx="17.5" cy="17.5" r="2" stroke="currentColor" strokeWidth="1.6" />
+            </svg>
+          }
+          label="Doručení 1–2 dny"
+          note="PPL na adresu i ParcelShop"
+        />
+        <TrustRow
+          icon={
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <path d="M21 12c0 5-4 8-9 9-5-1-9-4-9-9V5l9-3 9 3v7Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+              <path d="M8 12l3 3 5-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          }
+          label="Vrácení do 14 dní"
+          note="Bez udání důvodu"
+        />
+        <TrustRow
+          icon={
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M3 10h18" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M7 15h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          }
+          label="Bezpečná platba"
+          note="Karta, Apple Pay, převod"
+        />
+        <TrustRow
+          icon={
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <path d="M4 6h16l-1.5 12a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8L4 6Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+              <path d="M9 6V4.5A2.5 2.5 0 0 1 11.5 2h1A2.5 2.5 0 0 1 15 4.5V6" stroke="currentColor" strokeWidth="1.6" />
+            </svg>
+          }
+          label="Skladem v ČR"
+          note="Expedice ze skladu Brno"
+          last
+        />
+      </ul>
 
-      {/* ── Shipping note ── */}
+      {/* ── Free-shipping nudge ── */}
       <div className="flex items-center gap-3">
         <div
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
@@ -249,6 +338,20 @@ export function ProductBuyBox({
         >
           Doprava zdarma při objednávce nad 1 500 Kč
         </p>
+      </div>
+
+      {/* ── Meta ── */}
+      <div
+        className="px-5 py-4 space-y-1.5"
+        style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-md)' }}
+      >
+        <MetaRow label="Skladem" value={`${selectedVariant.stock} ks`} />
+        {selectedVariant.weightGrams && (
+          <MetaRow
+            label="Hmotnost"
+            value={`${(selectedVariant.weightGrams / 1000).toFixed(2)} kg`}
+          />
+        )}
       </div>
 
       {/* ── Mobile sticky mini buy bar (hidden on md+) ─────────────── */}
@@ -308,5 +411,47 @@ function MetaRow({ label, value }: { label: string; value: string }) {
         {value}
       </span>
     </div>
+  );
+}
+
+function TrustRow({
+  icon,
+  label,
+  note,
+  last,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  note: string;
+  last?: boolean;
+}) {
+  return (
+    <li
+      className="flex items-center gap-3 px-5 py-3.5"
+      style={{
+        borderBottom: last ? undefined : '1px solid rgba(43,49,47,0.07)',
+      }}
+    >
+      <span
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+        style={{ background: '#ffffff', color: 'var(--color-forest)' }}
+      >
+        {icon}
+      </span>
+      <div className="leading-tight">
+        <p
+          className="font-poppins-semibold"
+          style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
+        >
+          {label}
+        </p>
+        <p
+          className="font-poppins-regular"
+          style={{ fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)' }}
+        >
+          {note}
+        </p>
+      </div>
+    </li>
   );
 }
