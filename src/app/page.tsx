@@ -81,7 +81,7 @@ export default async function HomePage() {
       {/* ── MARINA GALANTI BANNER ─────────────────────────────────────── */}
       <section className="px-4 pt-4 md:px-6 md:pt-5">
         <div
-          className="relative w-full overflow-hidden aspect-[4/3] sm:aspect-[16/9] md:aspect-[16/6]"
+          className="relative w-full overflow-hidden aspect-[4/5] sm:aspect-[16/10] md:aspect-[16/7]"
           style={{ borderRadius: 'var(--radius-2xl)' }}
         >
           <Image
@@ -90,15 +90,20 @@ export default async function HomePage() {
             fill sizes="100vw"
             className="object-cover object-[55%_40%]"
           />
+          {/* Deeper bottom gradient on mobile so the text sits on a richer base now that it's lower. */}
           <div
             className="absolute inset-0 md:hidden"
-            style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.65) 100%)' }}
+            style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 38%, rgba(0,0,0,0.78) 100%)' }}
           />
           <div
             className="absolute inset-0 hidden md:block"
             style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.22) 45%, rgba(0,0,0,0) 68%)' }}
           />
-          <div className="absolute inset-0 flex items-end" style={{ paddingBottom: 'calc(2.5rem + 64px)' }}>
+          {/* Content hugs the bottom: 20px breathing room above the promo ticker (64px). */}
+          <div
+            className="absolute inset-0 flex items-end"
+            style={{ paddingBottom: 'calc(1.25rem + 64px)' }}
+          >
             <div className="w-full px-4 md:px-6">
               <div className="max-w-lg">
                 <h2
