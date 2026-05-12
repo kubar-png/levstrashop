@@ -51,8 +51,14 @@ export function SiteHeader() {
       }`}
     >
       <div
-        className="flex w-full items-center justify-between gap-6 rounded-full px-4 py-2.5 shadow-[0_4px_22px_-8px_rgba(0,0,0,0.18)] ring-1 ring-black/5 backdrop-blur md:px-6 md:py-3"
-        style={{ background: 'var(--color-pill-bg)' }}
+        className="flex w-full items-center justify-between gap-6 px-4 py-2.5 shadow-[0_4px_22px_-8px_rgba(0,0,0,0.18)] ring-1 ring-black/5 backdrop-blur md:px-6 md:py-3"
+        style={{
+          background: 'var(--color-pill-bg)',
+          /* Concentric corners: hero radius (32px) − gap to hero edge (8px) = 24px.
+             Matches --radius-xl so the floating pill reads as the inner half of
+             a nested rounded frame. */
+          borderRadius: 'var(--radius-xl)',
+        }}
       >
         {/* Left: logo + nav */}
         <div className="flex items-center gap-7">

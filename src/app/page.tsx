@@ -29,7 +29,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
-      <section className="-mt-[76px] px-4 pt-4 md:-mt-[88px] md:px-6 md:pt-5">
+      <section className="-mt-[76px] px-4 pt-4 md:-mt-[88px] md:px-6 md:pt-6">
         <div
           className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[16/10] md:aspect-[16/8]"
           style={{ borderRadius: 'var(--radius-2xl)' }}

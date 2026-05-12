@@ -51,7 +51,7 @@ export default async function CategoryPage({
   return (
     <>
       {/* ── HERO — pulled behind the fixed pill nav, same as homepage ── */}
-      <section className="mx-auto max-w-7xl -mt-[76px] px-4 pt-4 md:-mt-[88px] md:px-6 md:pt-5">
+      <section className="mx-auto max-w-7xl -mt-[76px] px-4 pt-4 md:-mt-[88px] md:px-6 md:pt-6">
         <div
           className="relative w-full overflow-hidden aspect-[4/5] sm:aspect-[16/10] md:aspect-[16/7]"
           style={{ borderRadius: 'var(--radius-2xl)' }}
