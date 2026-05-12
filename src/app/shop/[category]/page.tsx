@@ -68,7 +68,7 @@ export default async function CategoryPage({
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(180deg, rgba(0,0,0,0) 38%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0.78) 100%)',
+                'linear-gradient(180deg, rgba(0,0,0,0) 62%, rgba(0,0,0,0.32) 86%, rgba(0,0,0,0.62) 100%)',
             }}
           />
           <div className="absolute inset-0 flex items-end pb-7 md:pb-10 px-7 md:px-10">

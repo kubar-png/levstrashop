@@ -56,13 +56,13 @@ export default async function ShopPage({
             sizes="(min-width: 1280px) 1280px, 100vw"
             className="object-cover object-[50%_30%]"
           />
-          {/* Bottom-to-top scrim: image stays clean at the top, deepens
-              under the text block so the headline + subtitle pop. */}
+          {/* Bottom-only scrim: most of the image stays clean and saturated;
+              dark slab fades in tightly behind the text block at the bottom. */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(180deg, rgba(0,0,0,0) 38%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0.78) 100%)',
+                'linear-gradient(180deg, rgba(0,0,0,0) 62%, rgba(0,0,0,0.32) 86%, rgba(0,0,0,0.62) 100%)',
             }}
           />
           <div className="absolute inset-0 flex items-end pb-7 md:pb-10 px-7 md:px-10">
