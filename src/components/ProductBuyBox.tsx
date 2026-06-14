@@ -416,8 +416,8 @@ function BuyCta({
       disabled={disabled}
       aria-disabled={disabled}
       className={`font-poppins-semibold flex items-center justify-between overflow-hidden transition-transform duration-200 active:scale-[0.985] ${
-        compact ? 'flex-1' : 'w-full'
-      }`}
+        isOut ? '' : 'cta-shine'
+      } ${compact ? 'flex-1' : 'w-full'}`}
       style={{
         background: isOut ? 'var(--color-cream)' : 'var(--color-forest)',
         color: isOut ? 'var(--color-text-muted)' : '#fff',
@@ -435,7 +435,7 @@ function BuyCta({
       {!isOut && (
         <span
           aria-hidden="true"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+          className="cta-circle flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
           style={{ background: 'var(--color-lime)', color: 'var(--color-ink)' }}
         >
           {state === 'added' ? (

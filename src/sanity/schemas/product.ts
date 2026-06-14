@@ -57,6 +57,12 @@ export const product = defineType({
       initialValue: false,
     }),
     defineField({
+      name: 'featuredRank',
+      title: 'Pořadí mezi featured',
+      type: 'number',
+      description: 'Nižší číslo = více vlevo v sekci "Nejoblíbenější". Prázdné = zařadí se na konec.',
+    }),
+    defineField({
       name: 'colorGroup',
       type: 'string',
       description: 'Groups color variants of the same model (e.g. "riga", "nikol")',

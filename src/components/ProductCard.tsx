@@ -1,4 +1,8 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { ProductImage } from './ProductImage';
 import { formatPrice, colorToSlug } from '@/lib/format';
 import type { ProductSummaryView } from '@/lib/data';
@@ -12,14 +16,31 @@ export function ProductCard({
   product: ProductSummaryView;
   colorSwatches?: ColorSwatch[];
 }) {
+  const router = useRouter();
+
+  // In-product colour variants with their own hero photo → hover swaps the card image.
+  const swatches = product.swatches && product.swatches.length > 1 ? product.swatches : null;
+  const [hover, setHover] = useState<number | null>(null);
+
+  // Preload variant images so the swap is instant on first hover.
+  useEffect(() => {
+    if (!swatches) return;
+    for (const s of swatches) {
+      const img = new window.Image();
+      img.src = s.imageUrl;
+    }
+  }, [swatches]);
+
   const href = product.heroColor
     ? `/shop/p/${product.slug}?barva=${colorToSlug(product.heroColor)}`
     : `/shop/p/${product.slug}`;
 
+  const shownImage = hover != null && swatches ? swatches[hover].imageUrl : product.imageUrl;
+
   return (
     <Link href={href} className="group block">
       <ProductImage
-        src={product.imageUrl}
+        src={shownImage}
         alt={product.title}
         placeholder={product.placeholder}
         sizes="(min-width: 1024px) 25vw, 50vw"
@@ -43,8 +64,46 @@ export function ProductCard({
           {formatPrice(product.minPriceCents)}
         </p>
 
-        {/* Color group swatches (Riga-type siblings: clickable links) */}
-        {colorSwatches && colorSwatches.length > 1 && (
+        {/* In-product colour variants: hover/focus previews that colour's photo,
+            tap/click opens the product on that colour. (Default = hero colour.) */}
+        {swatches && (
+          <div className="flex flex-wrap items-center -ml-1 mt-0.5" onMouseLeave={() => setHover(null)}>
+            {swatches.map((s, i) => {
+              const isActive = hover == null ? i === 0 : i === hover;
+              return (
+                <button
+                  key={`${s.color ?? i}`}
+                  type="button"
+                  onMouseEnter={() => setHover(i)}
+                  onFocus={() => setHover(i)}
+                  onBlur={() => setHover(null)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    router.push(s.color ? `/shop/p/${product.slug}?barva=${colorToSlug(s.color)}` : href);
+                  }}
+                  aria-label={s.color ? `Zobrazit barvu ${s.color}` : 'Barva'}
+                  title={s.color}
+                  className="grid place-items-center p-2 cursor-pointer"
+                >
+                  <span
+                    className="block h-4 w-4 rounded-full transition-transform duration-150"
+                    style={{
+                      background: s.colorHex,
+                      boxShadow: isActive
+                        ? `0 0 0 1.5px white, 0 0 0 2.5px ${s.colorHex}`
+                        : '0 0 0 1px var(--color-border-strong)',
+                      transform: isActive ? 'scale(1.15)' : undefined,
+                    }}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Color group swatches (Riga-type siblings: clickable links to sibling products) */}
+        {!swatches && colorSwatches && colorSwatches.length > 1 && (
           <div className="flex gap-1.5 mt-1">
             {colorSwatches.slice(0, 6).map((sw) =>
               sw.isCurrent ? (
@@ -74,8 +133,9 @@ export function ProductCard({
           </div>
         )}
 
-        {/* Variant color dots (kabelky: static visual indicators) */}
-        {(!colorSwatches || colorSwatches.length <= 1) &&
+        {/* Variant color dots (static visual indicators when no per-colour photos) */}
+        {!swatches &&
+          (!colorSwatches || colorSwatches.length <= 1) &&
           product.variantColorHexes &&
           product.variantColorHexes.length > 1 && (
             <div className="flex gap-1.5 mt-1">

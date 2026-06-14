@@ -23,7 +23,7 @@ import {
   postBySlugQuery,
   recentPostsQuery,
 } from '@/sanity/queries';
-import type { Product, ProductSummary, Category, Post, PostSummary } from '@/sanity/types';
+import type { Product, ProductSummary, Category, Post, PostSummary, SanityImage } from '@/sanity/types';
 import { mockProducts, mockSummaries, mockCategories } from './mock-data';
 
 export type PlaceholderSpec = {
@@ -54,6 +54,9 @@ export type ProductSummaryView = {
   colorHex?: string;
   heroColor?: string;
   variantColorHexes?: string[];
+  /** Per-colour hero images for card hover-swap (populated when the query
+   *  projects `swatchVariants`). Hero colour first; only set when >1 colour. */
+  swatches?: { color?: string; colorHex: string; imageUrl: string }[];
   colorSiblings?: { slug: string; title?: string; colorHex: string }[];
   /** Per-colour variants for the shop listing (populated by getShopProducts). */
   colorVariants?: ShopVariantView[];
@@ -107,12 +110,24 @@ export type CategoryView = {
 };
 
 function toSummary(p: ProductSummary): ProductSummaryView {
+  const cardImageUrl = (img: SanityImage) =>
+    urlFor(img).width(800).auto('format').quality(75).fit('max').url();
+
+  /* Per-colour hero images for card hover-swap. Keep only colours with a real
+     photo; put the product hero colour first so the default dot reads as current. */
+  const swatches = (p.swatchVariants ?? [])
+    .filter((v) => v.image?.asset?._ref && !v.image.asset._ref.endsWith('-svg'))
+    .map((v) => ({ color: v.color, colorHex: v.colorHex ?? '#cccccc', imageUrl: cardImageUrl(v.image!) }));
+  if (p.heroColor) {
+    swatches.sort((a, b) => (a.color === p.heroColor ? 0 : 1) - (b.color === p.heroColor ? 0 : 1));
+  }
+
   return {
     _id: p._id,
     title: p.title,
     slug: p.slug,
     shortDescription: p.shortDescription,
-    imageUrl: p.image ? urlFor(p.image).width(800).auto('format').quality(75).fit('max').url() : null,
+    imageUrl: p.image ? cardImageUrl(p.image) : null,
     category: p.category,
     subcategory: p.subcategory,
     minPriceCents: p.minPriceCents,
@@ -122,6 +137,7 @@ function toSummary(p: ProductSummary): ProductSummaryView {
     colorHex: p.colorHex,
     heroColor: p.heroColor,
     variantColorHexes: p.variantColorHexes?.length ? p.variantColorHexes : undefined,
+    swatches: swatches.length > 1 ? swatches : undefined,
     colorSiblings: p.colorSiblings?.length ? p.colorSiblings : undefined,
   };
 }

@@ -195,7 +195,7 @@ function AddToCartButton({ card }: { card: ColorCard }) {
       disabled={soldOut}
       aria-disabled={soldOut}
       data-added={added || undefined}
-      className="btn-add mt-2.5"
+      className={`btn-add mt-2.5 ${soldOut ? '' : 'cta-shine'}`}
       aria-label={`Přidat ${card.title}${card.color ? ` – ${card.color}` : ''} do košíku`}
     >
       {soldOut ? (
@@ -204,7 +204,7 @@ function AddToCartButton({ card }: { card: ColorCard }) {
         '✓ Přidáno'
       ) : (
         <>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg className="cta-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M5 7h14l-1.2 9.5a2 2 0 0 1-2 1.7H8.2a2 2 0 0 1-2-1.7L5 7Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
             <path d="M9 7V5.5A3 3 0 0 1 15 5.5V7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
           </svg>

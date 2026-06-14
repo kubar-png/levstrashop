@@ -338,7 +338,7 @@ export function CartDrawer() {
             <Link
               href="/cart"
               onClick={close}
-              className="font-poppins-semibold mt-4 flex w-full items-center justify-between overflow-hidden transition-transform duration-200 active:scale-[0.985]"
+              className="cta-shine font-poppins-semibold mt-4 flex w-full items-center justify-between overflow-hidden transition-transform duration-200 active:scale-[0.985]"
               style={{
                 background: 'var(--color-forest)',
                 color: '#ffffff',
@@ -364,10 +364,10 @@ export function CartDrawer() {
               </span>
               <span
                 aria-hidden="true"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                className="cta-circle flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
                 style={{ background: 'var(--color-lime)', color: 'var(--color-ink)' }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <svg className="cta-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path
                     d="M5 12h13M13 6l6 6-6 6"
                     stroke="currentColor"

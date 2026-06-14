@@ -36,10 +36,12 @@ export type ProductSummary = {
   minPriceCents: number;
   totalStock?: number;
   featured?: boolean;
+  featuredRank?: number;
   colorGroup?: string;
   colorHex?: string;
   heroColor?: string;
   variantColorHexes?: string[];
+  swatchVariants?: { color?: string; colorHex?: string; image?: SanityImage }[];
   colorSiblings?: { slug: string; title?: string; colorHex: string }[];
 };
 

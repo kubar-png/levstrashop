@@ -20,16 +20,19 @@ export const allProductsQuery = groq`
 `;
 
 export const featuredProductsQuery = groq`
-  *[_type == "product" && active == true && featured == true] | order(_createdAt desc)[0...8] {
+  *[_type == "product" && active == true && featured == true]
+  | order(coalesce(featuredRank, 999) asc, _createdAt desc)[0...12] {
     _id,
     title,
     "slug": slug.current,
     "image": images[0],
     "minPriceCents": math::min(variants[].price) * 100,
+    featuredRank,
     colorGroup,
     colorHex,
     heroColor,
     "variantColorHexes": variants[defined(colorHex)].colorHex,
+    "swatchVariants": variants[defined(images[0].asset)]{ color, colorHex, "image": images[0] },
     "colorSiblings": *[_type == "product" && active == true && defined(^.colorGroup) && colorGroup == ^.colorGroup && _id != ^._id] {
       "slug": slug.current,
       title,
@@ -86,7 +89,8 @@ export const productsByCategoryQuery = groq`
     "slug": slug.current,
     "image": images[0],
     "minPriceCents": math::min(variants[].price) * 100,
-    heroColor
+    heroColor,
+    "swatchVariants": variants[defined(images[0].asset)]{ color, colorHex, "image": images[0] }
   }
 `;
 
