@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { BrandLogo } from './BrandLogo';
 
 /**
  * Secondary nav links. The primary "E-shop" action is intentionally lifted
@@ -66,10 +67,9 @@ export function MobileMenu() {
           <Link
             href="/"
             onClick={close}
-            className="font-serif leading-none"
-            style={{ fontSize: '1.5rem', color: 'var(--color-ink)' }}
+            style={{ color: 'var(--color-ink)' }}
           >
-            levstra
+            <BrandLogo style={{ fontSize: '1.5rem' }} />
           </Link>
           <button
             type="button"

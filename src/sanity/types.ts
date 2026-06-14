@@ -38,6 +38,7 @@ export type ProductSummary = {
   featured?: boolean;
   colorGroup?: string;
   colorHex?: string;
+  heroColor?: string;
   variantColorHexes?: string[];
   colorSiblings?: { slug: string; title?: string; colorHex: string }[];
 };

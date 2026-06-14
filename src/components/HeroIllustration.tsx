@@ -42,7 +42,7 @@ export function HeroIllustration() {
           fill="#3d2418"
           fontFamily="system-ui, sans-serif"
         >
-          LEVSTRA
+          CIAOBAG
         </text>
 
         <defs>

@@ -6,7 +6,7 @@ export function renderOrderShipped(
   opts: { trackingNumber?: string; trackingUrl?: string } = {},
 ): { subject: string; html: string; text: string } {
   const ref = order.refId || '';
-  const subject = `Vaše objednávka ${ref} je na cestě — Levstra`;
+  const subject = `Vaše objednávka ${ref} je na cestě — Ciaobag`;
   const preheader = `Předali jsme balíček dopravci PPL. Sledujte zásilku online.`;
 
   const trackingBlock =
@@ -44,7 +44,7 @@ export function renderOrderShipped(
     `Vaše objednávka ${ref} je na cestě.\n` +
     (opts.trackingNumber ? `Číslo zásilky: ${opts.trackingNumber}\n` : '') +
     (opts.trackingUrl ? `Sledovat: ${opts.trackingUrl}\n` : '') +
-    `\nLevstra · https://levstra.cz`;
+    `\nCiaobag · https://levstra.cz`;
 
   return { subject, html, text };
 }

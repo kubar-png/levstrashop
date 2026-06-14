@@ -1,7 +1,7 @@
 import { Eyebrow, Card } from '@/components/ui';
 import { ContactForm } from '@/components/ContactForm';
 
-export const metadata = { title: 'Kontakt — Levstra' };
+export const metadata = { title: 'Kontakt — Ciaobag' };
 
 export default function ContactPage() {
   return (

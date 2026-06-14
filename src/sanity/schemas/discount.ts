@@ -82,16 +82,32 @@ export const discount = defineType({
       description: 'Automaticky se zvyšuje při zaplacené objednávce.',
     }),
     defineField({
+      name: 'validityType',
+      title: 'Platnost',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Neomezená (platí pořád)', value: 'unlimited' },
+          { title: 'Omezená (zvolte datum od/do)', value: 'limited' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'unlimited',
+      validation: (r) => r.required(),
+    }),
+    defineField({
       name: 'validFrom',
       title: 'Platnost od',
       type: 'datetime',
-      description: 'Prázdné = okamžitě.',
+      description: 'Prázdné = platí okamžitě.',
+      hidden: ({ document }) => document?.validityType !== 'limited',
     }),
     defineField({
       name: 'validUntil',
       title: 'Platnost do',
       type: 'datetime',
-      description: 'Prázdné = bez data konce.',
+      description: 'Po tomto datu kód přestane platit. Prázdné = bez data konce.',
+      hidden: ({ document }) => document?.validityType !== 'limited',
     }),
   ],
 

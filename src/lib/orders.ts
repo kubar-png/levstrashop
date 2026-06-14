@@ -8,6 +8,7 @@
 import { sanityWriteClient } from '@/sanity/client';
 import { isSanityWritable } from '@/sanity/env';
 import { groq } from 'next-sanity';
+import { createShipment, trackingUrlFor } from '@/lib/ppl';
 
 export type OrderItem = {
   productId: string;
@@ -29,6 +30,7 @@ export type OrderShipping = {
   zip?: string;
   country?: string;
   parcelShopId?: string;
+  parcelShopType?: string;
   parcelShopName?: string;
   parcelShopAddress?: string;
 };
@@ -107,6 +109,12 @@ export type OrderDoc = Omit<PendingOrderInput, 'discount'> & {
     paymentFailed?: string;
   };
   ecomailContactId?: string;
+  fulfilment?: {
+    pplShipmentNumber?: string;
+    pplLabelUrl?: string;
+    trackingUrl?: string;
+    note?: string;
+  };
   discount?: {
     code?: string;
     type?: 'percent' | 'fixed' | 'free-shipping';
@@ -271,4 +279,70 @@ export async function setEcomailContactId(orderId: string, contactId: string): P
   } catch (err) {
     console.error('[orders] setEcomailContactId failed:', err);
   }
+}
+
+/* ── PPL fulfilment ──────────────────────────────────────────────── */
+
+type FulfilmentUpdate = {
+  pplShipmentNumber?: string;
+  pplLabelUrl?: string;
+  trackingUrl?: string;
+};
+
+export async function setFulfilment(orderId: string, update: FulfilmentUpdate): Promise<void> {
+  if (!isSanityWritable()) return;
+  try {
+    const patch: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(update)) {
+      if (v !== undefined) patch[`fulfilment.${k}`] = v;
+    }
+    if (Object.keys(patch).length === 0) return;
+    await sanityWriteClient.patch(orderId).set(patch).commit();
+  } catch (err) {
+    console.error('[orders] setFulfilment failed:', err);
+  }
+}
+
+/**
+ * Create the PPL shipment for a paid order and persist the shipment number +
+ * label URL. Idempotent — returns the existing number if one is already set.
+ * Throws on PPL failure so callers can decide whether to surface/retry; the
+ * payment webhook calls this best-effort so a PPL hiccup never blocks payment.
+ */
+export async function createShipmentForOrder(
+  order: OrderDoc,
+): Promise<{ shipmentNumber: string; labelUrl?: string }> {
+  const existing = order.fulfilment?.pplShipmentNumber;
+  if (existing) return { shipmentNumber: existing, labelUrl: order.fulfilment?.pplLabelUrl };
+
+  const s = order.shipping ?? {};
+  const recipientName = s.name || [order.customer?.firstName, order.customer?.lastName].filter(Boolean).join(' ').trim();
+  const zip = (s.zip ?? '').trim();
+  if (!recipientName || !zip) {
+    throw new Error(`order ${order.refId}: missing recipient name/zip for PPL`);
+  }
+
+  const result = await createShipment({
+    orderId: order.refId,
+    shippingMode: order.shippingMode,
+    recipient: {
+      name: recipientName,
+      street: s.street,
+      city: s.city,
+      zip,
+      country: s.country || 'CZ',
+      phone: s.phone || order.customer?.phone,
+      email: order.email,
+    },
+    parcelShopCode: order.shippingMode === 'parcelshop' ? s.parcelShopId : undefined,
+    parcelShopType: s.parcelShopType,
+  });
+
+  await setFulfilment(order._id, {
+    pplShipmentNumber: result.shipmentNumber,
+    pplLabelUrl: result.labelUrl,
+    trackingUrl: trackingUrlFor(result.shipmentNumber),
+  });
+
+  return result;
 }

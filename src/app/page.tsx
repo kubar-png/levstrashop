@@ -34,7 +34,7 @@ export default async function HomePage() {
           className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[16/10] md:aspect-[16/8]"
           style={{ borderRadius: 'var(--radius-2xl)' }}
         >
-          <HeroGallery images={HERO_IMAGES} alt="Cestujte se stylem — Levstra" />
+          <HeroGallery images={HERO_IMAGES} alt="Cestujte se stylem — Ciaobag" />
           <div
             className="absolute inset-0 z-[5] pointer-events-none"
             style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.45) 100%)' }}

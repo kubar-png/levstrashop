@@ -24,16 +24,16 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://levstrashop.vercel
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Levstra — Cestujte se stylem',
-    template: '%s | Levstra',
+    default: 'Ciaobag — Cestujte se stylem',
+    template: '%s | Ciaobag',
   },
   description:
     'Kabelky a kufry Marina Galanti. Módu dovážíme už přes dvě desetiletí. Doprava zdarma nad 1 500 Kč.',
   openGraph: {
     type: 'website',
     locale: 'cs_CZ',
-    siteName: 'Levstra',
-    title: 'Levstra — Cestujte se stylem',
+    siteName: 'Ciaobag',
+    title: 'Ciaobag — Cestujte se stylem',
     description: 'Kabelky a kufry Marina Galanti.',
   },
   alternates: { canonical: '/' },

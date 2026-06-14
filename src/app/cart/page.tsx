@@ -8,6 +8,7 @@ import { formatPrice } from '@/lib/format';
 import { ParcelShopPicker, type SelectedParcelShop } from '@/components/ParcelShopPicker';
 import { Eyebrow, FormField } from '@/components/ui';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
+import { UpsellSection } from '@/components/UpsellSection';
 
 type ShippingMode = 'home' | 'parcelshop';
 
@@ -97,6 +98,21 @@ export default function CartPage() {
     });
   }
 
+  /* Bring the first invalid field into view — matters most when checkout is
+     triggered from the mobile sticky bar, far from the form. Double rAF waits
+     for the error re-render to commit before we look for [aria-invalid]. */
+  function scrollToFirstError() {
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        const el = document.querySelector<HTMLElement>('[aria-invalid="true"]');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.focus({ preventScroll: true });
+        }
+      }),
+    );
+  }
+
   async function checkout() {
     /* ── Gather + validate ── */
     const newErrors: Record<string, string> = {};
@@ -115,6 +131,9 @@ export default function CartPage() {
       if (zipErr) newErrors.zip = zipErr;
     } else if (!shop) {
       setError('Vyberte prosím výdejnu PPL ParcelShop.');
+      document
+        .getElementById('shipping-section')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
@@ -133,6 +152,7 @@ export default function CartPage() {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
       setError('Zkontrolujte prosím vyplněné údaje.');
+      scrollToFirstError();
       return;
     }
 
@@ -247,11 +267,11 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen px-4 pb-24 pt-28 md:px-6 md:pt-32">
+    <div className="min-h-screen px-4 pb-28 pt-28 md:px-6 md:pt-32 lg:pb-24">
       <div className="mx-auto max-w-6xl">
 
         {/* ── Page heading ── */}
-        <div className="mb-10">
+        <div className="mb-6">
           <Eyebrow tone="forest" serif size="md">Nákup</Eyebrow>
           <h1
             className="font-poppins-semibold mt-1 leading-none"
@@ -436,7 +456,8 @@ export default function CartPage() {
 
               {/* Shipping */}
               <div
-                className="p-6"
+                id="shipping-section"
+                className="p-5"
                 style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-lg)' }}
               >
                 <Eyebrow>Doprava</Eyebrow>
@@ -478,7 +499,7 @@ export default function CartPage() {
 
               {/* Vaše údaje — contact + shipping recipient details */}
               <div
-                className="p-6"
+                className="p-5"
                 style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-lg)' }}
               >
                 <Eyebrow>Vaše údaje</Eyebrow>
@@ -630,7 +651,7 @@ export default function CartPage() {
 
               {/* Totals + CTA */}
               <div
-                className="p-6"
+                className="p-5"
                 style={{ background: 'var(--color-forest)', borderRadius: 'var(--radius-lg)' }}
               >
                 <div className="space-y-2.5">
@@ -762,6 +783,59 @@ export default function CartPage() {
 
             </div>
           </div>
+        </div>
+
+        <UpsellSection />
+      </div>
+
+      {/* Mobile sticky checkout bar — keeps total + pay within reach on the
+          long single-page checkout (hidden once the desktop two-col kicks in). */}
+      <div
+        className="fixed inset-x-0 bottom-0 z-40 lg:hidden"
+        style={{
+          padding: '0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom)) 1rem',
+          background: 'rgba(255,255,255,0.92)',
+          backdropFilter: 'blur(10px)',
+          borderTop: '1px solid var(--color-border-subtle)',
+          boxShadow: '0 -4px 18px -8px rgba(0,0,0,0.15)',
+        }}
+      >
+        <div className="mx-auto flex max-w-6xl items-center gap-3">
+          <div className="flex flex-col leading-tight">
+            <span
+              className="font-poppins-regular"
+              style={{ fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)' }}
+            >
+              Celkem
+            </span>
+            <span
+              className="font-poppins-semibold tabular-nums"
+              style={{ fontSize: 'var(--text-h3)', color: 'var(--color-ink)', lineHeight: 1 }}
+            >
+              {formatPrice(total)}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={checkout}
+            disabled={loading}
+            className="font-poppins-semibold flex flex-1 items-center justify-center gap-2 transition-transform duration-200 active:scale-[0.985]"
+            style={{
+              background: 'var(--color-forest)',
+              color: '#fff',
+              minHeight: 52,
+              borderRadius: 'var(--radius-md)',
+              boxShadow: '0 10px 24px -12px rgba(45,81,67,0.6)',
+              padding: '0 18px',
+            }}
+          >
+            {loading ? 'Přesměrování…' : 'K platbě'}
+            {!loading && (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
     </div>
@@ -911,7 +985,7 @@ function PromoCodeField({
               autoComplete="off"
               spellCheck={false}
               disabled={busy}
-              className="font-poppins-regular flex-1 px-3.5 py-2.5 outline-none"
+              className="font-poppins-regular min-w-0 flex-1 px-3.5 py-2.5 outline-none"
               style={{
                 fontSize: 'var(--text-small)',
                 color: 'var(--color-ink)',
@@ -925,7 +999,7 @@ function PromoCodeField({
             <button
               type="submit"
               disabled={busy || !code.trim()}
-              className="font-poppins-semibold px-4 py-2.5 transition-opacity hover:opacity-85 disabled:opacity-50"
+              className="font-poppins-semibold shrink-0 px-4 py-2.5 transition-opacity hover:opacity-85 disabled:opacity-50"
               style={{
                 background: 'var(--color-ink)',
                 color: '#fff',

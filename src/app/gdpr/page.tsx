@@ -1,6 +1,6 @@
 import { Eyebrow, Banner } from '@/components/ui';
 
-export const metadata = { title: 'Ochrana osobních údajů — Levstra' };
+export const metadata = { title: 'Ochrana osobních údajů — Ciaobag' };
 
 export default function GdprPage() {
   const h2Style = {

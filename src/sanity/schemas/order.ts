@@ -188,6 +188,12 @@ export const order = defineType({
           type: 'string',
           description: 'Pokud je vybrán výdejní bod.',
         },
+        {
+          name: 'parcelShopType',
+          title: 'PPL typ výdejního bodu',
+          type: 'string',
+          description: 'ParcelShop / ParcelBox / AlzaBox — určuje PPL produkt.',
+        },
         { name: 'parcelShopName', title: 'PPL ParcelShop název', type: 'string' },
         { name: 'parcelShopAddress', title: 'PPL ParcelShop adresa', type: 'string' },
       ],

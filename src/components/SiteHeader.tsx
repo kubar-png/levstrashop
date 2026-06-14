@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { BrandLogo } from './BrandLogo';
 import { CartButton } from './CartButton';
 import { MobileMenu } from './MobileMenu';
 import { NavLinks } from './NavLinks';
@@ -62,11 +63,8 @@ export function SiteHeader() {
       >
         {/* Left: logo + nav */}
         <div className="flex items-center gap-7">
-          <Link href="/" className="flex items-center gap-2 shrink-0 text-[var(--color-pill-ink)]">
-            <LogoMark />
-            <span className="font-serif text-xl leading-none tracking-tight md:text-2xl">
-              levstra
-            </span>
+          <Link href="/" className="flex items-center shrink-0 text-[var(--color-pill-ink)]">
+            <BrandLogo className="text-xl md:text-2xl" />
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">
@@ -86,14 +84,4 @@ export function SiteHeader() {
   );
 }
 
-function LogoMark() {
-  return (
-    <span className="inline-flex h-7 w-7 items-center justify-center" aria-hidden="true">
-      <svg viewBox="0 0 32 32" width="22" height="22" fill="currentColor">
-        <path d="M16 2c1.5 5.2 4.3 8 9.5 9.5C20.3 13 17.5 15.8 16 21c-1.5-5.2-4.3-8-9.5-9.5C11.7 10 14.5 7.2 16 2Z" opacity="0.92" />
-        <path d="M16 11c1.5 5.2 4.3 8 9.5 9.5C20.3 22 17.5 24.8 16 30c-1.5-5.2-4.3-8-9.5-9.5C11.7 19 14.5 16.2 16 11Z" opacity="0.92" />
-      </svg>
-    </span>
-  );
-}
 

@@ -4,7 +4,7 @@ import { getAllPosts } from '@/lib/data';
 import { Eyebrow } from '@/components/ui';
 
 export const revalidate = 60;
-export const metadata = { title: 'Blog — Levstra' };
+export const metadata = { title: 'Blog — Ciaobag' };
 
 const dateFmt = new Intl.DateTimeFormat('cs-CZ', {
   day: 'numeric',

@@ -14,6 +14,7 @@ export const allProductsQuery = groq`
     featured,
     colorGroup,
     colorHex,
+    heroColor,
     "variantColorHexes": variants[defined(colorHex)].colorHex
   }
 `;
@@ -27,6 +28,7 @@ export const featuredProductsQuery = groq`
     "minPriceCents": math::min(variants[].price) * 100,
     colorGroup,
     colorHex,
+    heroColor,
     "variantColorHexes": variants[defined(colorHex)].colorHex,
     "colorSiblings": *[_type == "product" && active == true && defined(^.colorGroup) && colorGroup == ^.colorGroup && _id != ^._id] {
       "slug": slug.current,
@@ -83,8 +85,70 @@ export const productsByCategoryQuery = groq`
     title,
     "slug": slug.current,
     "image": images[0],
-    "minPriceCents": math::min(variants[].price) * 100
+    "minPriceCents": math::min(variants[].price) * 100,
+    heroColor
   }
+`;
+
+/* ── Shop listing (per-colour cards) ──────────────────────────────── */
+
+export const shopProductsQuery = groq`
+  *[_type == "product" && active == true && ($cat == "all" || category->slug.current == $cat)]
+  | order(_createdAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    shortDescription,
+    "image": images[0],
+    "category": category->{title, "slug": slug.current},
+    subcategory,
+    "minPriceCents": math::min(variants[].price) * 100,
+    "totalStock": math::sum(variants[].stock),
+    featured,
+    colorGroup,
+    colorHex,
+    heroColor,
+    "variantColorHexes": variants[defined(colorHex)].colorHex,
+    "variants": variants[]{
+      sku, color, colorHex, stock,
+      "priceCents": price * 100,
+      "image": images[0],
+      "imageRef": images[0].asset._ref
+    }
+  }
+`;
+
+/* ── Recommendations (cart upsell) ────────────────────────────────── */
+
+const recoProjection = `{
+  _id,
+  title,
+  "slug": slug.current,
+  shortDescription,
+  "image": images[0],
+  "category": category->{title, "slug": slug.current},
+  subcategory,
+  "minPriceCents": math::min(variants[].price) * 100,
+  "totalStock": math::sum(variants[].stock),
+  featured,
+  colorGroup,
+  colorHex,
+  heroColor,
+  "variantColorHexes": variants[defined(colorHex)].colorHex,
+  "variants": variants[]{ sku, size, color, colorHex, "priceCents": price * 100, stock, weightGrams }
+}`;
+
+/* Products in the same category as the cart items ($ids), excluding them. */
+export const recommendationsQuery = groq`
+  *[_type == "product" && active == true && !(_id in $ids)
+    && category->slug.current in *[_type == "product" && _id in $ids].category->slug.current]
+  | order(featured desc, _createdAt desc) [0...12] ${recoProjection}
+`;
+
+/* Featured fallback when the same-category pool is too small. */
+export const featuredWithVariantsQuery = groq`
+  *[_type == "product" && active == true && featured == true && !(_id in $ids)]
+  | order(_createdAt desc) [0...12] ${recoProjection}
 `;
 
 /* ── Blog ─────────────────────────────────────────────────────────── */

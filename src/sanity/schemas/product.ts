@@ -67,6 +67,12 @@ export const product = defineType({
       description: 'Hex color of this product for color swatches (e.g. #e07a3a)',
     }),
     defineField({
+      name: 'heroColor',
+      type: 'string',
+      description: 'Variant colour used for the catalog/hero image (PDP opens this colour).',
+      readOnly: true,
+    }),
+    defineField({
       name: 'active',
       type: 'boolean',
       description: 'If off, product is hidden from storefront',

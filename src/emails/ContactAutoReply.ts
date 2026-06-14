@@ -5,7 +5,7 @@ export function renderContactAutoReply(opts: { name?: string; message: string })
   html: string;
   text: string;
 } {
-  const subject = 'Děkujeme za zprávu — Levstra';
+  const subject = 'Děkujeme za zprávu — Ciaobag';
   const preheader = 'Vaši zprávu jsme přijali, ozveme se do 24 hodin.';
 
   const greeting = opts.name ? `Dobrý den, ${escapeHtml(opts.name)},` : 'Dobrý den,';
@@ -18,6 +18,6 @@ export function renderContactAutoReply(opts: { name?: string; message: string })
   `;
 
   const html = emailShell({ preheader, title: 'Děkujeme za zprávu', body });
-  const text = `${greeting}\n\nDěkujeme za vaši zprávu. Ozveme se do 24 hodin.\n\n— Levstra`;
+  const text = `${greeting}\n\nDěkujeme za vaši zprávu. Ozveme se do 24 hodin.\n\n— Ciaobag`;
   return { subject, html, text };
 }

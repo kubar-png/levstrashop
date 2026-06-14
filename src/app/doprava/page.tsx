@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'Doprava — Levstra' };
+export const metadata = { title: 'Doprava — Ciaobag' };
 
 export default function ShippingPage() {
   return (

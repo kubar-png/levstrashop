@@ -1,6 +1,6 @@
 import { Eyebrow, Banner } from '@/components/ui';
 
-export const metadata = { title: 'Obchodní podmínky — Levstra' };
+export const metadata = { title: 'Obchodní podmínky — Ciaobag' };
 
 const SECTIONS = [
   {

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { BrandLogo } from './BrandLogo';
 import { NewsletterSignup } from './NewsletterSignup';
 
 export function SiteFooter() {
@@ -48,14 +49,8 @@ export function SiteFooter() {
 
       {/* ── Bottom bar: logo left, socials + copyright right ── */}
       <div className="mt-20 flex items-end justify-between px-8 pb-6 md:mt-28 md:px-14 md:pb-7">
-        <Link href="/" className="flex items-center gap-3 text-white hover:opacity-80 transition">
-          <LogoMark />
-          <span
-            className="font-serif leading-none"
-            style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }}
-          >
-            levstra
-          </span>
+        <Link href="/" className="flex items-center text-white hover:opacity-80 transition">
+          <BrandLogo style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)' }} />
         </Link>
 
         <div className="flex flex-col items-end gap-4">
@@ -74,7 +69,7 @@ export function SiteFooter() {
             className="font-poppins-light"
             style={{ color: 'rgba(255,255,255,0.72)', fontSize: 'var(--text-small)' }}
           >
-            © {year} by Levstra.
+            © {year} by Ciaobag.
           </p>
         </div>
       </div>
@@ -88,9 +83,9 @@ export function SiteFooter() {
           href="https://larp.solutions"
           target="_blank"
           rel="noreferrer"
-          className="font-serif inline-flex items-center gap-1.5 italic transition-colors hover:text-white"
+          className="font-serif inline-flex items-center gap-1.5 italic underline decoration-dotted underline-offset-[3px] transition-colors hover:text-white hover:decoration-solid"
           style={{
-            color: 'rgba(255,255,255,0.45)',
+            color: 'rgba(255,255,255,0.65)',
             fontSize: 'var(--text-micro)',
             letterSpacing: '0.01em',
           }}
@@ -127,17 +122,6 @@ function FooterColumn({ title, children }: { title: string; children: React.Reac
         {children}
       </ul>
     </div>
-  );
-}
-
-function LogoMark() {
-  return (
-    <span className="inline-flex items-center justify-center" aria-hidden="true">
-      <svg viewBox="0 0 32 32" width="36" height="36" fill="currentColor">
-        <path d="M16 2c1.5 5.2 4.3 8 9.5 9.5C20.3 13 17.5 15.8 16 21c-1.5-5.2-4.3-8-9.5-9.5C11.7 10 14.5 7.2 16 2Z" opacity="0.92" />
-        <path d="M16 11c1.5 5.2 4.3 8 9.5 9.5C20.3 22 17.5 24.8 16 30c-1.5-5.2-4.3-8-9.5-9.5C11.7 19 14.5 16.2 16 11Z" opacity="0.92" />
-      </svg>
-    </span>
   );
 }
 

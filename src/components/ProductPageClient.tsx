@@ -5,6 +5,7 @@ import { ProductImage } from './ProductImage';
 import { ProductBuyBox } from './ProductBuyBox';
 import { ProductCard } from './ProductCard';
 import { Eyebrow } from './ui';
+import { colorToSlug } from '@/lib/format';
 import type { ProductSummaryView, ProductView, VariantView } from '@/lib/data';
 
 function ProductGallery({
@@ -16,47 +17,17 @@ function ProductGallery({
   alt: string;
   placeholder?: ProductView['placeholder'];
 }) {
-  const [idx, setIdx] = useState(0);
-  const canPrev = idx > 0;
-  const canNext = idx < images.length - 1;
+  const n = images.length;
 
-  // Touch-swipe state for mobile gallery navigation.
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
-
-  function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
-    const t = e.touches[0];
-    touchStartX.current = t.clientX;
-    touchStartY.current = t.clientY;
-  }
-
-  function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
-    if (touchStartX.current == null || touchStartY.current == null) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchStartX.current;
-    const dy = t.clientY - touchStartY.current;
-    touchStartX.current = null;
-    touchStartY.current = null;
-    // Only treat as swipe if horizontal movement dominates and exceeds threshold.
-    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
-    if (dx < 0 && canNext) setIdx((i) => Math.min(images.length - 1, i + 1));
-    else if (dx > 0 && canPrev) setIdx((i) => Math.max(0, i - 1));
-  }
-
-  return (
-    <div>
-      {/* Main image with nav arrows */}
+  // Single image: nothing to slide.
+  if (n <= 1) {
+    return (
       <div
-        className="relative overflow-hidden touch-pan-y"
-        style={{
-          background: 'var(--color-cream)',
-          borderRadius: 'var(--radius-xl)',
-        }}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
+        className="relative overflow-hidden"
+        style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-xl)' }}
       >
         <ProductImage
-          src={images[idx]}
+          src={images[0] ?? null}
           alt={alt}
           placeholder={placeholder}
           sizes="(min-width: 768px) 50vw, 100vw"
@@ -64,86 +35,177 @@ function ProductGallery({
           aspect="1/1"
           className="!rounded-none"
         />
-
-        {images.length > 1 && (
-          <>
-            <button
-              type="button"
-              className="btn-icon absolute left-3 top-1/2 -translate-y-1/2"
-              data-on-image="true"
-              onClick={() => setIdx((i) => Math.max(0, i - 1))}
-              aria-label="Předchozí foto"
-              aria-disabled={!canPrev}
-              disabled={!canPrev}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              className="btn-icon absolute right-3 top-1/2 -translate-y-1/2"
-              data-on-image="true"
-              onClick={() => setIdx((i) => Math.min(images.length - 1, i + 1))}
-              aria-label="Další foto"
-              aria-disabled={!canNext}
-              disabled={!canNext}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-
-            {/* Dot indicators */}
-            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-              {images.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setIdx(i)}
-                  aria-label={`Foto ${i + 1}`}
-                  className="h-1.5 rounded-full transition-all duration-200"
-                  style={{
-                    width: i === idx ? '18px' : '6px',
-                    background: i === idx ? '#fff' : 'rgba(255,255,255,0.45)',
-                  }}
-                />
-              ))}
-            </div>
-          </>
-        )}
       </div>
+    );
+  }
 
-      {/* Thumbnails */}
-      {images.length > 1 && (
-        <div className="mt-3 grid grid-cols-4 gap-3">
-          {images.map((src, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setIdx(i)}
-              aria-label={`Zobrazit foto ${i + 1}`}
-              className="overflow-hidden transition-opacity duration-150"
-              style={{
-                background: 'var(--color-cream)',
-                opacity: i === idx ? 1 : 0.55,
-                outline: i === idx ? '2px solid var(--color-forest)' : 'none',
-                outlineOffset: '2px',
-                borderRadius: 'var(--radius-md)',
-              }}
-            >
+  return <LoopingGallery images={images} alt={alt} placeholder={placeholder} />;
+}
+
+function LoopingGallery({
+  images,
+  alt,
+  placeholder,
+}: {
+  images: (string | null)[];
+  alt: string;
+  placeholder?: ProductView['placeholder'];
+}) {
+  const n = images.length;
+
+  // Clone last image before the first and first image after the last so the
+  // wrap-around (last→first / first→last) slides seamlessly in one direction.
+  // Track layout: [cloneOfLast, img0..imgN-1, cloneOfFirst] — length n + 2.
+  const slides = [images[n - 1], ...images, images[0]];
+
+  // `pos` is the index into `slides`. Real image i lives at pos = i + 1.
+  const [pos, setPos] = useState(1);
+  const [animate, setAnimate] = useState(true);
+
+  const realIdx = pos === 0 ? n - 1 : pos === n + 1 ? 0 : pos - 1;
+
+  function go(delta: number) {
+    setAnimate(true);
+    setPos((p) => p + delta);
+  }
+  function jumpTo(real: number) {
+    setAnimate(true);
+    setPos(real + 1);
+  }
+
+  // After a wrap slide finishes on a clone, snap (without animation) to the
+  // matching real slide so the next move continues seamlessly.
+  function onTransitionEnd() {
+    if (pos === n + 1) {
+      setAnimate(false);
+      setPos(1);
+    } else if (pos === 0) {
+      setAnimate(false);
+      setPos(n);
+    }
+  }
+
+  // Touch-swipe for mobile.
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }
+  function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
+    if (touchStartX.current == null || touchStartY.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+    if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    go(dx < 0 ? 1 : -1);
+  }
+
+  const slidePct = 100 / slides.length;
+
+  return (
+    <div>
+      <div
+        className="relative overflow-hidden touch-pan-y"
+        style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-xl)' }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        {/* Sliding track */}
+        <div
+          className="flex"
+          style={{
+            width: `${slides.length * 100}%`,
+            transform: `translateX(-${pos * slidePct}%)`,
+            transition: animate ? 'transform 350ms cubic-bezier(0.22, 1, 0.36, 1)' : 'none',
+          }}
+          onTransitionEnd={onTransitionEnd}
+        >
+          {slides.map((src, i) => (
+            <div key={i} style={{ width: `${slidePct}%` }} className="shrink-0">
               <ProductImage
                 src={src}
-                alt={`${alt} ${i + 1}`}
+                alt={alt}
                 placeholder={placeholder}
-                sizes="(min-width: 768px) 12vw, 25vw"
+                sizes="(min-width: 768px) 50vw, 100vw"
+                priority={i === 1}
                 aspect="1/1"
                 className="!rounded-none"
               />
-            </button>
+            </div>
           ))}
         </div>
-      )}
+
+        <button
+          type="button"
+          className="btn-icon absolute left-3 top-1/2 -translate-y-1/2"
+          data-on-image="true"
+          onClick={() => go(-1)}
+          aria-label="Předchozí foto"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          className="btn-icon absolute right-3 top-1/2 -translate-y-1/2"
+          data-on-image="true"
+          onClick={() => go(1)}
+          aria-label="Další foto"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {/* Dot indicators */}
+        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => jumpTo(i)}
+              aria-label={`Foto ${i + 1}`}
+              className="h-1.5 rounded-full transition-all duration-200"
+              style={{
+                width: i === realIdx ? '18px' : '6px',
+                background: i === realIdx ? '#fff' : 'rgba(255,255,255,0.45)',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Thumbnails */}
+      <div className="mt-3 grid grid-cols-4 gap-3">
+        {images.map((src, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => jumpTo(i)}
+            aria-label={`Zobrazit foto ${i + 1}`}
+            className="overflow-hidden transition-opacity duration-150"
+            style={{
+              background: 'var(--color-cream)',
+              opacity: i === realIdx ? 1 : 0.55,
+              outline: i === realIdx ? '2px solid var(--color-forest)' : 'none',
+              outlineOffset: '2px',
+              borderRadius: 'var(--radius-md)',
+            }}
+          >
+            <ProductImage
+              src={src}
+              alt={`${alt} ${i + 1}`}
+              placeholder={placeholder}
+              sizes="(min-width: 768px) 12vw, 25vw"
+              aspect="1/1"
+              className="!rounded-none"
+            />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -151,11 +213,17 @@ function ProductGallery({
 export function ProductPageClient({
   product,
   related = [],
+  initialColor,
 }: {
   product: ProductView;
   related?: ProductSummaryView[];
+  initialColor?: string;
 }) {
-  const [selected, setSelected] = useState<VariantView>(product.variants[0]);
+  const initialVariant =
+    (initialColor
+      ? product.variants.find((v) => v.color && colorToSlug(v.color) === initialColor)
+      : undefined) ?? product.variants[0];
+  const [selected, setSelected] = useState<VariantView>(initialVariant);
 
   const displayImages =
     selected.imageUrls && selected.imageUrls.length > 0
@@ -168,7 +236,12 @@ export function ProductPageClient({
     <>
       {/* ── Gallery ── */}
       <div key={selected.sku} className="page-transition">
-        <ProductGallery images={images} alt={product.title} placeholder={product.placeholder} />
+        <ProductGallery
+          key={images.map(String).join('|')}
+          images={images}
+          alt={product.title}
+          placeholder={product.placeholder}
+        />
       </div>
 
       {/* ── Info panel ── */}

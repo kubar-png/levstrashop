@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 
-export const metadata: Metadata = { title: 'Levstra Studio' };
+export const metadata: Metadata = { title: 'Ciaobag Studio' };
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,

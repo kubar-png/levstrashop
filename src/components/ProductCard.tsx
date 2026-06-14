@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ProductImage } from './ProductImage';
-import { formatPrice } from '@/lib/format';
+import { formatPrice, colorToSlug } from '@/lib/format';
 import type { ProductSummaryView } from '@/lib/data';
 
 type ColorSwatch = { slug: string; colorHex: string; isCurrent: boolean };
@@ -12,8 +12,12 @@ export function ProductCard({
   product: ProductSummaryView;
   colorSwatches?: ColorSwatch[];
 }) {
+  const href = product.heroColor
+    ? `/shop/p/${product.slug}?barva=${colorToSlug(product.heroColor)}`
+    : `/shop/p/${product.slug}`;
+
   return (
-    <Link href={`/shop/p/${product.slug}`} className="group block">
+    <Link href={href} className="group block">
       <ProductImage
         src={product.imageUrl}
         alt={product.title}

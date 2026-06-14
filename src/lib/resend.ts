@@ -3,8 +3,8 @@
  *
  * Required env vars:
  *   RESEND_API_KEY              — from https://resend.com/api-keys
- *   RESEND_FROM_ORDERS          — e.g. "Levstra <objednavky@levstra.cz>"
- *   RESEND_FROM_CONTACT         — e.g. "Levstra <info@levstra.cz>"
+ *   RESEND_FROM_ORDERS          — e.g. "Ciaobag <objednavky@levstra.cz>"
+ *   RESEND_FROM_CONTACT         — e.g. "Ciaobag <info@levstra.cz>"
  *   RESEND_REPLY_TO             — optional, e.g. "info@levstra.cz"
  *   RESEND_INTERNAL_INBOX       — where contact form notifications go (info@levstra.cz)
  *
@@ -31,8 +31,8 @@ function getResend(): Resend | null {
   return _resend;
 }
 
-const FROM_ORDERS = process.env.RESEND_FROM_ORDERS || 'Levstra <objednavky@levstra.cz>';
-const FROM_CONTACT = process.env.RESEND_FROM_CONTACT || 'Levstra <info@levstra.cz>';
+const FROM_ORDERS = process.env.RESEND_FROM_ORDERS || 'Ciaobag <objednavky@levstra.cz>';
+const FROM_CONTACT = process.env.RESEND_FROM_CONTACT || 'Ciaobag <info@levstra.cz>';
 const REPLY_TO = process.env.RESEND_REPLY_TO || 'info@levstra.cz';
 const INTERNAL_INBOX = process.env.RESEND_INTERNAL_INBOX || 'info@levstra.cz';
 

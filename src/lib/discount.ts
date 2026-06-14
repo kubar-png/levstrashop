@@ -26,6 +26,7 @@ export type DiscountDoc = {
   minOrderCents?: number;
   maxRedemptions?: number;
   redemptionCount?: number;
+  validityType?: 'unlimited' | 'limited';
   validFrom?: string;
   validUntil?: string;
 };
@@ -59,7 +60,7 @@ const HUMAN_REASONS: Record<string, string> = {
 
 const discountByCodeQuery = groq`*[_type == "discount" && lower(code) == lower($code)][0]{
   _id, code, description, active, type, value,
-  minOrderCents, maxRedemptions, redemptionCount, validFrom, validUntil
+  minOrderCents, maxRedemptions, redemptionCount, validityType, validFrom, validUntil
 }`;
 
 /**
@@ -91,12 +92,17 @@ export async function validateDiscount(
   if (!doc) return { ok: false, error: HUMAN_REASONS.unknown };
   if (!doc.active) return { ok: false, error: HUMAN_REASONS.inactive };
 
-  const now = Date.now();
-  if (doc.validFrom && Date.parse(doc.validFrom) > now) {
-    return { ok: false, error: HUMAN_REASONS.notStarted };
-  }
-  if (doc.validUntil && Date.parse(doc.validUntil) < now) {
-    return { ok: false, error: HUMAN_REASONS.expired };
+  /* Date window only applies to "limited" codes. Legacy docs without
+     validityType still honour any dates that were set on them. */
+  const enforceDates = doc.validityType === 'limited' || (!doc.validityType && (doc.validFrom || doc.validUntil));
+  if (enforceDates) {
+    const now = Date.now();
+    if (doc.validFrom && Date.parse(doc.validFrom) > now) {
+      return { ok: false, error: HUMAN_REASONS.notStarted };
+    }
+    if (doc.validUntil && Date.parse(doc.validUntil) < now) {
+      return { ok: false, error: HUMAN_REASONS.expired };
+    }
   }
   if (
     typeof doc.maxRedemptions === 'number' &&

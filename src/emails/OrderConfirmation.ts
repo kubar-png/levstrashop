@@ -3,7 +3,7 @@ import { EMAIL_COLORS as c, emailShell, escapeHtml, formatPriceKc } from './shar
 
 export function renderOrderConfirmation(order: OrderDoc): { subject: string; html: string; text: string } {
   const ref = order.refId || '';
-  const subject = `Potvrzení objednávky ${ref} — Levstra`;
+  const subject = `Potvrzení objednávky ${ref} — Ciaobag`;
   const preheader = `Děkujeme za vaši objednávku ${ref}. Zboží zabalíme co nejdřív.`;
 
   const itemsRows = (order.items ?? [])
@@ -96,7 +96,7 @@ export function renderOrderConfirmation(order: OrderDoc): { subject: string; htm
       .map((it) => `• ${it.title} × ${it.qty} — ${formatPriceKc(it.priceCents * it.qty)}`)
       .join('\n') +
     `\n\nCelkem: ${formatPriceKc(order.totalCents ?? 0)}\n\n` +
-    `Levstra · https://levstra.cz`;
+    `Ciaobag · https://levstra.cz`;
 
   return { subject, html, text };
 }

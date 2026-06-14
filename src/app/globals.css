@@ -386,6 +386,52 @@ h1 { letter-spacing: -0.035em; }
   color: var(--color-ink);
 }
 
+/* Compact add-to-cart button for catalog cards — forest outline that fills on
+   hover. Smaller footprint than .btn-primary so the grid stays calm. */
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 38px;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-forest);
+  background: transparent;
+  color: var(--color-forest);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--text-small);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--dur-med) var(--ease-out),
+              color var(--dur-med) var(--ease-out),
+              border-color var(--dur-med) var(--ease-out);
+}
+.btn-add:hover,
+.btn-add:focus-visible {
+  background: var(--color-forest);
+  color: #fff;
+}
+.btn-add:focus-visible {
+  outline: 2px solid var(--color-lime);
+  outline-offset: 2px;
+}
+.btn-add[data-added='true'] {
+  background: var(--color-forest);
+  color: #fff;
+  border-color: var(--color-forest);
+}
+.btn-add:disabled,
+.btn-add[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--color-border-strong);
+  color: var(--color-text-muted);
+  background: transparent;
+}
+
 /* Tertiary — text-only with animated underline. */
 .btn-tertiary {
   position: relative;

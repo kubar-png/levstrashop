@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'Vrácení zboží — Levstra' };
+export const metadata = { title: 'Vrácení zboží — Ciaobag' };
 
 export default function ReturnsPage() {
   return (

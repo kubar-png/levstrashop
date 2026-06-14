@@ -1,6 +1,6 @@
 import { Eyebrow, Card, Banner } from '@/components/ui';
 
-export const metadata = { title: 'Cookies — Levstra' };
+export const metadata = { title: 'Cookies — Ciaobag' };
 
 const CATEGORIES = [
   {

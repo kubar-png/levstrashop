@@ -66,6 +66,9 @@ export const variant = defineType({
       type: 'number',
       description: 'Used for PPL shipping calculation',
     }),
+    defineField({ name: 'lengthCm', title: 'Délka (cm)', type: 'number' }),
+    defineField({ name: 'widthCm', title: 'Šířka (cm)', type: 'number' }),
+    defineField({ name: 'heightCm', title: 'Výška (cm)', type: 'number' }),
   ],
   preview: {
     select: { sku: 'sku', size: 'size', color: 'color', stock: 'stock' },

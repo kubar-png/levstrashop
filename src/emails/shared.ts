@@ -54,7 +54,7 @@ export function emailShell({
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 1px 0 rgba(0,0,0,0.04);">
 
         <tr><td style="background:${c.forest};padding:28px 32px;color:#fff;">
-          <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.7);">Levstra</div>
+          <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.7);">Ciaobag</div>
           <div style="font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-top:6px;line-height:1.1;">${escapeHtml(title)}</div>
         </td></tr>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export type SelectedParcelShop = {
   id: string;
@@ -8,41 +8,82 @@ export type SelectedParcelShop = {
   street: string;
   city: string;
   zip: string;
+  /** PPL access-point type — picks the product (ParcelShop→SMAR, *Box→SBOX). */
+  type?: string;
 };
 
-type Shop = SelectedParcelShop & { openingHours?: string };
+/** Shape of the PPL widget's `ppl-parcelshop-map` event detail. */
+type PplWidgetDetail = {
+  code: string;
+  name?: string;
+  accessPointType?: string;
+  street?: string;
+  city?: string;
+  zipCode?: string;
+  country?: string;
+};
+
+const WIDGET_SRC = 'https://www.ppl.cz/sources/map/main.js';
+const SCRIPT_ID = 'ppl-parcelshop-widget';
 
 export function ParcelShopPicker({
   onSelect,
 }: {
   onSelect: (shop: SelectedParcelShop | null) => void;
 }) {
-  const [zip, setZip] = useState('');
-  const [shops, setShops] = useState<Shop[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [chosen, setChosen] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [chosen, setChosen] = useState<SelectedParcelShop | null>(null);
+  const onSelectRef = useRef(onSelect);
+  useEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
 
-  async function search() {
-    setLoading(true);
-    setError(null);
-    setShops([]);
-    try {
-      const res = await fetch(`/api/ppl/parcelshops?zip=${encodeURIComponent(zip)}`);
-      if (!res.ok) throw new Error((await res.json()).error || 'Chyba při vyhledávání');
-      const data: { shops: Shop[] } = await res.json();
-      setShops(data.shops);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Chyba při vyhledávání');
-    } finally {
-      setLoading(false);
+  /* The widget dispatches a CustomEvent on `document` when the user confirms
+     a pickup point. Listen once for the component's lifetime. */
+  useEffect(() => {
+    function handle(e: Event) {
+      const detail = (e as CustomEvent<PplWidgetDetail>).detail;
+      if (!detail?.code) return;
+      const shop: SelectedParcelShop = {
+        id: detail.code,
+        name: detail.name ?? detail.code,
+        street: detail.street ?? '',
+        city: detail.city ?? '',
+        zip: detail.zipCode ?? '',
+        type: detail.accessPointType,
+      };
+      setChosen(shop);
+      onSelectRef.current(shop);
+      setOpen(false);
     }
-  }
+    document.addEventListener('ppl-parcelshop-map', handle);
+    return () => document.removeEventListener('ppl-parcelshop-map', handle);
+  }, []);
 
-  function pick(shop: Shop) {
-    setChosen(shop.id);
-    onSelect({ id: shop.id, name: shop.name, street: shop.street, city: shop.city, zip: shop.zip });
-  }
+  /* Load (and re-load) the widget script while the modal is open so it
+     re-scans the freshly mounted container each time. */
+  useEffect(() => {
+    if (!open) return;
+    document.getElementById(SCRIPT_ID)?.remove();
+    const script = document.createElement('script');
+    script.id = SCRIPT_ID;
+    script.src = WIDGET_SRC;
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      script.remove();
+    };
+  }, [open]);
+
+  /* Lock body scroll behind the modal. */
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
 
   return (
     <div
@@ -57,116 +98,96 @@ export function ParcelShopPicker({
         className="font-poppins-semibold"
         style={{ fontSize: 'var(--text-h3)', color: 'var(--color-forest)' }}
       >
-        Vyzvednutí na PPL ParcelShopu
+        Výdejní místo PPL
       </h2>
       <p
         className="mt-1"
         style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
       >
-        Zadejte PSČ a vyberte nejbližší výdejnu.
+        {chosen
+          ? 'Vybrané výdejní místo:'
+          : 'Vyberte výdejnu, ParcelBox nebo AlzaBox na mapě.'}
       </p>
 
-      <div className="mt-4 flex gap-2">
-        <input
-          type="text"
-          inputMode="numeric"
-          maxLength={5}
-          placeholder="612 00"
-          value={zip}
-          onChange={(e) => setZip(e.target.value.replace(/\s/g, ''))}
-          aria-label="PSČ"
-          className="flex-1 outline-none transition-colors"
+      {chosen && (
+        <div
+          className="mt-3 p-3"
           style={{
-            padding: '0.6rem 1rem',
-            minHeight: 44,
-            borderRadius: '999px',
-            border: '1.5px solid var(--color-border-strong)',
-            fontSize: 'var(--text-small)',
-            color: 'var(--color-ink)',
-            background: '#fff',
-          }}
-          onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--color-forest)')}
-          onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--color-border-strong)')}
-        />
-        <button
-          type="button"
-          onClick={search}
-          disabled={loading || zip.length < 5}
-          aria-disabled={loading || zip.length < 5}
-          className="btn-secondary"
-          style={{ borderRadius: '999px' }}
-        >
-          {loading ? 'Hledám…' : 'Najít'}
-        </button>
-      </div>
-
-      {error && (
-        <p
-          className="mt-3 font-poppins-medium"
-          style={{ fontSize: 'var(--text-small)', color: 'var(--color-danger)' }}
-        >
-          {error}
-        </p>
-      )}
-
-      {shops.length > 0 && (
-        <ul
-          className="mt-5 overflow-y-auto"
-          style={{
-            maxHeight: '20rem',
+            background: 'var(--color-cream)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--color-border-subtle)',
           }}
         >
-          {shops.map((shop, i) => {
-            const isChosen = chosen === shop.id;
-            return (
-              <li
-                key={shop.id}
-                style={{
-                  borderBottom: i < shops.length - 1 ? '1px solid var(--color-border-subtle)' : undefined,
-                }}
+          <p className="font-poppins-semibold" style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}>
+            {chosen.name}
+          </p>
+          <p style={{ fontSize: 'var(--text-micro)', color: 'var(--color-text-muted)' }}>
+            {[chosen.street, chosen.city, chosen.zip].filter(Boolean).join(', ')}
+          </p>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="btn-secondary mt-4"
+        style={{ width: '100%' }}
+      >
+        {chosen ? 'Změnit výdejní místo' : 'Vybrat výdejní místo na mapě'}
+      </button>
+
+      {open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Výběr výdejního místa PPL"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          style={{ background: 'rgba(43,49,47,0.55)' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOpen(false);
+          }}
+        >
+          <div
+            className="flex w-full max-w-3xl flex-col overflow-hidden"
+            style={{
+              background: '#fff',
+              borderRadius: 'var(--radius-lg)',
+              height: 'auto',
+              maxHeight: '94vh',
+            }}
+          >
+            <div
+              className="flex items-center justify-between px-5 py-3"
+              style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
+            >
+              <span
+                className="font-poppins-semibold"
+                style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
               >
-                <button
-                  type="button"
-                  onClick={() => pick(shop)}
-                  aria-pressed={isChosen}
-                  className="flex w-full flex-col gap-1 text-left transition"
-                  style={{
-                    padding: '0.85rem 1rem',
-                    background: isChosen ? 'var(--color-forest)' : 'transparent',
-                    color: isChosen ? '#fff' : 'var(--color-ink)',
-                  }}
-                >
-                  <span
-                    className="font-poppins-semibold"
-                    style={{ fontSize: 'var(--text-small)' }}
-                  >
-                    {shop.name}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: 'var(--text-micro)',
-                      color: isChosen ? 'rgba(255,255,255,0.85)' : 'var(--color-text-muted)',
-                    }}
-                  >
-                    {shop.street}, {shop.city} {shop.zip}
-                  </span>
-                  {shop.openingHours && (
-                    <span
-                      style={{
-                        fontSize: 'var(--text-micro)',
-                        color: isChosen ? 'rgba(255,255,255,0.7)' : 'var(--color-text-muted)',
-                      }}
-                    >
-                      {shop.openingHours}
-                    </span>
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+                Vyberte výdejní místo
+              </span>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Zavřít"
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-opacity hover:opacity-60"
+                style={{ color: 'var(--color-ink)' }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+            {/* PPL widget renders into this container. An explicit height
+                (>400px) is required — the widget adapts to it and fits its
+                own footer button inside. With flex/0 height it self-sizes to
+                80vh and overflows the panel, clipping the bottom button. */}
+            <div
+              id="ppl-parcelshop-map"
+              style={{ width: '100%', height: 'min(80vh, 760px)', minHeight: 420 }}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

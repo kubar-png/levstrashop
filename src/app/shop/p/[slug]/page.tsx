@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 export const revalidate = 60;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://levstra.cz';
-const BRAND = 'Levstra';
+const BRAND = 'Ciaobag';
 
 export async function generateMetadata({
   params,
@@ -33,10 +33,13 @@ export async function generateMetadata({
 
 export default async function ProductPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ barva?: string }>;
 }) {
   const { slug } = await params;
+  const { barva } = await searchParams;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
@@ -106,7 +109,7 @@ export default async function ProductPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <div className="grid gap-10 md:grid-cols-2 md:gap-14 lg:gap-20">
-        <ProductPageClient product={product} related={related} />
+        <ProductPageClient product={product} related={related} initialColor={barva} />
       </div>
     </div>
   );

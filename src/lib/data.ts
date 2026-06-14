@@ -16,6 +16,9 @@ import {
   productsByCategoryQuery,
   categoriesQuery,
   colorSiblingsQuery,
+  shopProductsQuery,
+  recommendationsQuery,
+  featuredWithVariantsQuery,
   allPostsQuery,
   postBySlugQuery,
   recentPostsQuery,
@@ -49,8 +52,23 @@ export type ProductSummaryView = {
   featured?: boolean;
   colorGroup?: string;
   colorHex?: string;
+  heroColor?: string;
   variantColorHexes?: string[];
   colorSiblings?: { slug: string; title?: string; colorHex: string }[];
+  /** Per-colour variants for the shop listing (populated by getShopProducts). */
+  colorVariants?: ShopVariantView[];
+  /** True when the product has no real photo yet (only an SVG placeholder). */
+  isPlaceholder?: boolean;
+};
+
+export type ShopVariantView = {
+  sku: string;
+  color?: string;
+  colorHex?: string;
+  priceCents: number;
+  stock: number;
+  imageUrl: string | null;
+  isPlaceholder: boolean;
 };
 
 export type VariantView = {
@@ -94,7 +112,7 @@ function toSummary(p: ProductSummary): ProductSummaryView {
     title: p.title,
     slug: p.slug,
     shortDescription: p.shortDescription,
-    imageUrl: p.image ? urlFor(p.image).width(1000).fit('max').url() : null,
+    imageUrl: p.image ? urlFor(p.image).width(800).auto('format').quality(75).fit('max').url() : null,
     category: p.category,
     subcategory: p.subcategory,
     minPriceCents: p.minPriceCents,
@@ -102,6 +120,7 @@ function toSummary(p: ProductSummary): ProductSummaryView {
     featured: p.featured,
     colorGroup: p.colorGroup,
     colorHex: p.colorHex,
+    heroColor: p.heroColor,
     variantColorHexes: p.variantColorHexes?.length ? p.variantColorHexes : undefined,
     colorSiblings: p.colorSiblings?.length ? p.colorSiblings : undefined,
   };
@@ -116,7 +135,7 @@ function toFull(p: Product): ProductView {
     descriptionText: undefined, // Portable Text rendered separately when source is Sanity
     imageUrls: p.images
       .filter((img) => img?.asset?._ref)
-      .map((img) => urlFor(img).width(1600).fit('max').url()),
+      .map((img) => urlFor(img).width(1200).auto('format').quality(78).fit('max').url()),
     category: p.category,
     variants: p.variants.map((v) => ({
       sku: v.sku,
@@ -129,7 +148,7 @@ function toFull(p: Product): ProductView {
       imageUrls: v.images?.length
         ? v.images
             .filter((img) => img?.asset?._ref)
-            .map((img) => urlFor(img).width(1600).fit('max').url())
+            .map((img) => urlFor(img).width(1200).auto('format').quality(78).fit('max').url())
         : undefined,
     })),
     colorGroup: p.colorGroup,
@@ -170,6 +189,131 @@ export async function getProductsByCategory(slug: string): Promise<ProductSummar
   } catch {
     return mockSummaries.filter((p) => p.category?.slug === slug);
   }
+}
+
+export type RecommendationView = ProductSummaryView & { variants: VariantView[] };
+
+type RawRecoVariant = {
+  sku: string;
+  size?: string;
+  color?: string;
+  colorHex?: string;
+  priceCents: number;
+  stock: number;
+  weightGrams?: number;
+};
+type RawReco = ProductSummary & { variants?: RawRecoVariant[] };
+
+function toReco(p: RawReco): RecommendationView {
+  return {
+    ...toSummary(p),
+    variants: (p.variants ?? []).map((v) => ({
+      sku: v.sku,
+      size: v.size,
+      color: v.color,
+      colorHex: v.colorHex,
+      priceCents: v.priceCents,
+      stock: v.stock,
+      weightGrams: v.weightGrams,
+    })),
+  };
+}
+
+/**
+ * Cart upsell: products in the same category as the items already in the
+ * cart ($ids), excluding those items. Falls back to featured products when
+ * the same-category pool is too small. Only returns products with stock.
+ */
+export async function getRecommendations(ids: string[], limit = 4): Promise<RecommendationView[]> {
+  if (!isSanityConfigured() || ids.length === 0) return [];
+  try {
+    const sameCat = await sanityClient.fetch<RawReco[]>(recommendationsQuery, { ids });
+    let pool = sameCat;
+    if (pool.length < limit) {
+      const featured = await sanityClient.fetch<RawReco[]>(featuredWithVariantsQuery, { ids });
+      const seen = new Set(pool.map((p) => p._id));
+      pool = [...pool, ...featured.filter((p) => !seen.has(p._id))];
+    }
+    return pool
+      .map(toReco)
+      .filter((r) => r.variants.some((v) => v.stock > 0))
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
+type RawShopVariant = {
+  sku: string;
+  color?: string;
+  colorHex?: string;
+  priceCents: number;
+  stock: number;
+  image?: { asset?: { _ref?: string } };
+  imageRef?: string;
+};
+type RawShopProduct = ProductSummary & { variants?: RawShopVariant[] };
+
+/**
+ * Shop listing data with per-colour variants (sku, colour, first image),
+ * so the listing can render one card per colour. Falls back to plain
+ * summaries (no variants → one card each) when Sanity is unavailable.
+ */
+export async function getShopProducts(category: 'all' | 'kabelky' | 'kufry'): Promise<ProductSummaryView[]> {
+  const mock = () =>
+    category === 'all' ? mockSummaries : mockSummaries.filter((p) => p.category?.slug === category);
+  if (!isSanityConfigured()) return mock();
+
+  let rows: RawShopProduct[];
+  try {
+    rows = await sanityClient.fetch<RawShopProduct[]>(shopProductsQuery, { cat: category });
+  } catch (err) {
+    console.error('[data] getShopProducts fetch failed:', err);
+    return mock();
+  }
+  if (!rows.length) return mock();
+
+  /* Per-image safety: one malformed image must never blow up the whole
+     listing (which previously fell back to mock data and hid real products). */
+  const safeUrl = (img: unknown): string | null => {
+    if (!img) return null;
+    try {
+      return urlFor(img as Parameters<typeof urlFor>[0]).width(800).auto('format').quality(75).fit('max').url();
+    } catch {
+      return null;
+    }
+  };
+
+  const decorated = rows.map((p) => {
+    const colorVariants = (p.variants ?? []).map((v) => {
+      const ref = v.imageRef ?? v.image?.asset?._ref;
+      const url = safeUrl(v.image);
+      return {
+        sku: v.sku,
+        color: v.color,
+        colorHex: v.colorHex,
+        priceCents: v.priceCents,
+        stock: v.stock,
+        imageUrl: url,
+        isPlaceholder: !ref || ref.endsWith('-svg') || !url,
+      };
+    });
+
+    /* "Has a real photo" mirrors what cardsForProduct renders: a genuine hero
+       upload (not an SVG placeholder) or at least one colour variant with a
+       real photo. Products still awaiting photos are sorted to the end. */
+    const heroRef = p.image?.asset?._ref;
+    const heroReal = !!heroRef && !heroRef.endsWith('-svg');
+    const hasPhoto = heroReal || colorVariants.some((v) => v.imageUrl && !v.isPlaceholder);
+
+    return { view: { ...toSummary(p), colorVariants, isPlaceholder: !hasPhoto }, hasPhoto };
+  });
+
+  /* Array.sort is stable, so the _createdAt-desc order from the query is kept
+     within the photographed and photoless groups respectively. */
+  return decorated
+    .sort((a, b) => Number(b.hasPhoto) - Number(a.hasPhoto))
+    .map((d) => d.view);
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductView | null> {

@@ -243,16 +243,11 @@ export function ProductBuyBox({
 
       {/* ── CTA ── */}
       <div className="space-y-3 pt-2">
-        <button
-          type="button"
+        <BuyCta
           onClick={handleAdd}
           disabled={outOfStock || added}
-          aria-disabled={outOfStock || added}
-          className="btn-primary w-full"
-          style={{ borderRadius: 'var(--radius-lg)' }}
-        >
-          {outOfStock ? 'Vyprodáno' : added ? '✓ Přidáno do košíku' : 'Přidat do košíku'}
-        </button>
+          state={outOfStock ? 'out' : added ? 'added' : 'normal'}
+        />
 
         {/* Stock nudge — warning color + icon (passes WCAG AA) */}
         {!outOfStock && selectedVariant.stock <= 5 && (
@@ -379,19 +374,83 @@ export function ProductBuyBox({
             {formatPrice(selectedVariant.priceCents)}
           </span>
         </div>
-        <button
-          type="button"
+        <BuyCta
+          compact
           onClick={handleAdd}
           disabled={outOfStock || added}
-          aria-disabled={outOfStock || added}
-          className="btn-primary flex-1"
-          style={{ borderRadius: 'var(--radius-md)' }}
-        >
-          {outOfStock ? 'Vyprodáno' : added ? '✓ Přidáno' : 'Přidat do košíku'}
-        </button>
+          state={outOfStock ? 'out' : added ? 'added' : 'normal'}
+        />
       </div>
 
     </div>
+  );
+}
+
+/** Solid-forest add-to-cart CTA mirroring the mini-cart's "K pokladně"
+ *  button: filled green, label left, lime icon-circle right. The prominent
+ *  conversion treatment the quiet outlined btn-primary lacked. */
+function BuyCta({
+  onClick,
+  disabled,
+  state,
+  compact,
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  state: 'normal' | 'added' | 'out';
+  compact?: boolean;
+}) {
+  const isOut = state === 'out';
+  const label = isOut
+    ? 'Vyprodáno'
+    : state === 'added'
+      ? compact
+        ? '✓ Přidáno'
+        : '✓ Přidáno do košíku'
+      : 'Přidat do košíku';
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-disabled={disabled}
+      className={`font-poppins-semibold flex items-center justify-between overflow-hidden transition-transform duration-200 active:scale-[0.985] ${
+        compact ? 'flex-1' : 'w-full'
+      }`}
+      style={{
+        background: isOut ? 'var(--color-cream)' : 'var(--color-forest)',
+        color: isOut ? 'var(--color-text-muted)' : '#fff',
+        padding: compact ? '12px 14px 12px 18px' : '17px 18px 17px 22px',
+        borderRadius: 'var(--radius-lg)',
+        minHeight: compact ? 52 : 60,
+        boxShadow: isOut ? 'none' : '0 10px 24px -10px rgba(45,81,67,0.55)',
+        cursor: isOut ? 'not-allowed' : 'pointer',
+        opacity: isOut ? 0.9 : 1,
+      }}
+    >
+      <span style={{ fontSize: compact ? '0.95rem' : '1.05rem', lineHeight: 1.1 }}>
+        {label}
+      </span>
+      {!isOut && (
+        <span
+          aria-hidden="true"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+          style={{ background: 'var(--color-lime)', color: 'var(--color-ink)' }}
+        >
+          {state === 'added' ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : (
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 7h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+              <path d="M9 7V5.5A3 3 0 0 1 15 5.5V7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          )}
+        </span>
+      )}
+    </button>
   );
 }
 

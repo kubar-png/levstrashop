@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'O nás — Levstra' };
+export const metadata = { title: 'O nás — Ciaobag' };
 
 export default function AboutPage() {
   return (
@@ -29,7 +29,7 @@ export default function AboutPage() {
         }}
       >
         <p>
-          Levstra je rodinný projekt postavený na kvalitě, vkusu a dlouhých přátelstvích s
+          Ciaobag je rodinný projekt postavený na kvalitě, vkusu a dlouhých přátelstvích s
           italskými výrobci. Začínali jsme s jedním butikem a dnes přivážíme kabelky a kufry
           značky Marina Galanti do celého Česka.
         </p>

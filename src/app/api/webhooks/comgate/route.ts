@@ -18,6 +18,7 @@
 
 import { getPaymentStatus, redactSecret, verifyWebhookSecret, type ComgateNotification } from '@/lib/comgate';
 import {
+  createShipmentForOrder,
   decrementStockForOrder,
   findOrderByRefId,
   markEmailSent,
@@ -87,6 +88,15 @@ export async function POST(req: Request) {
       /* Already-processed branch — markOrderPaid returns the existing doc
          unchanged when status is already in a post-paid state. */
       if (order && order.emailsSent?.confirmation) {
+        /* Already fully processed — but self-heal if a previous PPL attempt
+           failed and Comgate is re-notifying. Best-effort, never blocks. */
+        if (!order.fulfilment?.pplShipmentNumber) {
+          try {
+            await createShipmentForOrder(order);
+          } catch (err) {
+            console.error('[comgate webhook] PPL shipment retry failed:', err);
+          }
+        }
         return new Response('OK', { status: 200 });
       }
 
@@ -126,6 +136,15 @@ export async function POST(req: Request) {
             priceCents: it.priceCents,
           })),
         });
+      }
+
+      /* Auto-create the PPL shipment so the order lands in PPL right after
+         payment. Best-effort: a PPL failure must never block the webhook —
+         the order is left for the /api/ppl/ship retry route. */
+      try {
+        await createShipmentForOrder(fresh);
+      } catch (err) {
+        console.error('[comgate webhook] PPL shipment create failed:', err);
       }
     } else if (canonical.status === 'CANCELLED') {
       await markOrderFailed(refId, canonical.paymentErrorReason ?? 'Comgate: CANCELLED');

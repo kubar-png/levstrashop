@@ -175,7 +175,11 @@ export async function POST(req: Request) {
         ? {
             name: recipientName,
             phone: customer.phone,
+            city: parcelShop.city,
+            zip: parcelShop.zip,
+            country: 'CZ',
             parcelShopId: parcelShop.id,
+            parcelShopType: parcelShop.type,
             parcelShopName: parcelShop.name,
             parcelShopAddress: [parcelShop.street, parcelShop.city].filter(Boolean).join(', '),
           }
