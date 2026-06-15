@@ -34,7 +34,7 @@ export default function CartPage() {
   /* Contact + shipping recipient details */
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName]   = useState('');
-  const [phone, setPhone]         = useState('');
+  const [phone, setPhone]         = useState('+420 ');
   const [street, setStreet]       = useState('');
   const [city, setCity]           = useState('');
   const [zip, setZip]             = useState('');
@@ -77,6 +77,11 @@ export default function CartPage() {
     if (!/^(\+?420)?\d{9}$|^\+\d{10,14}$/.test(cleaned))
       return 'Telefon v podobě +420 777 123 456 nebo 9 číslic.';
     return null;
+  }
+  /** Ensure the phone is stored in +420 E.164 form, whether typed or autofilled. */
+  function normalizePhone(v: string): string {
+    const c = v.replace(/[\s\-()]/g, '');
+    return /^\+/.test(c) ? c : `+420${c.replace(/^420/, '')}`;
   }
   function validateZip(v: string): string | null {
     const cleaned = v.replace(/\s+/g, '');
@@ -172,7 +177,7 @@ export default function CartPage() {
           customer: {
             firstName: firstName.trim(),
             lastName: lastName.trim(),
-            phone: phone.replace(/[\s\-()]/g, ''),
+            phone: normalizePhone(phone),
           },
           shippingAddress:
             mode === 'home'
@@ -508,7 +513,7 @@ export default function CartPage() {
               >
                 <Eyebrow>Vaše údaje</Eyebrow>
 
-                <div className="mt-3.5 space-y-3">
+                <form className="mt-3.5 space-y-3" onSubmit={(e) => e.preventDefault()} noValidate>
                   <FormField
                     label="E-mail"
                     type="email"
@@ -604,7 +609,7 @@ export default function CartPage() {
                       </div>
                     </>
                   )}
-                </div>
+                </form>
               </div>
 
               {/* Fakturace — collapsible toggle for company invoice */}
