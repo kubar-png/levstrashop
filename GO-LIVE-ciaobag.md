@@ -197,3 +197,13 @@ Plán: převzít text z `eshop.levstra.cz/obchodni-podminky/` **1:1**, jen:
 2. **Backlink** má vést na `https://www.levstra.cz` (firemní web), nebo jinam?
 3. **Sociální sítě**: zůstávají profily `@levstra`, nebo budou ciaobag profily?
 4. Mám rovnou **implementovat** kódové části (patička 8a, právní stránky 8b–8d, oprava e-mailových šablon 5, env poznámky)? Texty + údaje na to mám připravené.
+
+---
+
+## Backlog (po launchi / až bude klient + creds u sebe)
+
+- ⬜ **Expres platba Apple Pay / Google Pay** přes Comgate (rovnou, bez výběru metody).
+  - **Jak:** v `createPayment` poslat konkrétní `method` kód (místo `ALL`) → brána rovnou spustí Apple/Google Pay. Checkout route doplnit o volitelný `method`; na košíku přidat expres tlačítka zobrazená podle dostupnosti zařízení (Apple Pay jen Safari/Apple, Google Pay Chrome/Android).
+  - **Co to blokuje teď:** potřebujeme přesné **method kódy** z `GET /v2.0/method.json` — vyžaduje Comgate creds (klient nebyl po ruce). Apple/Google Pay jsou na Comgate účtu **zapnuté ✓**.
+  - **Pozor (rozsah):** zůstává to redirect na Comgate (ne nativní in-page Apple Pay sheet) → doručovací adresu zákazník pořád vyplní u nás, přeskočí se jen výběr platební metody. Plný one-tap (adresa z Apple Pay) = nativní token-relay integrace = velká práce navíc, hosted brána to takhle nedává.
+  - **Až bude klient/creds:** hodit Comgate creds do `.env.local` → vytáhnu kódy z `method.json` a postavím to (ideálně samo-detekčně, aby se kódy nemusely psát natvrdo).
