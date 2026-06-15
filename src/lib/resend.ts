@@ -31,8 +31,10 @@ function getResend(): Resend | null {
   return _resend;
 }
 
-const FROM_ORDERS = process.env.RESEND_FROM_ORDERS || 'Ciaobag <objednavky@ciaobag.cz>';
-const FROM_CONTACT = process.env.RESEND_FROM_CONTACT || 'Ciaobag <ahoj@ciaobag.cz>';
+// Sending domain verified in Resend = eshop.ciaobag.cz (subdomain). Reply-to and the
+// internal inbox stay on the apex (real Active24 mailboxes).
+const FROM_ORDERS = process.env.RESEND_FROM_ORDERS || 'Ciaobag <objednavky@eshop.ciaobag.cz>';
+const FROM_CONTACT = process.env.RESEND_FROM_CONTACT || 'Ciaobag <ahoj@eshop.ciaobag.cz>';
 const REPLY_TO = process.env.RESEND_REPLY_TO || 'ahoj@ciaobag.cz';
 const INTERNAL_INBOX = process.env.RESEND_INTERNAL_INBOX || 'jirka@ciaobag.cz';
 
