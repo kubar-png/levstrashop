@@ -44,7 +44,7 @@ export function renderOrderShipped(
     `Vaše objednávka ${ref} je na cestě.\n` +
     (opts.trackingNumber ? `Číslo zásilky: ${opts.trackingNumber}\n` : '') +
     (opts.trackingUrl ? `Sledovat: ${opts.trackingUrl}\n` : '') +
-    `\nCiaobag · https://levstra.cz`;
+    `\nCiaobag · https://ciaobag.cz`;
 
   return { subject, html, text };
 }

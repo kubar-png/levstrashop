@@ -96,7 +96,7 @@ export function renderOrderConfirmation(order: OrderDoc): { subject: string; htm
       .map((it) => `• ${it.title} × ${it.qty} — ${formatPriceKc(it.priceCents * it.qty)}`)
       .join('\n') +
     `\n\nCelkem: ${formatPriceKc(order.totalCents ?? 0)}\n\n` +
-    `Ciaobag · https://levstra.cz`;
+    `Ciaobag · https://ciaobag.cz`;
 
   return { subject, html, text };
 }

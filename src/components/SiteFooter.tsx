@@ -31,12 +31,17 @@ export function SiteFooter() {
           </div>
 
           <FooterColumn title="Kontakt">
-            <li>Levstra s.r.o. · IČO: 27686281</li>
-            <li>Hněvkovského 587/39a</li>
-            <li>617 00 Brno</li>
+            <li>Levstra s.r.o.</li>
+            <li>IČO: 27686281 · DIČ: CZ27686281</li>
+            <li>Hněvkovského 587/39a, 617 00 Brno</li>
             <li>
-              <a href="mailto:info@levstra.cz" className="hover:underline transition">
-                info@levstra.cz
+              <a href="mailto:info@ciaobag.cz" className="hover:underline transition">
+                info@ciaobag.cz
+              </a>
+            </li>
+            <li>
+              <a href="https://www.levstra.cz" target="_blank" rel="noreferrer" className="hover:underline transition">
+                www.levstra.cz
               </a>
             </li>
           </FooterColumn>
@@ -66,10 +71,18 @@ export function SiteFooter() {
             </a>
           </div>
           <p
-            className="font-poppins-light"
+            className="font-poppins-light text-right"
             style={{ color: 'rgba(255,255,255,0.72)', fontSize: 'var(--text-small)' }}
           >
-            © {year} by Ciaobag.
+            © {year} Ciaobag · provozovatelem e-shopu ciaobag.cz je{' '}
+            <a
+              href="https://www.levstra.cz"
+              target="_blank"
+              rel="noreferrer"
+              className="underline decoration-dotted underline-offset-2 hover:decoration-solid transition"
+            >
+              Levstra s.r.o.
+            </a>
           </p>
         </div>
       </div>

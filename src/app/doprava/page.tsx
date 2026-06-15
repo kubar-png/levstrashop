@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'Doprava — Ciaobag' };
+export const metadata = { title: 'Doprava a platba — Ciaobag' };
 
 export default function ShippingPage() {
   return (
@@ -18,7 +18,7 @@ export default function ShippingPage() {
           letterSpacing: '-0.03em',
         }}
       >
-        Doprava
+        Doprava a platba
       </h1>
 
       <div
@@ -64,6 +64,18 @@ export default function ShippingPage() {
         <p>
           Po odeslání obdržíte e-mail s číslem zásilky a odkazem na sledování. Zásilky odesíláme
           v pracovní dny do 14:00.
+        </p>
+
+        <h2
+          className="font-poppins-semibold pt-2"
+          style={{ fontSize: 'var(--text-h3)', color: 'var(--color-forest)', letterSpacing: '-0.02em' }}
+        >
+          Platba
+        </h2>
+        <p>
+          Platíte online přes platební bránu <strong>ComGate</strong> — platební kartou nebo
+          okamžitým bankovním převodem přes internetové bankovnictví. Objednávku expedujeme po
+          připsání platby.
         </p>
       </div>
 

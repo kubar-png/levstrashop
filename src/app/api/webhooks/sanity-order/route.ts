@@ -3,7 +3,7 @@
  *
  * Configure in https://sanity.io/manage:
  *   Project → API → Webhooks → Create webhook
- *     - URL:  https://levstra.cz/api/webhooks/sanity-order
+ *     - URL:  https://ciaobag.cz/api/webhooks/sanity-order
  *     - Dataset: production
  *     - Trigger on: Create + Update
  *     - Filter (GROQ):  _type == "order"

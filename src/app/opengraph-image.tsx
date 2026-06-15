@@ -167,7 +167,7 @@ export default async function OG() {
                 display: 'flex',
               }}
             >
-              levstra.cz
+              ciaobag.cz
             </div>
           </div>
         </div>

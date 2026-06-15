@@ -28,11 +28,11 @@ export default function ContactPage() {
           <Card padding="lg">
             <Eyebrow>E-mail</Eyebrow>
             <a
-              href="mailto:info@levstra.cz"
+              href="mailto:info@ciaobag.cz"
               className="mt-2 block font-poppins-semibold hover:underline"
               style={{ fontSize: 'var(--text-h3)', color: 'var(--color-ink)' }}
             >
-              info@levstra.cz
+              info@ciaobag.cz
             </a>
             <p
               className="mt-2"
