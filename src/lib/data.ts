@@ -144,13 +144,25 @@ function toSummary(p: ProductSummary): ProductSummaryView {
   };
 }
 
+/** Flatten Portable Text blocks to plain text (paragraphs separated by blank lines). */
+function blocksToText(blocks?: Product['description']): string | undefined {
+  if (!blocks?.length) return undefined;
+  const parts = blocks
+    .map((b) => {
+      const children = (b as { children?: { text?: string }[] }).children ?? [];
+      return children.map((c) => c.text ?? '').join('');
+    })
+    .filter((s) => s.trim().length > 0);
+  return parts.length ? parts.join('\n\n') : undefined;
+}
+
 function toFull(p: Product): ProductView {
   return {
     _id: p._id,
     title: p.title,
     slug: p.slug,
     shortDescription: p.shortDescription,
-    descriptionText: undefined, // Portable Text rendered separately when source is Sanity
+    descriptionText: blocksToText(p.description),
     imageUrls: p.images
       .filter((img) => img?.asset?._ref)
       .map((img) => urlFor(img).width(1200).auto('format').quality(78).fit('max').url()),

@@ -291,6 +291,7 @@ export function ProductPageClient({
               color: 'var(--color-text-muted)',
               borderTop: '1px solid var(--color-border-subtle)',
               paddingTop: '1.5rem',
+              whiteSpace: 'pre-line',
             }}
           >
             {product.descriptionText}
