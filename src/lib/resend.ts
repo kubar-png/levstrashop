@@ -17,6 +17,8 @@ import { renderOrderConfirmation } from '@/emails/OrderConfirmation';
 import { renderOrderShipped } from '@/emails/OrderShipped';
 import { renderContactAutoReply } from '@/emails/ContactAutoReply';
 import { renderContactNotification } from '@/emails/ContactNotification';
+import { renderWelcomeDiscount } from '@/emails/WelcomeDiscount';
+import { renderReviewRequest } from '@/emails/ReviewRequest';
 
 let _resend: Resend | null = null;
 
@@ -104,6 +106,29 @@ export async function sendContactNotification(opts: {
 }): Promise<SendResult> {
   const { subject, html, text } = renderContactNotification(opts);
   return send(FROM_CONTACT, INTERNAL_INBOX, subject, html, text, opts.email);
+}
+
+/** Welcome + discount code, sent after the exit-intent popup signup. */
+export async function sendWelcomeDiscount(opts: {
+  to: string;
+  code: string;
+  percent?: number;
+  minOrderKc?: number;
+  validDays?: number;
+}): Promise<SendResult> {
+  const { to, ...rest } = opts;
+  const { subject, html, text } = renderWelcomeDiscount(rest);
+  return send(FROM_CONTACT, to, subject, html, text);
+}
+
+/** Review request, sent a few days after the order is marked delivered. */
+export async function sendReviewRequest(
+  order: OrderDoc,
+  opts: { reviewUrl: string; incentive?: string },
+): Promise<SendResult> {
+  if (!order.email) return { ok: false, error: 'order has no email' };
+  const { subject, html, text } = renderReviewRequest(order, opts);
+  return send(FROM_ORDERS, order.email, subject, html, text);
 }
 
 export function isResendConfigured(): boolean {

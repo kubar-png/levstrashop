@@ -1,5 +1,5 @@
 import type { OrderDoc } from '@/lib/orders';
-import { EMAIL_COLORS as c, emailShell, escapeHtml, formatPriceKc } from './shared';
+import { EMAIL_COLORS as c, EMAIL_SITE, emailButton, emailShell, escapeHtml, formatPriceKc } from './shared';
 
 export function renderOrderConfirmation(order: OrderDoc): { subject: string; html: string; text: string } {
   const ref = order.refId || '';
@@ -78,7 +78,7 @@ export function renderOrderConfirmation(order: OrderDoc): { subject: string; htm
     <div style="font-size:14px;line-height:1.55;color:${c.ink};">${shippingBlock}</div>
 
     <div style="margin-top:32px;text-align:center;">
-      <a href="https://levstra.cz/shop" style="display:inline-block;background:${c.forest};color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:14px 28px;border-radius:999px;">Pokračovat v nákupu</a>
+      ${emailButton('Pokračovat v nákupu', `${EMAIL_SITE}/shop`)}
     </div>
   `;
 

@@ -1,11 +1,12 @@
 /**
  * Email design tokens — kept in lockstep with src/app/globals.css brand colors.
- * Inline-styled HTML strings are used because email clients hate stylesheets.
+ * Inline-styled HTML (tables) is used because email clients hate stylesheets.
  */
 
 export const EMAIL_COLORS = {
   ink: '#2B312F',
   forest: '#2D5143',
+  forestDeep: '#1F4537',
   cream: '#F2F0EB',
   bg: '#EEEEEE',
   sky: '#A0C8FF',
@@ -17,6 +18,8 @@ export const EMAIL_COLORS = {
 };
 
 export const EMAIL_FONTS = `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
+export const EMAIL_SITE = 'https://www.ciaobag.cz';
+export const EMAIL_CONTACT = 'ahoj@ciaobag.cz';
 
 export function formatPriceKc(cents: number): string {
   const v = (cents / 100).toLocaleString('cs-CZ', {
@@ -24,6 +27,14 @@ export function formatPriceKc(cents: number): string {
     maximumFractionDigits: 0,
   });
   return `${v} Kč`;
+}
+
+/** Branded pill button (email-safe inline anchor). */
+export function emailButton(label: string, href: string, variant: 'forest' | 'lime' = 'forest'): string {
+  const c = EMAIL_COLORS;
+  const bg = variant === 'lime' ? c.lime : c.forest;
+  const fg = variant === 'lime' ? c.ink : '#ffffff';
+  return `<a href="${href}" style="display:inline-block;background:${bg};color:${fg};font-size:14px;font-weight:600;text-decoration:none;padding:14px 30px;border-radius:999px;">${escapeHtml(label)}</a>`;
 }
 
 export function emailShell({
@@ -51,38 +62,57 @@ export function emailShell({
   <span style="display:none;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">${escapeHtml(preheader)}</span>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${c.bg};padding:32px 16px;">
     <tr><td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 1px 0 rgba(0,0,0,0.04);">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.05);">
 
-        <tr><td style="background:${c.forest};padding:28px 32px;color:#fff;">
-          <div style="font-family:Georgia,serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.7);">Ciaobag</div>
-          <div style="font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-top:6px;line-height:1.1;">${escapeHtml(title)}</div>
+        <!-- Brand bar -->
+        <tr><td style="background:${c.forestDeep};padding:24px 32px;">
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;letter-spacing:0.01em;color:#ffffff;line-height:1;">
+            <span style="color:${c.lime};">&#10038;</span>&nbsp;ciaobag
+          </div>
+        </td></tr>
+        <tr><td style="height:4px;line-height:4px;font-size:0;background:${c.lime};">&nbsp;</td></tr>
+
+        <!-- Title -->
+        <tr><td style="padding:32px 32px 0 32px;">
+          <h1 style="margin:0;font-size:25px;font-weight:700;letter-spacing:-0.02em;line-height:1.15;color:${c.ink};">${escapeHtml(title)}</h1>
         </td></tr>
 
         ${
           intro
-            ? `<tr><td style="padding:28px 32px 8px 32px;font-size:16px;line-height:1.55;color:${c.ink};">${intro}</td></tr>`
+            ? `<tr><td style="padding:14px 32px 0 32px;font-size:16px;line-height:1.55;color:${c.ink};">${intro}</td></tr>`
             : ''
         }
 
-        <tr><td style="padding:${intro ? '12px' : '28px'} 32px 32px 32px;font-size:15px;line-height:1.55;color:${c.ink};">
+        <tr><td style="padding:24px 32px 32px 32px;font-size:15px;line-height:1.55;color:${c.ink};">
           ${body}
         </td></tr>
 
-        <tr><td style="background:${c.cream};padding:24px 32px;font-size:12px;line-height:1.6;color:${c.muted};">
+        <!-- Footer -->
+        <tr><td style="background:${c.cream};padding:22px 32px;font-size:12px;line-height:1.7;color:${c.muted};">
           ${footer ?? defaultFooter()}
         </td></tr>
 
       </table>
-      <div style="font-size:11px;color:${c.muted};margin-top:16px;font-family:${EMAIL_FONTS};">Levstra s.r.o. · Hněvkovského 587/39a, 617 00 Brno · IČO 27686281</div>
+      <div style="font-size:11px;color:${c.muted};margin-top:16px;line-height:1.6;font-family:${EMAIL_FONTS};">
+        Ciaobag · provozuje Levstra s.r.o. · Hněvkovského 587/39a, 617 00 Brno · IČO 27686281
+      </div>
     </td></tr>
   </table>
 </body></html>`;
 }
 
-function defaultFooter() {
+function navLink(label: string, href: string): string {
+  return `<a href="${href}" style="color:${EMAIL_COLORS.forest};text-decoration:none;font-weight:600;">${label}</a>`;
+}
+
+function defaultFooter(): string {
   return `
-    Tento e-mail jste obdrželi v souvislosti s objednávkou na <a href="https://levstra.cz" style="color:${EMAIL_COLORS.forest};text-decoration:none;">levstra.cz</a>.<br>
-    Máte otázku? Napište nám na <a href="mailto:info@levstra.cz" style="color:${EMAIL_COLORS.forest};text-decoration:none;">info@levstra.cz</a>.
+    <div style="margin-bottom:8px;">
+      ${navLink('E-shop', `${EMAIL_SITE}/shop`)} &nbsp;·&nbsp;
+      ${navLink('Doprava a platba', `${EMAIL_SITE}/doprava`)} &nbsp;·&nbsp;
+      ${navLink('Kontakt', `${EMAIL_SITE}/kontakt`)}
+    </div>
+    Máte dotaz? Napište nám na <a href="mailto:${EMAIL_CONTACT}" style="color:${EMAIL_COLORS.forest};text-decoration:none;">${EMAIL_CONTACT}</a>.
   `;
 }
 
