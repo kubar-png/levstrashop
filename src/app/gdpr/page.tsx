@@ -41,7 +41,7 @@ export default function GdprPage() {
           <p className="mt-2">
             Správcem osobních údajů a provozovatelem e-shopu ciaobag.cz je Levstra s.r.o.,
             IČO: 27686281, DIČ: CZ27686281, se sídlem Hněvkovského 587/39a, Komárov, 617 00 Brno,
-            e-mail: info@ciaobag.cz. Při zpracování postupujeme v souladu s nařízením (EU)
+            e-mail: ahoj@ciaobag.cz. Při zpracování postupujeme v souladu s nařízením (EU)
             2016/679 (GDPR) a zákonem č. 110/2019 Sb.
           </p>
         </section>
@@ -91,8 +91,8 @@ export default function GdprPage() {
           <p className="mt-2">
             Máte právo na přístup, opravu, výmaz, omezení zpracování, přenositelnost údajů a
             právo vznést námitku. Žádosti zasílejte na{' '}
-            <a className="underline" href="mailto:info@ciaobag.cz" style={{ color: 'var(--color-forest)' }}>
-              info@ciaobag.cz
+            <a className="underline" href="mailto:ahoj@ciaobag.cz" style={{ color: 'var(--color-forest)' }}>
+              ahoj@ciaobag.cz
             </a>
             . Stížnost můžete podat u Úřadu pro ochranu osobních údajů (www.uoou.cz).
           </p>

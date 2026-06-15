@@ -53,8 +53,8 @@ export default function CookiesPage() {
             Provozovatelem e-shopu ciaobag.cz a správcem údajů získaných prostřednictvím cookies
             je Levstra s.r.o., IČO: 27686281, se sídlem Hněvkovského 587/39a, Komárov,
             617 00 Brno, e-mail:{' '}
-            <a className="underline" href="mailto:info@ciaobag.cz" style={{ color: 'var(--color-forest)' }}>
-              info@ciaobag.cz
+            <a className="underline" href="mailto:ahoj@ciaobag.cz" style={{ color: 'var(--color-forest)' }}>
+              ahoj@ciaobag.cz
             </a>
             . Podrobnosti o zpracování osobních údajů najdete v dokumentu{' '}
             <a className="underline" href="/gdpr" style={{ color: 'var(--color-forest)' }}>
@@ -123,8 +123,8 @@ export default function CookiesPage() {
           <h2 className="font-poppins-semibold" style={h2Style}>7. Kontakt</h2>
           <p className="mt-2">
             Máte-li k používání cookies jakýkoli dotaz, napište nám na{' '}
-            <a className="underline" href="mailto:info@ciaobag.cz" style={{ color: 'var(--color-forest)' }}>
-              info@ciaobag.cz
+            <a className="underline" href="mailto:ahoj@ciaobag.cz" style={{ color: 'var(--color-forest)' }}>
+              ahoj@ciaobag.cz
             </a>
             . Dozorovým úřadem pro oblast ochrany osobních údajů je Úřad pro ochranu osobních údajů
             (www.uoou.cz).

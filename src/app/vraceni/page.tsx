@@ -31,7 +31,7 @@ export default function ReturnsPage() {
         </p>
 
         <ol className="space-y-3 pl-5 list-decimal">
-          <li>Napište nám na <a className="underline" href="mailto:info@ciaobag.cz" style={{ color: 'var(--color-forest)' }}>info@ciaobag.cz</a> a uveďte číslo objednávky.</li>
+          <li>Napište nám na <a className="underline" href="mailto:ahoj@ciaobag.cz" style={{ color: 'var(--color-forest)' }}>ahoj@ciaobag.cz</a> a uveďte číslo objednávky.</li>
           <li>Zabalte zboží a přiložte vyplněný formulář pro odstoupení od smlouvy.</li>
           <li>Odešlete na naši adresu — náklady na dopravu zpět hradí zákazník.</li>
           <li>Peníze vrátíme do 14 dnů od přijetí zboží na stejný účet, ze kterého proběhla platba.</li>

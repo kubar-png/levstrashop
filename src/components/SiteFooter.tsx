@@ -35,8 +35,8 @@ export function SiteFooter() {
             <li>IČO: 27686281 · DIČ: CZ27686281</li>
             <li>Hněvkovského 587/39a, 617 00 Brno</li>
             <li>
-              <a href="mailto:info@ciaobag.cz" className="hover:underline transition">
-                info@ciaobag.cz
+              <a href="mailto:ahoj@ciaobag.cz" className="hover:underline transition">
+                ahoj@ciaobag.cz
               </a>
             </li>
             <li>

@@ -12,7 +12,7 @@ const SECTIONS = [
         Komárov, 617 00 Brno, zapsanou v obchodním rejstříku vedeném u Krajského soudu
         v Brně, oddíl C, vložka 47338 (dále jen „prodávající&quot;), a kupujícím při prodeji
         zboží prostřednictvím internetového obchodu na adrese ciaobag.cz. Provozovatelem
-        e-shopu ciaobag.cz je Levstra s.r.o. Kontakt: info@ciaobag.cz, tel. +420 516 770 609.
+        e-shopu ciaobag.cz je Levstra s.r.o. Kontakt: ahoj@ciaobag.cz, tel. +420 516 770 609.
       </>
     ),
   },
@@ -69,7 +69,7 @@ const SECTIONS = [
     body: (
       <>
         Záruční doba činí 24 měsíců od převzetí zboží. Reklamaci uplatňuje kupující písemně na
-        e-mail info@ciaobag.cz nebo na adresu sídla prodávajícího. Reklamaci vyřídíme nejpozději
+        e-mail ahoj@ciaobag.cz nebo na adresu sídla prodávajícího. Reklamaci vyřídíme nejpozději
         do 30 dnů.
       </>
     ),
