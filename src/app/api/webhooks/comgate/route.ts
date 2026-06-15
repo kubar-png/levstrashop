@@ -28,7 +28,7 @@ import {
 } from '@/lib/orders';
 import { sendOrderConfirmation } from '@/lib/resend';
 import { notifyEcomailOfOrder, trackPurchase } from '@/lib/ecomail';
-import { incrementRedemption } from '@/lib/discount';
+import { incrementRedemption, recordRedemption } from '@/lib/discount';
 
 export const runtime = 'nodejs';
 
@@ -111,6 +111,9 @@ export async function POST(req: Request) {
 
       if (fresh.discount?.discountRefId) {
         await incrementRedemption(fresh.discount.discountRefId);
+        /* Once-per-customer: remember this buyer's e-mail so the same code
+           can't be reused by the same e-mail (enforced in validateDiscount). */
+        if (fresh.email) await recordRedemption(fresh.discount.discountRefId, fresh.email);
       }
 
       if (!fresh.emailsSent?.confirmation) {

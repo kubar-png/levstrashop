@@ -143,7 +143,7 @@ export async function POST(req: Request) {
     let forcesFreeShipping = false;
 
     if (discountCode && discountCode.trim()) {
-      const result = await validateDiscount(discountCode, subtotal, baseShipping);
+      const result = await validateDiscount(discountCode, subtotal, baseShipping, email);
       if (!result.ok) {
         return NextResponse.json({ error: `Slevový kód: ${result.error}` }, { status: 400 });
       }
