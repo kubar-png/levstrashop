@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Poppins, Forum } from 'next/font/google';
 import './globals.css';
 import { SiteHeader } from '@/components/SiteHeader';
@@ -38,6 +38,10 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: '/' },
   robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#2d5143',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
