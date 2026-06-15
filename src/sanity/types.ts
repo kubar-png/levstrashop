@@ -7,6 +7,7 @@ export type Variant = {
   color?: string;
   colorHex?: string;
   priceCents: number;
+  compareAtCents?: number;
   stock: number;
   weightGrams?: number;
   images?: SanityImage[];

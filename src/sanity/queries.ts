@@ -56,6 +56,7 @@ export const productBySlugQuery = groq`
       color,
       colorHex,
       "priceCents": price * 100,
+      "compareAtCents": compareAtPrice * 100,
       stock,
       weightGrams,
       images
@@ -116,6 +117,7 @@ export const shopProductsQuery = groq`
     "variants": variants[]{
       sku, color, colorHex, stock,
       "priceCents": price * 100,
+      "compareAtCents": compareAtPrice * 100,
       "image": images[0],
       "imageRef": images[0].asset._ref
     }

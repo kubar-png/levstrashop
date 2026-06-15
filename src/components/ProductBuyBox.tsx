@@ -103,13 +103,38 @@ export function ProductBuyBox({
   return (
     <div className="mt-6 space-y-6">
 
-      {/* ── Price ── */}
-      <p
-        className="font-serif leading-none"
-        style={{ fontSize: 'var(--text-h1)', color: 'var(--color-forest)' }}
-      >
-        {formatPrice(selectedVariant.priceCents)}
-      </p>
+      {/* ── Price (with optional struck-through original + % off) ── */}
+      <div className="flex items-baseline gap-3 flex-wrap">
+        <p
+          className="font-serif leading-none"
+          style={{ fontSize: 'var(--text-h1)', color: 'var(--color-forest)' }}
+        >
+          {formatPrice(selectedVariant.priceCents)}
+        </p>
+        {selectedVariant.compareAtCents != null &&
+          selectedVariant.compareAtCents > selectedVariant.priceCents && (
+            <>
+              <span
+                className="font-poppins-regular line-through"
+                style={{ fontSize: 'var(--text-lead)', color: 'var(--color-text-muted)' }}
+              >
+                {formatPrice(selectedVariant.compareAtCents)}
+              </span>
+              <span
+                className="font-poppins-semibold"
+                style={{
+                  fontSize: 'var(--text-small)',
+                  color: '#fff',
+                  background: 'var(--color-forest)',
+                  borderRadius: 999,
+                  padding: '2px 10px',
+                }}
+              >
+                −{Math.round((1 - selectedVariant.priceCents / selectedVariant.compareAtCents) * 100)} %
+              </span>
+            </>
+          )}
+      </div>
 
       {/* ── Sibling color navigation (separate product per color) ── */}
       {hasSiblings && (
@@ -372,6 +397,15 @@ export function ProductBuyBox({
             style={{ fontSize: 'var(--text-h3)', color: 'var(--color-forest)', lineHeight: 1 }}
           >
             {formatPrice(selectedVariant.priceCents)}
+            {selectedVariant.compareAtCents != null &&
+              selectedVariant.compareAtCents > selectedVariant.priceCents && (
+                <span
+                  className="font-poppins-regular line-through ml-2"
+                  style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}
+                >
+                  {formatPrice(selectedVariant.compareAtCents)}
+                </span>
+              )}
           </span>
         </div>
         <BuyCta

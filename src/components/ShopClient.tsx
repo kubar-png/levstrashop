@@ -21,6 +21,7 @@ type ColorCard = {
   sku?: string;
   stock: number;
   priceCents: number;
+  compareAtCents?: number;
   imageUrl: string | null;
   placeholder?: ProductSummaryView['placeholder'];
   href: string;
@@ -50,6 +51,7 @@ function cardsForProduct(p: ProductSummaryView): ColorCard[] {
         sku: pick?.sku,
         stock: pick?.stock ?? p.totalStock ?? 0,
         priceCents: pick?.priceCents ?? p.minPriceCents,
+        compareAtCents: pick?.compareAtCents,
         imageUrl: p.imageUrl,
         placeholder: p.placeholder,
         href,
@@ -72,6 +74,7 @@ function cardsForProduct(p: ProductSummaryView): ColorCard[] {
     sku: v.sku,
     stock: v.stock,
     priceCents: v.priceCents,
+    compareAtCents: v.compareAtCents,
     imageUrl: v.imageUrl,
     placeholder: p.placeholder,
     href: v.color ? `${base}?barva=${colorToSlug(v.color)}` : base,
@@ -498,12 +501,28 @@ export function ShopClient({
                 {cards.map((c) => (
                   <div key={c.key} className="group flex flex-col">
                     <Link href={c.href} className="block">
-                      <ProductImage
-                        src={c.imageUrl}
-                        alt={c.color ? `${c.title} – ${c.color}` : c.title}
-                        placeholder={c.placeholder}
-                        sizes="(min-width: 1024px) 25vw, 50vw"
-                      />
+                      <div className="relative">
+                        <ProductImage
+                          src={c.imageUrl}
+                          alt={c.color ? `${c.title} – ${c.color}` : c.title}
+                          placeholder={c.placeholder}
+                          sizes="(min-width: 1024px) 25vw, 50vw"
+                        />
+                        {c.compareAtCents != null && c.compareAtCents > c.priceCents && (
+                          <span
+                            className="font-poppins-semibold absolute left-2 top-2"
+                            style={{
+                              background: 'var(--color-forest)',
+                              color: '#fff',
+                              fontSize: 'var(--text-micro)',
+                              borderRadius: 999,
+                              padding: '3px 9px',
+                            }}
+                          >
+                            Sleva
+                          </span>
+                        )}
+                      </div>
                       <div className="mt-3 flex flex-col gap-1 px-1">
                         <h3
                           className="font-poppins-semibold leading-snug transition-colors group-hover:text-[var(--color-forest)]"
@@ -518,6 +537,11 @@ export function ShopClient({
                         )}
                         <p style={{ fontSize: 'var(--text-small)', color: 'var(--color-text-muted)' }}>
                           {formatPrice(c.priceCents)}
+                          {c.compareAtCents != null && c.compareAtCents > c.priceCents && (
+                            <span className="line-through ml-2" style={{ opacity: 0.7 }}>
+                              {formatPrice(c.compareAtCents)}
+                            </span>
+                          )}
                         </p>
                       </div>
                     </Link>

@@ -55,6 +55,13 @@ export const variant = defineType({
       validation: (r) => r.required().min(0).integer(),
     }),
     defineField({
+      name: 'compareAtPrice',
+      title: 'Původní cena (Kč) — sleva',
+      type: 'number',
+      description: 'Volitelné. Je-li vyšší než cena, zobrazí se přeškrtnutá jako původní cena (akce).',
+      validation: (r) => r.min(0).integer(),
+    }),
+    defineField({
       name: 'stock',
       type: 'number',
       validation: (r) => r.required().min(0).integer(),

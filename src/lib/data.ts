@@ -69,6 +69,7 @@ export type ShopVariantView = {
   color?: string;
   colorHex?: string;
   priceCents: number;
+  compareAtCents?: number;
   stock: number;
   imageUrl: string | null;
   isPlaceholder: boolean;
@@ -80,6 +81,7 @@ export type VariantView = {
   color?: string;
   colorHex?: string;
   priceCents: number;
+  compareAtCents?: number;
   stock: number;
   weightGrams?: number;
   imageUrls?: string[];
@@ -159,6 +161,7 @@ function toFull(p: Product): ProductView {
       color: v.color,
       colorHex: v.colorHex,
       priceCents: v.priceCents,
+      compareAtCents: v.compareAtCents,
       stock: v.stock,
       weightGrams: v.weightGrams,
       imageUrls: v.images?.length
@@ -264,6 +267,7 @@ type RawShopVariant = {
   color?: string;
   colorHex?: string;
   priceCents: number;
+  compareAtCents?: number;
   stock: number;
   image?: { asset?: { _ref?: string } };
   imageRef?: string;
@@ -309,6 +313,7 @@ export async function getShopProducts(category: 'all' | 'kabelky' | 'kufry'): Pr
         color: v.color,
         colorHex: v.colorHex,
         priceCents: v.priceCents,
+        compareAtCents: v.compareAtCents,
         stock: v.stock,
         imageUrl: url,
         isPlaceholder: !ref || ref.endsWith('-svg') || !url,
