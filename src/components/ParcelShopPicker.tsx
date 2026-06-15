@@ -23,10 +23,30 @@ type PplWidgetDetail = {
   country?: string;
 };
 
-const WIDGET_SRC = 'https://www.ppl.cz/sources/map/main.js';
-const WIDGET_CSS = 'https://www.ppl.cz/sources/map/main.css';
-const SCRIPT_ID = 'ppl-parcelshop-widget';
-const CSS_ID = 'ppl-parcelshop-widget-css';
+/**
+ * The PPL widget renders its UI directly into the DOM it's mounted in, so the
+ * site's global CSS (Tailwind preflight resets `button`, `svg`, `display`, …)
+ * leaks in and breaks the widget's internal layout — which clipped its own
+ * "Vybrat" button no matter how we sized the container.
+ *
+ * Fix: render it inside an isolated <iframe> that loads PPL's official JS + CSS
+ * in its own document (our styles can't reach it), and relay the selection
+ * event out via postMessage.
+ */
+const WIDGET_DOC = `<!doctype html><html lang="cs"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://www.ppl.cz/sources/map/main.css">
+<style>html,body{margin:0;padding:0;height:100%}#ppl-parcelshop-map{height:100vh;width:100%}</style>
+</head><body>
+<div id="ppl-parcelshop-map" data-language="cs" data-country="cz"></div>
+<script>
+document.addEventListener('ppl-parcelshop-map', function (e) {
+  parent.postMessage({ __pplShop: true, detail: e.detail }, '*');
+});
+</script>
+<script src="https://www.ppl.cz/sources/map/main.js" async></script>
+</body></html>`;
 
 export function ParcelShopPicker({
   onSelect,
@@ -40,61 +60,40 @@ export function ParcelShopPicker({
     onSelectRef.current = onSelect;
   }, [onSelect]);
 
-  /* The widget dispatches a CustomEvent on `document` when the user confirms
-     a pickup point. Listen once for the component's lifetime. */
+  /* Selection arrives from inside the iframe via postMessage. */
   useEffect(() => {
-    function handle(e: Event) {
-      const detail = (e as CustomEvent<PplWidgetDetail>).detail;
-      if (!detail?.code) return;
+    function handle(e: MessageEvent) {
+      const data = e.data as { __pplShop?: boolean; detail?: PplWidgetDetail };
+      if (!data?.__pplShop || !data.detail?.code) return;
+      const d = data.detail;
       const shop: SelectedParcelShop = {
-        id: detail.code,
-        name: detail.name ?? detail.code,
-        street: detail.street ?? '',
-        city: detail.city ?? '',
-        zip: detail.zipCode ?? '',
-        type: detail.accessPointType,
+        id: d.code,
+        name: d.name ?? d.code,
+        street: d.street ?? '',
+        city: d.city ?? '',
+        zip: d.zipCode ?? '',
+        type: d.accessPointType,
       };
       setChosen(shop);
       onSelectRef.current(shop);
       setOpen(false);
     }
-    document.addEventListener('ppl-parcelshop-map', handle);
-    return () => document.removeEventListener('ppl-parcelshop-map', handle);
+    window.addEventListener('message', handle);
+    return () => window.removeEventListener('message', handle);
   }, []);
 
-  /* Load (and re-load) the widget script while the modal is open so it
-     re-scans the freshly mounted container each time. */
-  useEffect(() => {
-    if (!open) return;
-    /* The official PPL widget needs BOTH its JS and its CSS. Without main.css the
-       internal layout renders broken and the bottom "Vybrat" button gets clipped.
-       Load the stylesheet once (left in <head>); re-inject the script each open so
-       it re-scans the freshly mounted container. */
-    if (!document.getElementById(CSS_ID)) {
-      const link = document.createElement('link');
-      link.id = CSS_ID;
-      link.rel = 'stylesheet';
-      link.href = WIDGET_CSS;
-      document.head.appendChild(link);
-    }
-    document.getElementById(SCRIPT_ID)?.remove();
-    const script = document.createElement('script');
-    script.id = SCRIPT_ID;
-    script.src = WIDGET_SRC;
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      script.remove();
-    };
-  }, [open]);
-
-  /* Lock body scroll behind the modal. */
+  /* Lock body scroll + close on Escape while the modal is open. */
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
     };
   }, [open]);
 
@@ -161,42 +160,34 @@ export function ParcelShopPicker({
           }}
         >
           <div
-            className="flex w-full max-w-3xl flex-col overflow-hidden"
+            className="relative w-full max-w-3xl overflow-hidden"
             style={{
               background: '#fff',
               borderRadius: 'var(--radius-lg)',
-              maxHeight: '90vh',
             }}
           >
-            <div
-              className="flex items-center justify-between px-5 py-3"
-              style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
+            {/* No header bar — it only stole vertical space from the widget and
+                pushed its "Vybrat" button toward the fold. A floating close
+                button keeps the full height for the map. */}
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Zavřít"
+              className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-md transition-opacity hover:opacity-80"
+              style={{ background: '#fff', color: 'var(--color-ink)' }}
             >
-              <span
-                className="font-poppins-semibold"
-                style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
-              >
-                Vyberte výdejní místo
-              </span>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Zavřít"
-                className="flex h-9 w-9 items-center justify-center rounded-full transition-opacity hover:opacity-60"
-                style={{ color: 'var(--color-ink)' }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-            {/* Per PPL docs the widget adapts to the parent height when it's
-                > 400px and fits its own "Vybrat" button inside — as long as
-                main.css is loaded (see the effect above). A fixed ~600px box
-                keeps it a tidy popup. */}
-            <div
-              id="ppl-parcelshop-map"
-              style={{ width: '100%', height: 'min(600px, 78vh)', minHeight: 460 }}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+            {/* Isolated iframe — PPL's own JS + CSS, untouched by our global
+                styles. Height clears the widget's 550px minimum even on phones
+                (86vh ≈ 573px on a 667px-tall screen); the widget adapts to fill
+                it and keeps its "Vybrat" button inside. */}
+            <iframe
+              title="Mapa výdejních míst PPL"
+              srcDoc={WIDGET_DOC}
+              style={{ width: '100%', height: 'min(640px, 86vh)', border: 0, display: 'block' }}
             />
           </div>
         </div>
