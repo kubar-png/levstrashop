@@ -82,6 +82,15 @@ export const discount = defineType({
       description: 'Automaticky se zvyšuje při zaplacené objednávce.',
     }),
     defineField({
+      name: 'redeemedEmails',
+      title: 'Uplatněno e-maily',
+      type: 'array',
+      of: [{ type: 'string' }],
+      readOnly: true,
+      description:
+        'E-maily (malými písmeny), které kód už uplatnily. Zajišťuje „jednou na zákazníka". Plní se automaticky.',
+    }),
+    defineField({
       name: 'validityType',
       title: 'Platnost',
       type: 'string',

@@ -29,6 +29,8 @@ export type DiscountDoc = {
   validityType?: 'unlimited' | 'limited';
   validFrom?: string;
   validUntil?: string;
+  /** Lowercased e-mails that have already redeemed this code (once-per-customer). */
+  redeemedEmails?: string[];
 };
 
 export type DiscountValidationResult =
@@ -56,11 +58,12 @@ const HUMAN_REASONS: Record<string, string> = {
   exhausted: 'Tento kód byl už plně uplatněn.',
   minOrder: 'Pro tento kód je potřeba vyšší hodnota košíku.',
   notConfigured: 'Slevové kódy zatím nejsou k dispozici.',
+  alreadyUsed: 'Tento kód jste už použili.',
 };
 
 const discountByCodeQuery = groq`*[_type == "discount" && lower(code) == lower($code)][0]{
   _id, code, description, active, type, value,
-  minOrderCents, maxRedemptions, redemptionCount, validityType, validFrom, validUntil
+  minOrderCents, maxRedemptions, redemptionCount, validityType, validFrom, validUntil, redeemedEmails
 }`;
 
 /**
@@ -70,11 +73,15 @@ const discountByCodeQuery = groq`*[_type == "discount" && lower(code) == lower($
  * @param subtotalCents  Items subtotal (no shipping). Required so we can
  *                       compute percent discounts + enforce minOrder.
  * @param shippingCents  Current shipping cost (matters for free-shipping codes).
+ * @param email          Optional buyer e-mail. When given, codes that have
+ *                       already been redeemed by this e-mail are rejected
+ *                       (once-per-customer). Omit it for anonymous previews.
  */
 export async function validateDiscount(
   code: string,
   subtotalCents: number,
   shippingCents: number,
+  email?: string,
 ): Promise<DiscountValidationResult> {
   const trimmed = (code ?? '').trim();
   if (!trimmed) return { ok: false, error: HUMAN_REASONS.unknown };
@@ -111,6 +118,18 @@ export async function validateDiscount(
   ) {
     return { ok: false, error: HUMAN_REASONS.exhausted };
   }
+
+  /* Once-per-customer (by e-mail). Only enforced when an e-mail is supplied —
+     anonymous previews skip this so the popup/cart can still show the deal. */
+  const normalizedEmail = (email ?? '').trim().toLowerCase();
+  if (
+    normalizedEmail &&
+    Array.isArray(doc.redeemedEmails) &&
+    doc.redeemedEmails.includes(normalizedEmail)
+  ) {
+    return { ok: false, error: HUMAN_REASONS.alreadyUsed };
+  }
+
   if (typeof doc.minOrderCents === 'number' && subtotalCents < doc.minOrderCents) {
     return { ok: false, error: HUMAN_REASONS.minOrder };
   }
@@ -155,5 +174,35 @@ export async function incrementRedemption(discountDocId: string): Promise<void> 
       .commit();
   } catch (err) {
     console.error('[discount] incrementRedemption failed:', err);
+  }
+}
+
+/**
+ * Record that an e-mail has redeemed this code (once-per-customer ledger).
+ * Appends the lowercased e-mail to `redeemedEmails`, skipping duplicates so the
+ * array stays a clean unique set. Best-effort — a failure does not invalidate
+ * the order. Mirrors `incrementRedemption`.
+ */
+export async function recordRedemption(docId: string, email: string): Promise<void> {
+  if (!isSanityWritable()) return;
+  const normalized = (email ?? '').trim().toLowerCase();
+  if (!normalized) return;
+  try {
+    /* Guard the append so we never write the same e-mail twice. We do the
+       de-dupe check against current state; `insert after [-1]` does the
+       atomic append on top of `setIfMissing([])`. */
+    const existing = await sanityWriteClient.fetch<string[] | null>(
+      `*[_id == $id][0].redeemedEmails`,
+      { id: docId },
+    );
+    if (Array.isArray(existing) && existing.includes(normalized)) return;
+
+    await sanityWriteClient
+      .patch(docId)
+      .setIfMissing({ redeemedEmails: [] })
+      .insert('after', 'redeemedEmails[-1]', [normalized])
+      .commit();
+  } catch (err) {
+    console.error('[discount] recordRedemption failed:', err);
   }
 }
