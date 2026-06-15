@@ -24,7 +24,9 @@ type PplWidgetDetail = {
 };
 
 const WIDGET_SRC = 'https://www.ppl.cz/sources/map/main.js';
+const WIDGET_CSS = 'https://www.ppl.cz/sources/map/main.css';
 const SCRIPT_ID = 'ppl-parcelshop-widget';
+const CSS_ID = 'ppl-parcelshop-widget-css';
 
 export function ParcelShopPicker({
   onSelect,
@@ -64,6 +66,17 @@ export function ParcelShopPicker({
      re-scans the freshly mounted container each time. */
   useEffect(() => {
     if (!open) return;
+    /* The official PPL widget needs BOTH its JS and its CSS. Without main.css the
+       internal layout renders broken and the bottom "Vybrat" button gets clipped.
+       Load the stylesheet once (left in <head>); re-inject the script each open so
+       it re-scans the freshly mounted container. */
+    if (!document.getElementById(CSS_ID)) {
+      const link = document.createElement('link');
+      link.id = CSS_ID;
+      link.rel = 'stylesheet';
+      link.href = WIDGET_CSS;
+      document.head.appendChild(link);
+    }
     document.getElementById(SCRIPT_ID)?.remove();
     const script = document.createElement('script');
     script.id = SCRIPT_ID;
@@ -141,17 +154,18 @@ export function ParcelShopPicker({
           role="dialog"
           aria-modal="true"
           aria-label="Výběr výdejního místa PPL"
-          className="fixed inset-0 z-[100] flex"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4"
           style={{ background: 'rgba(43,49,47,0.55)' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
           }}
         >
           <div
-            className="flex w-full flex-col overflow-hidden"
+            className="flex w-full max-w-3xl flex-col overflow-hidden"
             style={{
               background: '#fff',
-              height: '100dvh',
+              borderRadius: 'var(--radius-lg)',
+              maxHeight: '90vh',
             }}
           >
             <div
@@ -176,14 +190,13 @@ export function ParcelShopPicker({
                 </svg>
               </button>
             </div>
-            {/* Full-screen panel. The PPL widget can self-size taller than a
-                laptop viewport once a pickup point is selected, so this
-                container scrolls (overflow:auto) — its bottom "select" button is
-                then always reachable. Full width also shortens the detail panel
-                so it fits better vertically. */}
+            {/* Per PPL docs the widget adapts to the parent height when it's
+                > 400px and fits its own "Vybrat" button inside — as long as
+                main.css is loaded (see the effect above). A fixed ~600px box
+                keeps it a tidy popup. */}
             <div
               id="ppl-parcelshop-map"
-              style={{ width: '100%', height: 'calc(100dvh - 52px)', minHeight: 460, overflow: 'auto' }}
+              style={{ width: '100%', height: 'min(600px, 78vh)', minHeight: 460 }}
             />
           </div>
         </div>
