@@ -358,9 +358,9 @@ export function CartDrawer() {
                     color: 'var(--color-lime)',
                   }}
                 >
-                  Krok 1 ze 2
+                  Váš košík
                 </span>
-                <span style={{ fontSize: '1.05rem', lineHeight: 1.1 }}>K pokladně</span>
+                <span style={{ fontSize: '1.05rem', lineHeight: 1.1 }}>Prohlédnout košík</span>
               </span>
               <span
                 aria-hidden="true"

@@ -9,6 +9,7 @@ import { ParcelShopPicker, type SelectedParcelShop } from '@/components/ParcelSh
 import { Eyebrow, FormField } from '@/components/ui';
 import { NewsletterSignup } from '@/components/NewsletterSignup';
 import { UpsellSection } from '@/components/UpsellSection';
+import { TrustBadges } from '@/components/TrustBadges';
 
 type ShippingMode = 'home' | 'parcelshop';
 
@@ -448,6 +449,9 @@ export default function CartPage() {
                 </p>
               </div>
             )}
+
+            {/* Sales reinforcement — same three benefits as the product page */}
+            <TrustBadges className="mt-1" />
           </div>
 
           {/* ── RIGHT: Summary panel ── */}

@@ -141,19 +141,18 @@ export function ParcelShopPicker({
           role="dialog"
           aria-modal="true"
           aria-label="Výběr výdejního místa PPL"
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4"
           style={{ background: 'rgba(43,49,47,0.55)' }}
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
           }}
         >
           <div
-            className="flex w-full max-w-3xl flex-col overflow-hidden"
+            className="flex w-full max-w-4xl flex-col overflow-hidden"
             style={{
               background: '#fff',
               borderRadius: 'var(--radius-lg)',
-              height: 'auto',
-              maxHeight: '94vh',
+              height: 'min(96dvh, 900px)',
             }}
           >
             <div
@@ -178,13 +177,13 @@ export function ParcelShopPicker({
                 </svg>
               </button>
             </div>
-            {/* PPL widget renders into this container. An explicit height
-                (>400px) is required — the widget adapts to it and fits its
-                own footer button inside. With flex/0 height it self-sizes to
-                80vh and overflows the panel, clipping the bottom button. */}
+            {/* PPL widget renders into this container. It needs an explicit
+                height to fit its own footer "select" button inside; we give it
+                nearly the whole panel (panel height minus the ~52px header) so
+                the confirm button isn't clipped on shorter laptop screens. */}
             <div
               id="ppl-parcelshop-map"
-              style={{ width: '100%', height: 'min(80vh, 760px)', minHeight: 420 }}
+              style={{ width: '100%', height: 'calc(min(96dvh, 900px) - 52px)', minHeight: 460 }}
             />
           </div>
         </div>
