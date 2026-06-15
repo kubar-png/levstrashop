@@ -160,7 +160,7 @@ export function ParcelShopPicker({
           }}
         >
           <div
-            className="relative w-full max-w-3xl overflow-hidden"
+            className="relative w-full max-w-5xl overflow-hidden"
             style={{
               background: '#fff',
               borderRadius: 'var(--radius-lg)',
@@ -187,7 +187,7 @@ export function ParcelShopPicker({
             <iframe
               title="Mapa výdejních míst PPL"
               srcDoc={WIDGET_DOC}
-              style={{ width: '100%', height: 'min(640px, 86vh)', border: 0, display: 'block' }}
+              style={{ width: '100%', height: 'min(760px, 88vh)', border: 0, display: 'block' }}
             />
           </div>
         </div>
