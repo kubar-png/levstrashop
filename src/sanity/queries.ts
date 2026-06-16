@@ -19,6 +19,35 @@ export const allProductsQuery = groq`
   }
 `;
 
+/* ── Product feeds (Heureka / Zboží.cz / Google Shopping) ──────────────
+   Every active product with full variant detail incl. dimensions — the
+   only query that pulls lengthCm/widthCm/heightCm for the feed PARAMs. */
+export const feedProductsQuery = groq`
+  *[_type == "product" && active == true] | order(_createdAt desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    shortDescription,
+    "category": category->{title, "slug": slug.current},
+    subcategory,
+    images,
+    colorGroup,
+    variants[]{
+      sku,
+      size,
+      color,
+      "priceCents": price * 100,
+      "compareAtCents": compareAtPrice * 100,
+      stock,
+      weightGrams,
+      lengthCm,
+      widthCm,
+      heightCm,
+      images
+    }
+  }
+`;
+
 export const featuredProductsQuery = groq`
   *[_type == "product" && active == true && featured == true]
   | order(coalesce(featuredRank, 999) asc, _createdAt desc)[0...12] {

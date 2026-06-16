@@ -1,5 +1,5 @@
 /**
- * Sales-reinforcement trust badges — the same three benefits shown on the
+ * Sales-reinforcement trust badges — the same four benefits shown on the
  * product page, reused on the cart to strengthen the buyer's decision.
  */
 
@@ -27,7 +27,7 @@ const BADGES = [
   },
   {
     label: 'Bezpečná platba',
-    note: 'Karta i bankovní převod',
+    note: 'Karta, Apple Pay, převod',
     icon: (
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
         <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.6" />
@@ -36,12 +36,22 @@ const BADGES = [
       </svg>
     ),
   },
+  {
+    label: 'Skladem v ČR',
+    note: 'Expedice ze skladu Brno',
+    icon: (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+        <path d="M4 6h16l-1.5 12a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8L4 6Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+        <path d="M9 6V4.5A2.5 2.5 0 0 1 11.5 2h1A2.5 2.5 0 0 1 15 4.5V6" stroke="currentColor" strokeWidth="1.6" />
+      </svg>
+    ),
+  },
 ];
 
 export function TrustBadges({ className }: { className?: string }) {
   return (
     <div
-      className={`grid grid-cols-1 gap-4 px-5 py-4 sm:grid-cols-3 ${className ?? ''}`}
+      className={`grid grid-cols-1 gap-4 px-5 py-4 sm:grid-cols-2 ${className ?? ''}`}
       style={{
         border: '1px solid var(--color-border-subtle)',
         borderRadius: 'var(--radius-xl)',
