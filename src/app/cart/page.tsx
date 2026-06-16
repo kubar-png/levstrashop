@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCart } from '@/lib/cart';
 import { formatPrice } from '@/lib/format';
 import { ParcelShopPicker, type SelectedParcelShop } from '@/components/ParcelShopPicker';
@@ -51,6 +51,23 @@ export default function CartPage() {
 
   /* Field-level error map (key = field name). */
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  /* Returned from a cancelled Comgate payment (?cancelled=1). The items are
+     still here — the cart only clears on a confirmed payment — so we just
+     reassure the buyer and invite them to retry. Read from the URL on mount
+     rather than via useSearchParams() (which suspends during prerender). */
+  const [showCancelled, setShowCancelled] = useState(false);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('cancelled') === '1') {
+      setShowCancelled(true);
+    }
+  }, []);
+
+  function dismissCancelled() {
+    setShowCancelled(false);
+    /* Strip the flag so a refresh or back-navigation doesn't re-trigger it. */
+    window.history.replaceState(null, '', '/cart');
+  }
 
   const subtotal     = totalCentsFn();
   const thresholdHit = subtotal >= FREE_THRESHOLD;
@@ -275,6 +292,53 @@ export default function CartPage() {
   return (
     <div className="min-h-screen px-4 pb-28 pt-28 md:px-6 md:pt-32 lg:pb-24">
       <div className="mx-auto max-w-6xl">
+
+        {/* ── Cancelled-payment notice (Comgate → /cart?cancelled=1) ── */}
+        {showCancelled && (
+          <div
+            role="status"
+            className="mb-6 flex items-start gap-3 px-5 py-4"
+            style={{ background: 'var(--color-blush)', borderRadius: 'var(--radius-lg)' }}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              aria-hidden="true"
+              className="mt-0.5 shrink-0"
+              style={{ color: 'var(--color-orange-deep)' }}
+            >
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M12 7.5v5.5M12 16.2h.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+            <div className="min-w-0 flex-1">
+              <p
+                className="font-poppins-semibold"
+                style={{ fontSize: 'var(--text-small)', color: 'var(--color-ink)' }}
+              >
+                Platba byla zrušena
+              </p>
+              <p
+                className="font-poppins-regular mt-0.5"
+                style={{ fontSize: 'var(--text-micro)', color: 'var(--color-ink)', opacity: 0.72 }}
+              >
+                Vaše položky jsme nechali v košíku — můžete v objednávce pokračovat a zaplatit znovu.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={dismissCancelled}
+              aria-label="Zavřít"
+              className="-mr-1.5 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-opacity hover:opacity-60"
+              style={{ color: 'var(--color-ink)' }}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </button>
+          </div>
+        )}
 
         {/* ── Page heading ── */}
         <div className="mb-6">
