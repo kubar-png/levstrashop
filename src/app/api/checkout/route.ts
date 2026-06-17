@@ -192,7 +192,7 @@ export async function POST(req: Request) {
             country: shippingAddress?.country ?? 'CZ',
           };
 
-    await createPendingOrder({
+    const orderId = await createPendingOrder({
       refId,
       paymentProvider: 'comgate',
       email,
@@ -212,6 +212,17 @@ export async function POST(req: Request) {
       items: verifiedItems,
       discount: orderDiscount,
     });
+
+    /* Fail closed: never send the customer to the gateway if we couldn't persist
+       the order — otherwise the payment succeeds with no order to mark paid, the
+       webhook can't find it, and the success page polls forever. */
+    if (!orderId) {
+      console.error('[checkout] order not persisted (Sanity write failed) — aborting before payment', { refId });
+      return NextResponse.json(
+        { error: 'Objednávku se teď nepodařilo založit. Zkuste to prosím za chvíli.' },
+        { status: 503 },
+      );
+    }
 
     /* Comgate v2.0 — return/cancel/notify URLs live in the Portal, NOT per-payment.
        Configure once at https://portal.comgate.cz/ → Integrace → Propojení obchodu. */

@@ -29,6 +29,23 @@ export function formatPriceKc(cents: number): string {
   return `${v} Kč`;
 }
 
+/** Append Sanity CDN transform params so emails fetch a small cropped thumbnail,
+ *  not the multi-MB original. No-op for non-Sanity / already-parametrised URLs. */
+export function emailImageUrl(url: string, px = 120): string {
+  if (!url) return url;
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}w=${px}&h=${px}&fit=crop&auto=format`;
+}
+
+/** Rounded square product thumbnail for item lists — the product hero shot so the
+ *  customer sees what they ordered. Neutral box fallback when an item has no image. */
+export function productThumb(url: string | undefined, alt: string, px = 56): string {
+  const radius = Math.round(px * 0.18);
+  const frame = `width:${px}px;height:${px}px;border-radius:${radius}px;display:block;background:${EMAIL_COLORS.cream};`;
+  if (!url) return `<span style="${frame}"></span>`;
+  return `<img src="${emailImageUrl(url, px * 2)}" width="${px}" height="${px}" alt="${escapeHtml(alt)}" style="${frame}object-fit:cover;border:1px solid ${EMAIL_COLORS.border};" />`;
+}
+
 /** Branded pill button (email-safe inline anchor). */
 export function emailButton(label: string, href: string, variant: 'forest' | 'lime' = 'forest'): string {
   const c = EMAIL_COLORS;

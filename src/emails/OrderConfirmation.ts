@@ -1,5 +1,5 @@
 import type { OrderDoc } from '@/lib/orders';
-import { EMAIL_COLORS as c, EMAIL_SITE, emailButton, emailShell, escapeHtml, formatPriceKc } from './shared';
+import { EMAIL_COLORS as c, EMAIL_SITE, emailButton, emailShell, escapeHtml, formatPriceKc, productThumb } from './shared';
 
 export function renderOrderConfirmation(order: OrderDoc): { subject: string; html: string; text: string } {
   const ref = order.refId || '';
@@ -12,6 +12,9 @@ export function renderOrderConfirmation(order: OrderDoc): { subject: string; htm
       const lineTotal = item.priceCents * item.qty;
       return `
         <tr>
+          <td style="padding:14px 12px 14px 0;border-bottom:1px solid ${c.border};vertical-align:top;width:56px;">
+            ${productThumb(item.image, item.title, 56)}
+          </td>
           <td style="padding:14px 0;border-bottom:1px solid ${c.border};vertical-align:top;">
             <div style="font-size:15px;font-weight:600;color:${c.ink};">${escapeHtml(item.title)}</div>
             ${meta ? `<div style="font-size:12px;color:${c.muted};margin-top:2px;">${escapeHtml(meta)}</div>` : ''}

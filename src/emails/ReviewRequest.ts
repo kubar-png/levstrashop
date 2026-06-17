@@ -1,5 +1,5 @@
 import type { OrderDoc } from '@/lib/orders';
-import { EMAIL_COLORS as c, emailButton, emailShell, escapeHtml } from './shared';
+import { EMAIL_COLORS as c, emailButton, emailShell, escapeHtml, productThumb } from './shared';
 
 /** Review request — sent a few days after the order is marked delivered. */
 export function renderReviewRequest(
@@ -10,8 +10,14 @@ export function renderReviewRequest(
   const subject = `Jak jste spokojeni s nákupem? — Ciaobag`;
   const preheader = `Pomozte ostatním — ohodnoťte objednávku ${ref}.`;
 
-  const itemsList = (order.items ?? [])
-    .map((it) => `<li style="margin-bottom:4px;">${escapeHtml(it.title)}</li>`)
+  const itemsRows = (order.items ?? [])
+    .map(
+      (it) => `
+        <tr>
+          <td style="padding:5px 12px 5px 0;vertical-align:middle;width:48px;">${productThumb(it.image, it.title, 48)}</td>
+          <td style="padding:5px 0;vertical-align:middle;font-size:14px;color:${c.ink};">${escapeHtml(it.title)}</td>
+        </tr>`,
+    )
     .join('');
 
   const body = `
@@ -19,7 +25,7 @@ export function renderReviewRequest(
       udělalo radost a už ho stíháte naplno používat.</p>
     <p style="margin:0 0 18px 0;">Budeme moc rádi, když nám věnujete chvilku a napíšete krátké hodnocení —
       pomůžete tím ostatním při výběru.</p>
-    ${itemsList ? `<ul style="margin:0 0 22px 0;padding-left:20px;color:${c.ink};font-size:14px;line-height:1.6;">${itemsList}</ul>` : ''}
+    ${itemsRows ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px 0;">${itemsRows}</table>` : ''}
     <div style="text-align:center;">${emailButton('Napsat hodnocení', opts.reviewUrl)}</div>
     ${opts.incentive ? `<p style="margin:22px 0 0 0;text-align:center;color:${c.muted};font-size:13px;">${escapeHtml(opts.incentive)}</p>` : ''}
   `;
