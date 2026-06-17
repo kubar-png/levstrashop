@@ -127,7 +127,10 @@ export function SiteFooter() {
               </g>
             </svg>
           </span>
-          <span className="underline decoration-dotted underline-offset-[3px] transition-[text-decoration] group-hover:decoration-solid">
+          <span
+            className="not-italic underline decoration-dotted underline-offset-[3px] transition-[text-decoration] group-hover:decoration-solid"
+            style={{ fontFamily: 'var(--font-brand)' }}
+          >
             fatto a mano od Jakuba, léta páně {year}
           </span>
           <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="opacity-70">

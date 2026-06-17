@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Poppins, Forum } from 'next/font/google';
+import { Poppins, Forum, Bricolage_Grotesque } from 'next/font/google';
 import './globals.css';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -19,6 +19,13 @@ const forum = Forum({
   variable: '--font-serif',
   subsets: ['latin', 'latin-ext'],
   weight: ['400'],
+});
+
+// studiojakub.cz brand/heading font — used only for the footer maker's-mark signature.
+const bricolage = Bricolage_Grotesque({
+  variable: '--font-brand',
+  subsets: ['latin', 'latin-ext'],
+  weight: ['700'],
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.ciaobag.cz';
@@ -52,7 +59,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="cs" className={`${poppins.variable} ${forum.variable} h-full`}>
+    <html lang="cs" className={`${poppins.variable} ${forum.variable} ${bricolage.variable} h-full`}>
       <body className="min-h-full flex flex-col">
         <SiteHeader />
         <main className="flex-1 pt-[76px] md:pt-[88px]">
