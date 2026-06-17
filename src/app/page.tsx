@@ -52,7 +52,6 @@ const HERO_IMAGES = [
   `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`,
   `${WIX}/f0cf6b_29b8ee8366484656828782c7267140df~mv2.jpg`,
   `${WIX}/f0cf6b_447c2054b701497e93bbfa703008a619~mv2.jpg`,
-  `${WIX}/f0cf6b_59b0236fe6ae4dd39ea9700a093c14e4~mv2.jpg`,
 ];
 
 export default async function HomePage() {
