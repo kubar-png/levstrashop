@@ -2,7 +2,12 @@ import { getShopProducts } from '@/lib/data';
 import { ShopClient } from '@/components/ShopClient';
 
 export const revalidate = 60;
-export const metadata = { title: 'E-shop — Ciaobag' };
+export const metadata = {
+  title: 'E-shop — Ciaobag',
+  description:
+    'Kabelky a kufry Marina Galanti i další italské módní doplňky. Prohlédněte si celou kolekci Ciaobag — doprava zdarma nad 1 500 Kč, doručení PPL.',
+  alternates: { canonical: '/shop' },
+};
 
 const VALID = ['all', 'kabelky', 'kufry'] as const;
 type Cat = (typeof VALID)[number];

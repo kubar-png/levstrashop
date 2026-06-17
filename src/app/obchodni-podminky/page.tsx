@@ -1,6 +1,11 @@
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'Obchodní podmínky — Ciaobag' };
+export const metadata = {
+  title: 'Obchodní podmínky — Ciaobag',
+  description:
+    'Obchodní podmínky e-shopu ciaobag.cz, který provozuje Levstra s.r.o. Vše o objednávce, platbě, dodání a vašich právech při nákupu zboží.',
+  alternates: { canonical: '/obchodni-podminky' },
+};
 
 const SECTIONS = [
   {

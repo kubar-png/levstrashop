@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'O nás — Ciaobag' };
+export const metadata = {
+  title: 'O nás — Ciaobag',
+  description:
+    'Ciaobag — italskou módu a doplňky dovážíme už přes dvě desetiletí. Přečtěte si náš příběh o lásce ke stylu, kvalitě a cestování se stylem.',
+  alternates: { canonical: '/o-nas' },
+};
 
 export default function AboutPage() {
   return (

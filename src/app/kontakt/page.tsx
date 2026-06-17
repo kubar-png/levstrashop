@@ -1,7 +1,12 @@
 import { Eyebrow, Card } from '@/components/ui';
 import { ContactForm } from '@/components/ContactForm';
 
-export const metadata = { title: 'Kontakt — Ciaobag' };
+export const metadata = {
+  title: 'Kontakt — Ciaobag',
+  description:
+    'Spojte se s Ciaobag — rádi poradíme s výběrem kabelky či kufru i s vaší objednávkou. Najdete zde kontaktní e-mail, telefon a fakturační údaje.',
+  alternates: { canonical: '/kontakt' },
+};
 
 export default function ContactPage() {
   return (

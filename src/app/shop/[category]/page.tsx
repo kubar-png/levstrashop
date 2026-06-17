@@ -12,6 +12,13 @@ const TITLES: Record<Cat, string> = {
   kufry: 'Kufry',
 };
 
+const DESCRIPTIONS: Record<Cat, string> = {
+  kabelky:
+    'Dámské kabelky Marina Galanti — elegantní italský design pro každý den i výjimečné příležitosti. Nakupte u Ciaobag, doprava zdarma nad 1 500 Kč.',
+  kufry:
+    'Cestovní kufry Marina Galanti — lehké, stylové a odolné na každou cestu. Vyberte si u Ciaobag, doprava zdarma nad 1 500 Kč, doručení PPL.',
+};
+
 export async function generateMetadata({
   params,
 }: {
@@ -20,7 +27,11 @@ export async function generateMetadata({
   const { category } = await params;
   const c = category as Cat;
   if (!(KNOWN as readonly string[]).includes(c)) return { title: 'E-shop — Ciaobag' };
-  return { title: `${TITLES[c]} — Ciaobag` };
+  return {
+    title: `${TITLES[c]} — Ciaobag`,
+    description: DESCRIPTIONS[c],
+    alternates: { canonical: `/shop/${c}` },
+  };
 }
 
 export default async function CategoryPage({

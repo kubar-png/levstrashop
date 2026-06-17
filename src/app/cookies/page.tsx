@@ -1,6 +1,11 @@
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'Cookies — Ciaobag' };
+export const metadata = {
+  title: 'Cookies — Ciaobag',
+  description:
+    'Zásady používání cookies na ciaobag.cz. Zjistěte, jaké soubory cookies používáme, k čemu slouží a jak si můžete spravovat svůj souhlas.',
+  alternates: { canonical: '/cookies' },
+};
 
 export default function CookiesPage() {
   const h2Style = {

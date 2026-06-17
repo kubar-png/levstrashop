@@ -93,7 +93,7 @@ export function SiteFooter() {
         style={{ borderColor: 'rgba(255,255,255,0.08)' }}
       >
         <a
-          href="https://larp.solutions"
+          href="https://studiojakub.cz"
           target="_blank"
           rel="noreferrer"
           className="font-serif inline-flex items-center gap-1.5 italic underline decoration-dotted underline-offset-[3px] transition-colors hover:text-white hover:decoration-solid"
@@ -103,7 +103,7 @@ export function SiteFooter() {
             letterSpacing: '0.01em',
           }}
         >
-          uplácáno v larpu, léta páně {year}
+          fatto a mano od Jakuba, léta páně 2026
           <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="opacity-70">
             <path
               d="M4 3h5v5M9 3L3 9"

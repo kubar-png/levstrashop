@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'Vrácení zboží — Ciaobag' };
+export const metadata = {
+  title: 'Vrácení zboží — Ciaobag',
+  description:
+    'Vrácení zboží a reklamace u Ciaobag — 14 dní na odstoupení od smlouvy a 24měsíční záruka. Poradíme, jak snadno vrátit nebo reklamovat zboží.',
+  alternates: { canonical: '/vraceni' },
+};
 
 export default function ReturnsPage() {
   return (

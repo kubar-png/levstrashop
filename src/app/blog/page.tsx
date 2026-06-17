@@ -4,7 +4,12 @@ import { getAllPosts } from '@/lib/data';
 import { Eyebrow } from '@/components/ui';
 
 export const revalidate = 60;
-export const metadata = { title: 'Blog — Ciaobag' };
+export const metadata = {
+  title: 'Blog — Ciaobag',
+  description:
+    'Blog Ciaobag — tipy na cestování, módu a styl, péči o kabelky a kufry i novinky ze světa Marina Galanti. Inspirujte se k cestám se stylem.',
+  alternates: { canonical: '/blog' },
+};
 
 const dateFmt = new Intl.DateTimeFormat('cs-CZ', {
   day: 'numeric',
@@ -81,7 +86,7 @@ export default async function BlogPage() {
                   {post.coverImageUrl ? (
                     <Image
                       src={post.coverImageUrl}
-                      alt=""
+                      alt={post.title}
                       fill
                       sizes="(min-width: 768px) 40vw, 100vw"
                       className="object-cover transition duration-700 group-hover:scale-[1.04]"

@@ -4,6 +4,7 @@ import './globals.css';
 import { SiteHeader } from '@/components/SiteHeader';
 import { SiteFooter } from '@/components/SiteFooter';
 import { CookieBanner } from '@/components/CookieBanner';
+import { Analytics } from '@/components/Analytics';
 import { PageTransition } from '@/components/PageTransition';
 import { CartDrawer } from '@/components/CartDrawer';
 import { WelcomePopup } from '@/components/WelcomePopup';
@@ -37,7 +38,11 @@ export const metadata: Metadata = {
     title: 'Ciaobag — Cestujte se stylem',
     description: 'Kabelky a kufry Marina Galanti.',
   },
-  alternates: { canonical: '/' },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ciaobag — Cestujte se stylem',
+    description: 'Kabelky a kufry Marina Galanti.',
+  },
   robots: { index: true, follow: true },
 };
 
@@ -57,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartDrawer />
         <WelcomePopup />
         <CookieBanner />
+        <Analytics />
       </body>
     </html>
   );

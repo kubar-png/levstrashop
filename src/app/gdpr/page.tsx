@@ -1,6 +1,11 @@
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'Ochrana osobních údajů — Ciaobag' };
+export const metadata = {
+  title: 'Ochrana osobních údajů — Ciaobag',
+  description:
+    'Zásady ochrany osobních údajů (GDPR) e-shopu ciaobag.cz. Jak Levstra s.r.o. zpracovává a chrání vaše osobní údaje při nákupu a komunikaci.',
+  alternates: { canonical: '/gdpr' },
+};
 
 export default function GdprPage() {
   const h2Style = {

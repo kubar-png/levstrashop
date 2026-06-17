@@ -25,6 +25,7 @@ export async function generateMetadata({
   return {
     title: `${post.title} — Ciaobag Blog`,
     description: post.excerpt,
+    alternates: { canonical: `/blog/${slug}` },
     openGraph: {
       title: post.title,
       description: post.excerpt,
@@ -102,7 +103,7 @@ export default async function PostPage({
         >
           <Image
             src={post.coverImageUrl}
-            alt=""
+            alt={post.title}
             fill
             sizes="(min-width: 768px) 768px, 100vw"
             priority
@@ -137,7 +138,7 @@ export default async function PostPage({
                     {p.coverImageUrl ? (
                       <Image
                         src={p.coverImageUrl}
-                        alt=""
+                        alt={p.title}
                         fill
                         sizes="(min-width: 768px) 40vw, 100vw"
                         className="object-cover transition duration-700 group-hover:scale-[1.04]"

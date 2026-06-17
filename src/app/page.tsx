@@ -8,6 +8,38 @@ import { HeroGallery } from '@/components/HeroGallery';
 
 export const revalidate = 60;
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ciaobag.cz';
+
+export const metadata = {
+  alternates: { canonical: '/' },
+};
+
+const ORG_JSONLD = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Ciaobag',
+  legalName: 'Levstra s.r.o.',
+  url: SITE_URL,
+  logo: `${SITE_URL}/icon`,
+  email: 'ahoj@ciaobag.cz',
+  telephone: '+420516770609',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Hněvkovského 587/39a',
+    addressLocality: 'Brno',
+    postalCode: '617 00',
+    addressCountry: 'CZ',
+  },
+  sameAs: ['https://instagram.com/levstra'],
+};
+
+const WEBSITE_JSONLD = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Ciaobag',
+  url: SITE_URL,
+};
+
 const WIX = 'https://static.wixstatic.com/media';
 const IMG = {
   marinaModel: `${WIX}/f0cf6b_0fb65fabc4d54b149a2b6213e5153e9e~mv2.jpg`,
@@ -28,6 +60,14 @@ export default async function HomePage() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_JSONLD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_JSONLD) }}
+      />
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="-mt-[76px] px-4 pt-4 md:-mt-[88px] md:px-6 md:pt-6">
         <div

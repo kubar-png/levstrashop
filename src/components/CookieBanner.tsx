@@ -18,6 +18,8 @@ export function CookieBanner() {
   function accept(value: 'all' | 'essential') {
     localStorage.setItem(STORAGE_KEY, value);
     setConsent(value);
+    // Let analytics (and any other consent-gated scripts) react without a reload.
+    window.dispatchEvent(new Event('cookie-consent'));
   }
 
   if (!mounted || consent) return null;

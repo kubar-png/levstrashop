@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import { Eyebrow } from '@/components/ui';
 
-export const metadata = { title: 'Doprava a platba — Ciaobag' };
+export const metadata = {
+  title: 'Doprava a platba — Ciaobag',
+  description:
+    'Doprava a platba u Ciaobag — doručení PPL na adresu i na výdejní místo, platba kartou nebo převodem. Doprava zdarma nad 1 500 Kč po celé ČR.',
+  alternates: { canonical: '/doprava' },
+};
 
 export default function ShippingPage() {
   return (
