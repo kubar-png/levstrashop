@@ -108,7 +108,7 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-      <div className="grid gap-10 md:grid-cols-2 md:gap-14 lg:gap-20">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-14 lg:gap-20">
         <ProductPageClient product={product} related={related} initialColor={barva} />
       </div>
     </div>

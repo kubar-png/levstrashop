@@ -107,14 +107,15 @@ function LoopingGallery({
   return (
     <div>
       <div
-        className="relative overflow-hidden touch-pan-y"
-        style={{ background: 'var(--color-cream)', borderRadius: 'var(--radius-xl)' }}
+        className="relative w-full overflow-hidden touch-pan-y"
+        style={{ paddingBottom: '100%', background: 'var(--color-cream)', borderRadius: 'var(--radius-xl)' }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        {/* Sliding track */}
+        {/* Sliding track — absolutely fills the square box so its height never
+            depends on percentage-height resolution (which breaks inside flex). */}
         <div
-          className="flex"
+          className="absolute inset-0 flex"
           style={{
             width: `${slides.length * 100}%`,
             transform: `translateX(-${pos * slidePct}%)`,
@@ -123,7 +124,7 @@ function LoopingGallery({
           onTransitionEnd={onTransitionEnd}
         >
           {slides.map((src, i) => (
-            <div key={i} style={{ width: `${slidePct}%` }} className="shrink-0">
+            <div key={i} style={{ width: `${slidePct}%` }} className="h-full shrink-0">
               <ProductImage
                 src={src}
                 alt={alt}
@@ -131,7 +132,7 @@ function LoopingGallery({
                 sizes="(min-width: 768px) 50vw, 100vw"
                 priority={i === 1}
                 aspect="1/1"
-                className="!rounded-none"
+                className="!rounded-none h-full"
               />
             </div>
           ))}
