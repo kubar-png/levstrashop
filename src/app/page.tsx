@@ -8,7 +8,7 @@ import { HeroGallery } from '@/components/HeroGallery';
 
 export const revalidate = 60;
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ciaobag.cz';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.ciaobag.cz';
 
 export const metadata = {
   alternates: { canonical: '/' },

@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'levstrashop.vercel.app' }],
-        destination: 'https://ciaobag.cz/:path*',
+        destination: 'https://www.ciaobag.cz/:path*',
         permanent: true, // 308 — preserves method, cached by search engines
       },
     ];

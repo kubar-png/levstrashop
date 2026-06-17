@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { groq } from 'next-sanity';
 import { sanityClient } from '@/sanity/client';
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://ciaobag.cz';
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.ciaobag.cz';
 
 const productSlugsQuery = groq`*[_type=="product" && active==true].slug.current`;
 const postSlugsQuery = groq`*[_type=="post" && published==true].slug.current`;

@@ -21,7 +21,7 @@ const forum = Forum({
   weight: ['400'],
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ciaobag.cz';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.ciaobag.cz';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

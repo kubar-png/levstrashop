@@ -23,7 +23,7 @@ import { urlFor } from '@/sanity/client';
 import { feedProductsQuery } from '@/sanity/queries';
 import type { SanityImage } from '@/sanity/types';
 
-const BASE = (process.env.NEXT_PUBLIC_SITE_URL || 'https://ciaobag.cz').replace(/\/$/, '');
+const BASE = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.ciaobag.cz').replace(/\/$/, '');
 const CURRENCY = process.env.NEXT_PUBLIC_CURRENCY || 'CZK';
 
 /* The catalogue is resold branded goods — the real manufacturer is embedded
