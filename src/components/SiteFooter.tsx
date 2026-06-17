@@ -96,14 +96,40 @@ export function SiteFooter() {
           href="https://studiojakub.cz"
           target="_blank"
           rel="noreferrer"
-          className="font-serif inline-flex items-center gap-1.5 italic underline decoration-dotted underline-offset-[3px] transition-colors hover:text-white hover:decoration-solid"
+          className="group font-serif inline-flex items-center gap-2 italic transition-colors hover:text-white"
           style={{
             color: 'rgba(255,255,255,0.65)',
             fontSize: 'var(--text-micro)',
             letterSpacing: '0.01em',
           }}
         >
-          fatto a mano od Jakuba, léta páně 2026
+          {/* studiojakub.cz maker's mark — crimson tile + white thorn-star */}
+          <span
+            aria-hidden="true"
+            style={{
+              width: 18,
+              height: 18,
+              borderRadius: '50%',
+              overflow: 'hidden',
+              display: 'inline-flex',
+              flexShrink: 0,
+              background: '#E63946',
+              boxShadow: '0 0 0 1px rgba(255,255,255,0.22)',
+            }}
+          >
+            <svg viewBox="0 0 128 128" style={{ width: '100%', height: '100%', display: 'block' }}>
+              <rect width="128" height="128" fill="#E63946" />
+              <g transform="translate(64 64) scale(1.12) translate(-61.6 -65.925)">
+                <polygon
+                  points="96.23,32.88 70.21,63.13 103.56,85.03 66.75,69.64 56.22,108.12 59.49,68.36 19.64,70.23 58.46,61.06 44.36,23.73 65.09,57.82"
+                  fill="#F1F0EC"
+                />
+              </g>
+            </svg>
+          </span>
+          <span className="underline decoration-dotted underline-offset-[3px] transition-[text-decoration] group-hover:decoration-solid">
+            fatto a mano od Jakuba, léta páně {year}
+          </span>
           <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true" className="opacity-70">
             <path
               d="M4 3h5v5M9 3L3 9"
