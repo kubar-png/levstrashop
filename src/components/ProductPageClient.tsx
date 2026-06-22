@@ -300,118 +300,11 @@ export function ProductPageClient({
         )}
       </div>
 
-      {/* ── Community voice (testimonial stub) — spans both columns ───── */}
-      <CommunityVoice />
-
       {/* ── Related products — spans both columns ─────────────────── */}
       {related.length > 0 && (
         <RelatedProducts items={related} category={product.category?.title} />
       )}
     </>
-  );
-}
-
-/* ─── Community voice block ──────────────────────────────────────────── */
-
-const VOICES = [
-  {
-    name: 'Klára M.',
-    location: 'Praha',
-    text:
-      'Kabelka přišla zabalená jako dárek a kvalita kůže předčila moje očekávání. Nosím ji každý den, sluší úplně ke všemu.',
-  },
-  {
-    name: 'Petra V.',
-    location: 'Brno',
-    text:
-      'Objednávala jsem kufr před cestou na Kanáry — dorazil druhý den a kolečka fungují i po čtyřech přesunech letadlem.',
-  },
-  {
-    name: 'Adéla J.',
-    location: 'Olomouc',
-    text:
-      'Příjemná komunikace přes Instagram a holky mi pomohly vybrat barvu. Až teď jsem zjistila, že je to česká značka — paráda.',
-  },
-];
-
-function CommunityVoice() {
-  return (
-    <section
-      className="md:col-span-2"
-      style={{ paddingTop: 'var(--section-py)' }}
-    >
-      <div className="flex items-baseline justify-between gap-4">
-        <div>
-          <Eyebrow tone="forest" serif size="md">
-            Z naší komunity
-          </Eyebrow>
-          <h2
-            className="font-poppins-semibold mt-1 leading-[1.1]"
-            style={{
-              fontSize: 'var(--text-h2)',
-              letterSpacing: '-0.025em',
-              color: 'var(--color-ink)',
-            }}
-          >
-            Co píšou zákaznice
-          </h2>
-        </div>
-        <a
-          href="https://instagram.com/levstra"
-          target="_blank"
-          rel="noreferrer"
-          className="font-poppins-medium hidden hover:underline md:inline-block"
-          style={{ fontSize: 'var(--text-small)', color: 'var(--color-forest)' }}
-        >
-          @levstra na Instagramu →
-        </a>
-      </div>
-
-      <div className="mt-8 grid gap-4 md:grid-cols-3 md:gap-5">
-        {VOICES.map((v) => (
-          <figure
-            key={v.name}
-            className="flex flex-col justify-between p-6"
-            style={{
-              background: 'var(--color-cream)',
-              borderRadius: 'var(--radius-lg)',
-            }}
-          >
-            <svg
-              width="22"
-              height="18"
-              viewBox="0 0 22 18"
-              fill="var(--color-forest)"
-              aria-hidden="true"
-              className="opacity-30"
-            >
-              <path d="M0 18V11C0 5 3 1 9 0v3c-3 1-5 4-5 7h5v8H0Zm12 0v-7c0-6 3-10 9-11v3c-3 1-5 4-5 7h5v8h-9Z" />
-            </svg>
-            <blockquote
-              className="font-serif mt-3 leading-relaxed"
-              style={{
-                fontSize: 'var(--text-body)',
-                color: 'var(--color-ink)',
-              }}
-            >
-              „{v.text}"
-            </blockquote>
-            <figcaption
-              className="font-poppins-semibold mt-4"
-              style={{ fontSize: 'var(--text-small)', color: 'var(--color-forest)' }}
-            >
-              {v.name}
-              <span
-                className="font-poppins-regular ml-2"
-                style={{ color: 'var(--color-text-muted)' }}
-              >
-                · {v.location}
-              </span>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-    </section>
   );
 }
 
