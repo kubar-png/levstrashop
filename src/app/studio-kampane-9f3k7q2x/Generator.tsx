@@ -50,7 +50,7 @@ export default function Generator({ products }: { products: CampaignProduct[] })
             const url = `${BASE}?s=${encodeURIComponent(encodeSpec(spec))}`;
             const name = `ciaobag-${spec.archetype}-${spec.format}-${seed}-${i}.png`;
             return (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div key={url} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <img src={url} alt={spec.headline}
                   style={{ width: '100%', aspectRatio: spec.format === '1x1' ? '1 / 1' : '9 / 16', objectFit: 'cover', borderRadius: 12, background: '#fff', border: '1px solid rgba(43,49,47,0.12)' }} />
                 <button className="btn-add" onClick={() => download(url, name)}>Stáhnout PNG</button>

@@ -5,9 +5,9 @@ import { salePercent } from './copy';
 
 // Shared building blocks ----------------------------------------------------
 
-function Wordmark({ color }: { color: string }) {
+function Wordmark({ color, shadow }: { color: string; shadow?: boolean }) {
   return (
-    <div style={{ display: 'flex', fontFamily: 'Poppins', fontWeight: 600, fontSize: 34, letterSpacing: 1, color }}>
+    <div style={{ display: 'flex', fontFamily: 'Poppins', fontWeight: 600, fontSize: 34, letterSpacing: 1, color, textShadow: shadow ? '0 1px 8px rgba(0,0,0,0.5)' : undefined }}>
       Ciaobag
     </div>
   );
@@ -21,16 +21,17 @@ function CtaPill({ label, bg, ink }: { label: string; bg: string; ink: string })
   );
 }
 
-function PriceRow({ spec, color }: { spec: VariantSpec; color: string }) {
+function PriceRow({ spec, color, shadow }: { spec: VariantSpec; color: string; shadow?: boolean }) {
   const pct = salePercent(spec.product);
+  const shadowStyle = shadow ? '0 2px 14px rgba(0,0,0,0.6)' : undefined;
   return (
     <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, fontFamily: 'Poppins', color }}>
       {spec.product.compareAtCents && pct ? (
-        <div style={{ display: 'flex', fontSize: 30, textDecoration: 'line-through', opacity: 0.7 }}>
+        <div style={{ display: 'flex', fontSize: 30, textDecoration: 'line-through', opacity: 0.7, textShadow: shadowStyle }}>
           {(spec.product.compareAtCents / 100).toLocaleString('cs-CZ')} Kč
         </div>
       ) : null}
-      <div style={{ display: 'flex', fontWeight: 600, fontSize: 48 }}>
+      <div style={{ display: 'flex', fontWeight: 600, fontSize: 48, textShadow: shadowStyle }}>
         {(spec.product.priceCents / 100).toLocaleString('cs-CZ')} Kč
       </div>
     </div>
@@ -56,7 +57,7 @@ export function renderVariant(spec: VariantSpec): React.ReactElement {
 
       {/* Readability gradient over photo */}
       {onPhoto ? (
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.65) 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0.45) 62%, rgba(0,0,0,0.82) 100%)' }} />
       ) : null}
 
       {/* productOnColor / productLifestyle: product photo card */}
@@ -73,7 +74,7 @@ export function renderVariant(spec: VariantSpec): React.ReactElement {
 
       {/* Top bar: wordmark + optional sale badge */}
       <div style={{ position: 'absolute', top: padTop - (tall ? 120 : 30), left: 90, right: 90, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Wordmark color={onPhoto ? '#ffffff' : pal.ink} />
+        <Wordmark color={onPhoto ? '#ffffff' : pal.ink} shadow={onPhoto} />
         {spec.archetype === 'sale' && salePercent(spec.product) ? (
           <div style={{ display: 'flex', background: pal.accent, color: pal.ctaInk, fontWeight: 600, fontSize: 40, padding: '14px 28px', borderRadius: 18 }}>
             −{salePercent(spec.product)} %
@@ -83,10 +84,10 @@ export function renderVariant(spec: VariantSpec): React.ReactElement {
 
       {/* Bottom content block: headline + price + CTA */}
       <div style={{ position: 'absolute', left: 90, right: 90, bottom: padBottom, display: 'flex', flexDirection: 'column', gap: 28 }}>
-        <div style={{ display: 'flex', fontFamily: 'Forum', fontSize: tall ? 92 : 76, lineHeight: 1.05, color: onPhoto ? '#ffffff' : pal.ink, maxWidth: 900 }}>
+        <div style={{ display: 'flex', fontFamily: 'Forum', fontSize: tall ? 92 : 76, lineHeight: 1.05, color: onPhoto ? '#ffffff' : pal.ink, maxWidth: 900, textShadow: onPhoto ? '0 2px 16px rgba(0,0,0,0.6)' : 'none' }}>
           {spec.headline}
         </div>
-        {spec.archetype !== 'lifestyle' ? <PriceRow spec={spec} color={onPhoto ? '#ffffff' : pal.ink} /> : null}
+        {spec.archetype !== 'lifestyle' ? <PriceRow spec={spec} color={onPhoto ? '#ffffff' : pal.ink} shadow={onPhoto} /> : null}
         <CtaPill label={spec.cta} bg={pal.cta} ink={pal.ctaInk} />
       </div>
     </div>
