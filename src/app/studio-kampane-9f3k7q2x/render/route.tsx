@@ -27,40 +27,17 @@ function wixResize(url: string, maxPx = 1080): string {
   return `${base}/v1/fill/w_${maxPx},h_${maxPx},al_c,q_80,usm_0.66_1.00_0.01/image.jpg`;
 }
 
-/** Fetch a URL and return a base64 data URI (JPEG). */
-async function toDataUri(url: string): Promise<string> {
-  try {
-    const res = await fetch(wixResize(url));
-    if (!res.ok) return url; // fall back to original URL on fetch failure
-    const buf = await res.arrayBuffer();
-    const b64 = Buffer.from(buf).toString('base64');
-    const mime = res.headers.get('content-type') ?? 'image/jpeg';
-    return `data:${mime};base64,${b64}`;
-  } catch {
-    return url; // network error — degrade to original URL
-  }
-}
-
-/** Pre-fetch all image URLs in the spec and replace with data URIs. */
-async function prefetchImages(spec: VariantSpec): Promise<VariantSpec> {
-  const urls = new Set<string>();
-  if (spec.lifestyleUrl) urls.add(spec.lifestyleUrl);
-  if (spec.product.imageUrl) urls.add(spec.product.imageUrl);
-
-  const cache = new Map<string, string>();
-  await Promise.all(
-    [...urls].map(async (u) => {
-      cache.set(u, await toDataUri(u));
-    }),
-  );
-
+/**
+ * Rewrite the spec's image URLs to downscaled (≤1080px) variants. Satori/og then
+ * fetches the small images itself at render time — this keeps resvg's XML parser
+ * within bounds (the original 14 MB Wix files overflow it) without inlining the
+ * bytes as base64 data URIs (which fail under the production bundle).
+ */
+function resizeSpecImages(spec: VariantSpec): VariantSpec {
   return {
     ...spec,
-    lifestyleUrl: spec.lifestyleUrl ? (cache.get(spec.lifestyleUrl) ?? spec.lifestyleUrl) : undefined,
-    product: {
-      ...spec.product,
-      imageUrl: cache.get(spec.product.imageUrl) ?? spec.product.imageUrl,
-    },
+    lifestyleUrl: spec.lifestyleUrl ? wixResize(spec.lifestyleUrl) : undefined,
+    product: { ...spec.product, imageUrl: wixResize(spec.product.imageUrl) },
   };
 }
 
@@ -76,20 +53,32 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const { width, height } = DIMENSIONS[spec.format];
-  const [poppinsSemi, poppinsLight, forum, resolvedSpec] = await Promise.all([
+  const [poppinsSemi, poppinsLight, forum] = await Promise.all([
     font('Poppins-SemiBold.ttf'),
     font('Poppins-ExtraLight.ttf'),
     font('Forum-Regular.ttf'),
-    prefetchImages(spec),
   ]);
 
-  return new ImageResponse(renderVariant(resolvedSpec), {
-    width,
-    height,
-    fonts: [
-      { name: 'Poppins', data: poppinsSemi, weight: 600, style: 'normal' },
-      { name: 'Poppins', data: poppinsLight, weight: 200, style: 'normal' },
-      { name: 'Forum', data: forum, weight: 400, style: 'normal' },
-    ],
-  });
+  try {
+    const image = new ImageResponse(renderVariant(resizeSpecImages(spec)), {
+      width,
+      height,
+      fonts: [
+        { name: 'Poppins', data: poppinsSemi, weight: 600, style: 'normal' },
+        { name: 'Poppins', data: poppinsLight, weight: 200, style: 'normal' },
+        { name: 'Forum', data: forum, weight: 400, style: 'normal' },
+      ],
+    });
+    // Materialise the PNG instead of streaming it (the streamed body fails to
+    // pipe under the production server) and surface render errors as a 500 we
+    // can actually read, rather than an opaque "failed to pipe response".
+    const png = await image.arrayBuffer();
+    return new Response(png, {
+      headers: { 'content-type': 'image/png', 'cache-control': 'no-store' },
+    });
+  } catch (e) {
+    const err = e as { message?: string; stack?: string };
+    console.error('[render] failed:', err?.message, err?.stack);
+    return new Response('render failed', { status: 500 });
+  }
 }

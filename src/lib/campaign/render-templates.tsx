@@ -7,7 +7,7 @@ import { salePercent } from './copy';
 
 function Wordmark({ color, shadow }: { color: string; shadow?: boolean }) {
   return (
-    <div style={{ display: 'flex', fontFamily: 'Poppins', fontWeight: 600, fontSize: 34, letterSpacing: 1, color, textShadow: shadow ? '0 1px 8px rgba(0,0,0,0.5)' : undefined }}>
+    <div style={{ display: 'flex', fontFamily: 'Poppins', fontWeight: 600, fontSize: 34, letterSpacing: 1, color, textShadow: shadow ? '0 1px 8px rgba(0,0,0,0.5)' : 'none' }}>
       Ciaobag
     </div>
   );
@@ -23,7 +23,7 @@ function CtaPill({ label, bg, ink }: { label: string; bg: string; ink: string })
 
 function PriceRow({ spec, color, shadow }: { spec: VariantSpec; color: string; shadow?: boolean }) {
   const pct = salePercent(spec.product);
-  const shadowStyle = shadow ? '0 2px 14px rgba(0,0,0,0.6)' : undefined;
+  const shadowStyle = shadow ? '0 2px 14px rgba(0,0,0,0.6)' : 'none';
   return (
     <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, fontFamily: 'Poppins', color }}>
       {spec.product.compareAtCents && pct ? (
