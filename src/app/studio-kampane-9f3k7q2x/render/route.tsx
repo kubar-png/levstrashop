@@ -29,12 +29,16 @@ function wixResize(url: string, maxPx = 1080): string {
 
 /** Fetch a URL and return a base64 data URI (JPEG). */
 async function toDataUri(url: string): Promise<string> {
-  const res = await fetch(wixResize(url));
-  if (!res.ok) return url; // fall back to original URL on fetch failure
-  const buf = await res.arrayBuffer();
-  const b64 = Buffer.from(buf).toString('base64');
-  const mime = res.headers.get('content-type') ?? 'image/jpeg';
-  return `data:${mime};base64,${b64}`;
+  try {
+    const res = await fetch(wixResize(url));
+    if (!res.ok) return url; // fall back to original URL on fetch failure
+    const buf = await res.arrayBuffer();
+    const b64 = Buffer.from(buf).toString('base64');
+    const mime = res.headers.get('content-type') ?? 'image/jpeg';
+    return `data:${mime};base64,${b64}`;
+  } catch {
+    return url; // network error — degrade to original URL
+  }
 }
 
 /** Pre-fetch all image URLs in the spec and replace with data URIs. */
