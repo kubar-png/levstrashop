@@ -1,6 +1,7 @@
-import type { Archetype, CampaignProduct, Format, Palette, VariantSpec } from './types';
+import type { CampaignProduct, Format, Palette, TemplateId, VariantSpec } from './types';
+import { LIFESTYLE_TEMPLATES } from './types';
 import { LIFESTYLE_BACKGROUNDS, PALETTES } from './assets';
-import { pickHeadline, pickCta, salePercent } from './copy';
+import { pickHeadline, pickCta, pickBenefits, salePercent } from './copy';
 
 // Deterministic PRNG (mulberry32) so a seed reproduces a whole batch.
 function mulberry32(seed: number) {
@@ -14,7 +15,8 @@ function mulberry32(seed: number) {
   };
 }
 
-const ARCHETYPES: Archetype[] = ['lifestyle', 'productOnColor', 'productLifestyle', 'sale'];
+// Templates that show the product photo and work for any product.
+const PRODUCT_TEMPLATES: TemplateId[] = ['banner', 'colorBlock', 'split', 'features', 'statement', 'sale'];
 
 function buildVariant(rng: () => number, products: CampaignProduct[], format: Format, lockProductId?: string): VariantSpec {
   const pick = (n: number) => Math.floor(rng() * n);
@@ -22,26 +24,29 @@ function buildVariant(rng: () => number, products: CampaignProduct[], format: Fo
   const pool = lockProductId ? products.filter((p) => p.id === lockProductId) : products;
   const product = (pool.length ? pool : products)[pick(pool.length ? pool.length : products.length)];
 
-  let archetype = ARCHETYPES[pick(ARCHETYPES.length)];
-  // 'sale' only valid for an on-sale product; otherwise fall back deterministically.
-  if (archetype === 'sale' && salePercent(product) === null) {
-    archetype = (['lifestyle', 'productOnColor', 'productLifestyle'] as Archetype[])[pick(3)];
-  }
+  // Lifestyle templates only when a model photo matches the product's category —
+  // keeps the product on the photo consistent (no handbag model on a suitcase ad).
+  const matchingBgs = LIFESTYLE_BACKGROUNDS.filter((b) => b.category === product.category);
 
-  const usesLifestyle = archetype === 'lifestyle' || archetype === 'productLifestyle';
-  const lifestyleUrl = usesLifestyle && LIFESTYLE_BACKGROUNDS.length
-    ? LIFESTYLE_BACKGROUNDS[pick(LIFESTYLE_BACKGROUNDS.length)]
+  // 'sale' template only for a product that is actually discounted.
+  const productPool = PRODUCT_TEMPLATES.filter((t) => t !== 'sale' || salePercent(product) !== null);
+  const templates = matchingBgs.length > 0 ? [...productPool, ...LIFESTYLE_TEMPLATES] : productPool;
+  const template = templates[pick(templates.length)];
+
+  const lifestyleUrl = LIFESTYLE_TEMPLATES.includes(template)
+    ? matchingBgs[pick(matchingBgs.length)].url
     : undefined;
 
   const palette: Palette = PALETTES[pick(PALETTES.length)];
 
   return {
     format,
-    archetype,
+    template,
     product,
     lifestyleUrl,
-    headline: pickHeadline(archetype, product, pick),
+    headline: pickHeadline(product, pick, { sale: template === 'sale' }),
     cta: pickCta(pick),
+    benefits: pickBenefits(pick, 3),
     palette,
   };
 }

@@ -58,9 +58,10 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const { width, height } = DIMENSIONS[spec.format];
-  const [poppinsSemi, poppinsBold] = await Promise.all([
+  const [poppinsSemi, poppinsBold, forum] = await Promise.all([
     font('Poppins-SemiBold.ttf'),
     font('Poppins-Bold.ttf'),
+    font('Forum-Regular.ttf'),
   ]);
 
   try {
@@ -70,6 +71,7 @@ export async function GET(request: Request): Promise<Response> {
       fonts: [
         { name: 'Poppins', data: poppinsSemi, weight: 600, style: 'normal' },
         { name: 'Poppins', data: poppinsBold, weight: 700, style: 'normal' },
+        { name: 'Forum', data: forum, weight: 400, style: 'normal' },
       ],
     });
     // Materialise the PNG instead of streaming it (the streamed body fails to

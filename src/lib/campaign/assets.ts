@@ -1,14 +1,18 @@
 import type { Palette } from './types';
 
-// Lifestyle / model photography already shipping on the live site.
-// Copy the real URLs from src/app/page.tsx (WIX base + HERO_IMAGES + marinaModel).
-// Extend this array later if a dedicated campaign-photo folder is provided.
+/** A lifestyle/model photo tagged with the product category it suits, so a
+ *  suitcase ad never gets a model holding a handbag (and vice versa). */
+export type Background = { url: string; category: string };
+
+// Model photography already shipping on the live site. These are Marina Galanti
+// fashion / handbag shots, so they're tagged 'Kabelky'. Add suitcase lifestyle
+// photos tagged 'Kufry' here to unlock lifestyle templates for luggage.
 const WIX = 'https://static.wixstatic.com/media';
-export const LIFESTYLE_BACKGROUNDS: string[] = [
-  `${WIX}/f0cf6b_0fb65fabc4d54b149a2b6213e5153e9e~mv2.jpg`, // Marina model
-  `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`, // Hero rotation 1
-  `${WIX}/f0cf6b_29b8ee8366484656828782c7267140df~mv2.jpg`, // Hero rotation 2
-  `${WIX}/f0cf6b_447c2054b701497e93bbfa703008a619~mv2.jpg`, // Hero rotation 3
+export const LIFESTYLE_BACKGROUNDS: Background[] = [
+  { url: `${WIX}/f0cf6b_0fb65fabc4d54b149a2b6213e5153e9e~mv2.jpg`, category: 'Kabelky' }, // Marina model
+  { url: `${WIX}/f0cf6b_510434021b004f2abcfcc53a3a965203~mv2.jpg`, category: 'Kabelky' }, // Hero rotation 1
+  { url: `${WIX}/f0cf6b_29b8ee8366484656828782c7267140df~mv2.jpg`, category: 'Kabelky' }, // Hero rotation 2
+  { url: `${WIX}/f0cf6b_447c2054b701497e93bbfa703008a619~mv2.jpg`, category: 'Kabelky' }, // Hero rotation 3
 ];
 
 // Brand-token combinations. Keep contrast high enough for white/cream text.

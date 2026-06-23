@@ -5,7 +5,19 @@ export const DIMENSIONS: Record<Format, { width: number; height: number }> = {
   '9x16': { width: 1080, height: 1920 },
 };
 
-export type Archetype = 'lifestyle' | 'productOnColor' | 'productLifestyle' | 'sale';
+/** Visual layout templates. The lifestyle ones need a model photo and are only
+ *  used for products whose category matches an available photo. */
+export type TemplateId =
+  | 'banner' // product full-bleed + bottom shade
+  | 'colorBlock' // bold brand colour + product card + big headline
+  | 'split' // product photo top, colour band bottom
+  | 'features' // product + benefit callouts (infographic / USP)
+  | 'statement' // big typographic statement (cedule / message)
+  | 'sale' // bold discount % + strikethrough price
+  | 'lifestyle' // model photo + headline (Kabelky only)
+  | 'lifestyleFeatures'; // model photo + benefit badges (Kabelky only)
+
+export const LIFESTYLE_TEMPLATES: TemplateId[] = ['lifestyle', 'lifestyleFeatures'];
 
 export type Palette = {
   bg: string;
@@ -26,10 +38,11 @@ export type CampaignProduct = {
 
 export type VariantSpec = {
   format: Format;
-  archetype: Archetype;
+  template: TemplateId;
   product: CampaignProduct;
-  lifestyleUrl?: string; // background / secondary photo
+  lifestyleUrl?: string; // model/background photo (lifestyle templates)
   headline: string;
   cta: string;
+  benefits: string[]; // short benefit lines for features / USP templates
   palette: Palette;
 };

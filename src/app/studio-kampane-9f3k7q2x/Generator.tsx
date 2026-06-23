@@ -48,7 +48,7 @@ export default function Generator({ products }: { products: CampaignProduct[] })
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 20, alignItems: 'start' }}>
           {batch.map((spec, i) => {
             const url = `${BASE}?s=${encodeURIComponent(encodeSpec(spec))}`;
-            const name = `ciaobag-${spec.archetype}-${spec.format}-${seed}-${i}.png`;
+            const name = `ciaobag-${spec.template}-${spec.format}-${seed}-${i}.png`;
             return (
               <div key={url} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <img src={url} alt={spec.headline}
