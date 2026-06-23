@@ -15,16 +15,21 @@ async function font(file: string) {
 }
 
 /**
- * Rewrite a Wix media URL to request a downscaled version (max 1080px on longest side).
- * This keeps the SVG payload small enough for resvg's XML parser.
- * Non-Wix URLs are returned as-is.
+ * Normalise an image URL to a render-friendly size: large enough for a crisp
+ * full-bleed image, small enough that resvg's XML parser stays within bounds
+ * (the original 14 MB Wix files overflow it). Handles the two CDNs we use; any
+ * other URL is returned untouched.
  */
-function wixResize(url: string, maxPx = 1080): string {
-  if (!url.includes('wixstatic.com/media/')) return url;
-  // Strip any existing Wix transform suffix and append a resize directive
-  const base = url.replace(/\/v1\/.*$/, '');
-  // Wix requires both w and h; use fit mode (lg) to preserve aspect ratio
-  return `${base}/v1/fill/w_${maxPx},h_${maxPx},al_c,q_80,usm_0.66_1.00_0.01/image.jpg`;
+function resizeImage(url: string, px = 1280): string {
+  if (url.includes('wixstatic.com/media/')) {
+    const base = url.replace(/\/v1\/.*$/, '');
+    return `${base}/v1/fill/w_${px},h_${px},al_c,q_80,usm_0.66_1.00_0.01/image.jpg`;
+  }
+  if (url.includes('cdn.sanity.io/images/')) {
+    // Bump the requested width so the product photo is sharp when it fills the frame.
+    return /[?&]w=\d+/.test(url) ? url.replace(/([?&])w=\d+/, `$1w=${px}`) : `${url}${url.includes('?') ? '&' : '?'}w=${px}`;
+  }
+  return url;
 }
 
 /**
@@ -36,8 +41,8 @@ function wixResize(url: string, maxPx = 1080): string {
 function resizeSpecImages(spec: VariantSpec): VariantSpec {
   return {
     ...spec,
-    lifestyleUrl: spec.lifestyleUrl ? wixResize(spec.lifestyleUrl) : undefined,
-    product: { ...spec.product, imageUrl: wixResize(spec.product.imageUrl) },
+    lifestyleUrl: spec.lifestyleUrl ? resizeImage(spec.lifestyleUrl) : undefined,
+    product: { ...spec.product, imageUrl: resizeImage(spec.product.imageUrl) },
   };
 }
 
@@ -53,10 +58,9 @@ export async function GET(request: Request): Promise<Response> {
   }
 
   const { width, height } = DIMENSIONS[spec.format];
-  const [poppinsSemi, poppinsLight, forum] = await Promise.all([
+  const [poppinsSemi, poppinsBold] = await Promise.all([
     font('Poppins-SemiBold.ttf'),
-    font('Poppins-ExtraLight.ttf'),
-    font('Forum-Regular.ttf'),
+    font('Poppins-Bold.ttf'),
   ]);
 
   try {
@@ -65,8 +69,7 @@ export async function GET(request: Request): Promise<Response> {
       height,
       fonts: [
         { name: 'Poppins', data: poppinsSemi, weight: 600, style: 'normal' },
-        { name: 'Poppins', data: poppinsLight, weight: 200, style: 'normal' },
-        { name: 'Forum', data: forum, weight: 400, style: 'normal' },
+        { name: 'Poppins', data: poppinsBold, weight: 700, style: 'normal' },
       ],
     });
     // Materialise the PNG instead of streaming it (the streamed body fails to
