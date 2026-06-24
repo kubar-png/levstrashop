@@ -48,7 +48,9 @@ function SaleBadge({ pct, bg, ink, big }: { pct: number; bg: string; ink: string
 
 function PriceLine({ spec, color, shadow, size = 48 }: { spec: VariantSpec; color: string; shadow: boolean; size?: number }) {
   const pct = salePercent(spec.product);
-  const ts = shadow ? '0 1px 3px rgba(0,0,0,0.32)' : 'none';
+  // Legibility comes from the photo's bottom gradient, not a glyph shadow.
+  const ts = 'none';
+  void shadow;
   return (
     <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, fontFamily: 'Poppins', color }}>
       {spec.product.compareAtCents && pct ? (
@@ -90,9 +92,10 @@ const WHITE = '#ffffff';
 function PhotoScrims() {
   return (
     <>
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280, display: 'flex', backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0) 100%)' }} />
-      {/* Soft fade behind the text — does the readability work instead of a hard glyph shadow. */}
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '74%', display: 'flex', backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.26) 38%, rgba(0,0,0,0.58) 66%, rgba(0,0,0,0.84) 100%)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 280, display: 'flex', backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0) 100%)' }} />
+      {/* Bottom-up shadow gradient ON THE PHOTO — light but clearly visible, so the
+          copy stays readable without a hard shadow on the letters themselves. */}
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '80%', display: 'flex', backgroundImage: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.16) 32%, rgba(0,0,0,0.5) 62%, rgba(0,0,0,0.9) 100%)' }} />
     </>
   );
 }
@@ -115,12 +118,12 @@ function photoTemplate(ctx: Ctx, bgUrl: string, opts: { bigSale?: boolean; benef
             {spec.benefits.slice(0, 3).map((b, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <Sparkle size={30} color="#e1f861" />
-                <div style={{ display: 'flex', fontFamily: 'Poppins', fontWeight: 600, fontSize: 34, color: WHITE, textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>{b}</div>
+                <div style={{ display: 'flex', fontFamily: 'Poppins', fontWeight: 600, fontSize: 34, color: WHITE, textShadow: 'none' }}>{b}</div>
               </div>
             ))}
           </div>
         ) : null}
-        <div style={{ display: 'flex', fontFamily: 'Poppins', fontWeight: 700, fontSize: tall ? 86 : 72, lineHeight: 1.05, color: WHITE, maxWidth: 920, textShadow: '0 1px 4px rgba(0,0,0,0.32)' }}>
+        <div style={{ display: 'flex', fontFamily: 'Poppins', fontWeight: 700, fontSize: tall ? 86 : 72, lineHeight: 1.05, color: WHITE, maxWidth: 920, textShadow: 'none' }}>
           {spec.headline}
         </div>
         <PriceLine spec={spec} color={WHITE} shadow />
